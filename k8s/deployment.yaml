@@ -1,25 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pethub-uat-deployment
+  name: pethub-deployment
   labels:
-    name: pethub-uat-deployment
-    app: pethub-uat-app
+    name: pethub-deployment
+    app: pethub-be-service
 spec:
   replicas: 2
   selector:
     matchLabels:
-      name: pethub-uat-pod
-      app: pethub-uat-app
+      name: pethub-be-pod
+      app: pethub-be-service
   template:
     metadata:
-      name: pethub-uat-pod
-      labels:
-        name: pethub-uat-pod
-        app: pethub-uat-app
+      labels:  # removed the unnecessary name field
+        name: pethub-be-pod
+        app: pethub-be-service
     spec:
       containers:
-        - name: pethub-uat
+        - name: pethub-be
           image: "614839482597.dkr.ecr.ap-southeast-1.amazonaws.com/test-repository:latest"
           imagePullPolicy: Always
           resources:
@@ -39,10 +38,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pethub-uat-service
+  name: pethub-service
 spec:
   selector:
-    app: pethub-uat-app
+    app: pethub-be-service 
   ports:
     - protocol: TCP
       port: 80
