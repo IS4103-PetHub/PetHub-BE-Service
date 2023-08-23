@@ -1,4 +1,4 @@
-name: Build and Push to ECR
+name: Build and Push to ECR, deploy to EC2
 
 on:
   push:
@@ -34,3 +34,22 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+    - name: Deploy to EC2
+      env:
+        HOST: ec2-54-251-185-5.ap-southeast-1.compute.amazonaws.com # EC2 Public IPv4 DNS
+        USERNAME: ec2-user # default for AWS AMI
+        PEM_FILE: ${{ secrets.EC2_SSH_PRIVATE_KEY }} # Your EC2 SSH private key stored in GitHub secrets
+      run: |
+        # Install SSH client
+        sudo apt-get install -y openssh-client
+
+        # Write the SSH key to a file
+        echo "$PEM_FILE" > private_key.pem
+        chmod 600 private_key.pem
+
+        # SSH and pull the latest image, then run it
+        ssh -o StrictHostKeyChecking=no -i private_key.pem $USERNAME@$HOST << EOF
+          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker stop $(docker ps -q --filter ancestor=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG) || true
+          docker run -d -p 3000:3000 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+EOF
