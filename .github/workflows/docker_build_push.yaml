@@ -4,10 +4,15 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
-  
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    
+    env: # Common environment variables at the job level
+      ECR_REGISTRY: 807334509142.dkr.ecr.ap-southeast-1.amazonaws.com
+      ECR_REPOSITORY: pethub-image-repository
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
     - name: Checkout code
@@ -26,10 +31,6 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to Amazon ECR
-      env:
-        ECR_REGISTRY: 807334509142.dkr.ecr.ap-southeast-1.amazonaws.com
-        ECR_REPOSITORY: pethub-image-repository
-        IMAGE_TAG: ${{ github.sha }} # ensure unique image tag for each build
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -71,4 +72,3 @@ jobs:
           # Run the new image
           docker run -d -p 3000:3000 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         EOF
-
