@@ -48,7 +48,11 @@ jobs:
         chmod 600 private_key.pem
 
         # SSH and pull the latest image, then run it
-        ssh -o StrictHostKeyChecking=no -i private_key.pem $USERNAME@$HOST << EOF
+        ssh -o StrictHostKeyChecking=no -i private_key.pem $USERNAME@$HOST <<EOF
           docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker stop $(docker ps -q --filter ancestor=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG) || true
+          RUNNING_CONTAINER=$(docker ps -q --filter ancestor=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG)
+          if [ "$RUNNING_CONTAINER" != "" ]; then
+              docker stop $RUNNING_CONTAINER
+          fi
           docker run -d -p 3000:3000 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        EOF
