@@ -36,9 +36,11 @@ jobs:
 
     - name: Deploy to EC2
       env:
-        HOST: ec2-54-251-185-5.ap-southeast-1.compute.amazonaws.com # EC2 Public IPv4 DNS
-        USERNAME: ec2-user # default for AWS AMI
-        PEM_FILE: ${{ secrets.EC2_SSH_PRIVATE_KEY }} # Your EC2 SSH private key stored in GitHub secrets
+        HOST: ec2-54-251-185-5.ap-southeast-1.compute.amazonaws.com
+        USERNAME: ec2-user
+        PEM_FILE: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         # Install SSH client
         sudo apt-get install -y openssh-client
@@ -47,12 +49,26 @@ jobs:
         echo "$PEM_FILE" > private_key.pem
         chmod 600 private_key.pem
 
-        # SSH and pull the latest image, then run it
+        # SSH and authenticate, then pull the latest image and run it
         ssh -o StrictHostKeyChecking=no -i private_key.pem $USERNAME@$HOST <<EOF
+          # Set AWS credentials for this session
+          export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+          export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+          # Authenticate to ECR
+          aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+          # Pull the Docker image
+          echo "Pulling image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          # Check if the image is already running and stop it
           RUNNING_CONTAINER=$(docker ps -q --filter ancestor=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG)
           if [ "$RUNNING_CONTAINER" != "" ]; then
               docker stop $RUNNING_CONTAINER
           fi
+
+          # Run the new image
           docker run -d -p 3000:3000 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         EOF
+
