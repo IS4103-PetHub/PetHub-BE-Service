@@ -52,4 +52,3 @@ jobs:
           docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker stop $(docker ps -q --filter ancestor=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG) || true
           docker run -d -p 3000:3000 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-EOF
