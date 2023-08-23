@@ -63,10 +63,10 @@ jobs:
           echo "Pulling image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-          # Check if the image is already running and stop it
-          RUNNING_CONTAINER=$(docker ps -q --filter ancestor=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG)
-          if [ "$RUNNING_CONTAINER" != "" ]; then
-              docker stop $RUNNING_CONTAINER
+          # Check if any container is using port 3000 and stop it
+          PORT_3000_CONTAINER=$(docker ps -q --filter "expose=3000")
+          if [ "$PORT_3000_CONTAINER" != "" ]; then
+              docker stop $PORT_3000_CONTAINER
           fi
 
           # Run the new image
