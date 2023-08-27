@@ -80,9 +80,7 @@ router.get('/petBusiness', async (req, res, next) => {
 /*
 Create Admin Account
 
-TODO [jordan]: password hashing
-
-// NOTE: Not sure if should be doing the create this way using "create:{}"
+NOTE: Not sure if should be doing the create this way using "create:{}"
 Request Body Schema:
 {
   "firstName": "John",
@@ -98,8 +96,17 @@ Request Body Schema:
 */
 router.post('/applicationAdmin', async (req, res, next) => {
   try {
+    const adminPayload = req.body;
+    adminPayload.user.create.password = await hashPassword(adminPayload.user.create.password);
+    if (!isValidEmail(adminPayload.user.create.email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
     const admin = await prisma.applicationAdmin.create({
-      data: req.body,
+      data: adminPayload,
+      include: {
+        user: true,
+      }
     })
 
     res.status(200).json(admin);
@@ -109,12 +116,12 @@ router.post('/applicationAdmin', async (req, res, next) => {
 });
 
 /*
-Create Admin Account
+Create Pet Owner Account
 
 {
   "firstName": "Jordan",
   "lastName": "Doe",
-  "phoneNumber": "12345678",
+  "contactNumber": "12345678",
   "dateOfBirth": "1990-01-15T00:00:00Z", // need to be in iso format
   "user": {
     "create": {
@@ -127,8 +134,23 @@ Create Admin Account
 */
 router.post('/petOwners', async (req, res, next) => {
   try {
+    const petOwnersPayload = req.body;
+    petOwnersPayload.user.create.password = await hashPassword(petOwnersPayload.user.create.password);
+    if (!isValidEmail(petOwnersPayload.user.create.email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+    if (!isValidNumber(petOwnersPayload.contactNumber)) {
+      return res.status(400).json({ message: 'Invalid Contact Number format' });
+    }
+    if (!isValidDate(petOwnersPayload.dateOfBirth)) {
+      return res.status(400).json({ message: 'Invalid Date' });
+    }
+
     const petowners = await prisma.petOwner.create({
-      data: req.body,
+      data: petOwnersPayload,
+      include: {
+        user: true,
+      }
     })
 
     res.status(200).json(petowners);
@@ -157,8 +179,21 @@ Create pet Business Account
 */
 router.post('/petBusiness', async (req, res, next) => {
   try {
+    const petBusinessPayload = req.body;
+    petBusinessPayload.user.create.password = await hashPassword(petBusinessPayload.user.create.password);
+    if (!isValidEmail(petBusinessPayload.user.create.email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+    if (!isValidNumber(petBusinessPayload.contactNumber)) {
+      return res.status(400).json({ message: 'Invalid Contact Number format' });
+    }
+
+
     const petBusiness = await prisma.petBusiness.create({
-      data: req.body,
+      data: petBusinessPayload,
+      include: {
+        user: true,
+      }
     })
 
     res.status(200).json(petBusiness);
@@ -168,3 +203,27 @@ router.post('/petBusiness', async (req, res, next) => {
 });
 
 module.exports = router;
+
+// Helper Functions
+async function hashPassword(password) {
+  return await bcrypt.hash(password, 10)
+}
+
+
+// Validation Functions
+function isValidNumber(number) {
+  return /^\d{8}$/.test(number);
+}
+
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function isValidDate(date) {
+  const parsedDate = new Date(date);
+  if (!isNaN(parsedDate.getTime()) && parsedDate <= new Date()) {
+    return true;
+  }
+  return false;
+}
