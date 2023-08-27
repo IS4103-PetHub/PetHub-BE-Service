@@ -18,7 +18,7 @@ model User {
 
   applicationAdmin ApplicationAdmin?
   petOwner         PetOwner?
-  businessOwner    PetBusiness?
+  petBusiness    PetBusiness?
 }
 
 
@@ -38,7 +38,7 @@ model PetOwner {
   petOwnerId           Int      @id @default(autoincrement())
   firstName    String
   lastName     String
-  phoneNumber  String
+  contactNumber  String
   dateOfBirth  DateTime
   lastUpdated  DateTime @default(now())
   
@@ -49,9 +49,9 @@ model PetOwner {
 model PetBusiness {
   petBusinessId                  Int      @id @default(autoincrement())
   companyName         String
-  uen                 String
-  businessType BusinessType
-  businessDescription String
+  uen                 String?
+  businessType BusinessType?
+  businessDescription String?
   contactNumber String
   lastUpdated  DateTime @default(now())
   // logo                String // TODO: figure out best way to save logos
