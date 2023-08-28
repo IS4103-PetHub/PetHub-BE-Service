@@ -6,6 +6,8 @@ const prisma = new PrismaClient()
 
 const bcrypt = require('bcrypt');
 
+router.use('/users', router);
+
 router.get('/', async (req, res, next) => {
   res.send({ message: 'Ok api is working 🚀' });
 });
@@ -28,7 +30,7 @@ router.get('/users/', async (req, res, next) => {
 /*
 Get the list of all admins
 */
-router.get('/applicationAdmin/', async (req, res, next) => {
+router.get('/application-admin/', async (req, res, next) => {
   try {
     const admins = await prisma.applicationAdmin.findMany({
       include: {
@@ -45,7 +47,7 @@ router.get('/applicationAdmin/', async (req, res, next) => {
 /*
 Get the list of all petowners
 */
-router.get('/petOwners', async (req, res, next) => {
+router.get('/pet-owners', async (req, res, next) => {
   try {
     const petOwners = await prisma.petOwner.findMany({
       include: {
@@ -63,7 +65,7 @@ router.get('/petOwners', async (req, res, next) => {
 /*
 Get the list of all business owner
 */
-router.get('/petBusiness', async (req, res, next) => {
+router.get('/pet-businesses', async (req, res, next) => {
   try {
     const petBusiness = await prisma.petBusiness.findMany({
       include: {
@@ -94,9 +96,12 @@ Request Body Schema:
   }
 }
 */
-router.post('/applicationAdmin', async (req, res, next) => {
+router.post('/application-admins', async (req, res, next) => {
   try {
     const adminPayload = req.body;
+    if (!isValidPassword(adminPayload.user.create.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
     adminPayload.user.create.password = await hashPassword(adminPayload.user.create.password);
     if (!isValidEmail(adminPayload.user.create.email)) {
       return res.status(400).json({ message: 'Invalid email address' });
@@ -109,7 +114,7 @@ router.post('/applicationAdmin', async (req, res, next) => {
       }
     })
 
-    res.status(200).json(admin);
+    res.sendStatus(200);
   } catch (error) {
     next(error)
   }
@@ -132,9 +137,12 @@ Create Pet Owner Account
 }
 
 */
-router.post('/petOwners', async (req, res, next) => {
+router.post('/pet-owners', async (req, res, next) => {
   try {
     const petOwnersPayload = req.body;
+    if (!isValidPassword(petOwnersPayload.user.create.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
     petOwnersPayload.user.create.password = await hashPassword(petOwnersPayload.user.create.password);
     if (!isValidEmail(petOwnersPayload.user.create.email)) {
       return res.status(400).json({ message: 'Invalid email address' });
@@ -153,7 +161,7 @@ router.post('/petOwners', async (req, res, next) => {
       }
     })
 
-    res.status(200).json(petowners);
+    res.sendStatus(200);
   } catch (error) {
     next(error)
   }
@@ -164,9 +172,6 @@ Create pet Business Account
 
 {
   "companyName": "abc company",
-  "uen": "12345wqatg",
-  "businessType": "SERVICE",
-  "businessDescription": "abc company is a company that provides grooming services",
   "contactNumber": "12345678",
   "user": {
     "create": {
@@ -177,9 +182,12 @@ Create pet Business Account
 }
 
 */
-router.post('/petBusiness', async (req, res, next) => {
+router.post('/pet-businesses', async (req, res, next) => {
   try {
     const petBusinessPayload = req.body;
+    if (!isValidPassword(petBusinessPayload.user.create.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
     petBusinessPayload.user.create.password = await hashPassword(petBusinessPayload.user.create.password);
     if (!isValidEmail(petBusinessPayload.user.create.email)) {
       return res.status(400).json({ message: 'Invalid email address' });
@@ -196,7 +204,7 @@ router.post('/petBusiness', async (req, res, next) => {
       }
     })
 
-    res.status(200).json(petBusiness);
+    res.sendStatus(200);
   } catch (error) {
     next(error)
   }
@@ -226,4 +234,9 @@ function isValidDate(date) {
     return true;
   }
   return false;
+}
+
+function isValidPassword(password) {
+  const passwordRegex = /^(?!.* )(?=.*\d)(?=.*[a-z]).{8,}$/;
+  return passwordRegex.test(password)
 }
