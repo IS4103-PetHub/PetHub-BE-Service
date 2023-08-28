@@ -17,6 +17,9 @@ RUN npm install
 # copy the rest of the application to the container
 COPY . .
 
+# Create and apply database migrations in your Prisma prisma/migrations
+RUN npx prisma migrate dev
+
 # Generate the Prisma Client
 RUN npx prisma generate
 
@@ -24,4 +27,4 @@ RUN npx prisma generate
 EXPOSE 3000
 
 # Start application on the container
-CMD ["node", "app.js"]
+CMD ["node", "src/app.js"]
