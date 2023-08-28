@@ -53,6 +53,7 @@ model PetBusiness {
   businessType BusinessType?
   businessDescription String?
   contactNumber String
+  websiteURL String?
   lastUpdated  DateTime @default(now())
   // logo                String // TODO: figure out best way to save logos
 
