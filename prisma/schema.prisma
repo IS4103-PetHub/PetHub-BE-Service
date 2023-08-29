@@ -9,63 +9,67 @@ datasource db {
 
 // Entities
 model User {
-  userId       Int      @id @default(autoincrement())
-  email        String   @unique
-  password     String
+  userId        Int           @id @default(autoincrement())
+  email         String        @unique
+  password      String
+  accountType   AccountType
   accountStatus AccountStatus @default(ACTIVE)
-  dateCreated  DateTime @default(now())
-  lastUpdated  DateTime @default(now())
+  dateCreated   DateTime      @default(now())
+  lastUpdated   DateTime?
 
-  applicationAdmin ApplicationAdmin?
-  petOwner         PetOwner?
-  petBusiness    PetBusiness?
+  // Enforcement of email being associated only with one type of account
+  // must be implemented in your application logic as Prisma does not
+  // support multi-table unique constraints
+  internalUser InternalUser?
+  petOwner     PetOwner?
+  petBusiness  PetBusiness?
 }
 
+model InternalUser {
+  internalUserID Int       @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  adminRole      AdminRole
 
-model ApplicationAdmin {
-  adminId           Int      @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  adminRole AdminRole   
-  lastUpdated  DateTime @default(now())
-  
-  user         User     @relation(fields: [userId], references: [userId])
-  userId       Int @unique
+  user   User @relation(fields: [userId], references: [userId])
+  userId Int  @unique
 }
-
 
 model PetOwner {
-  petOwnerId           Int      @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  contactNumber  String
-  dateOfBirth  DateTime
-  lastUpdated  DateTime @default(now())
-  
-  user         User     @relation(fields: [userId], references: [userId])
-  userId       Int @unique
+  petOwnerId    Int      @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  contactNumber String
+  dateOfBirth   DateTime
+
+  user   User @relation(fields: [userId], references: [userId])
+  userId Int  @unique
 }
 
 model PetBusiness {
-  petBusinessId                  Int      @id @default(autoincrement())
+  petBusinessId       Int           @id @default(autoincrement())
   companyName         String
-  uen                 String?
-  businessType BusinessType?
+  uen                 String
+  businessType        BusinessType?
   businessDescription String?
-  contactNumber String
-  websiteURL String?
-  lastUpdated  DateTime @default(now())
+  contactNumber       String
+  websiteURL          String?
   // logo                String // TODO: figure out best way to save logos
 
-  user                User     @relation(fields: [userId], references: [userId])
-  userId              Int @unique
+  user   User @relation(fields: [userId], references: [userId])
+  userId Int  @unique
 }
-
 
 // enums
 enum AccountStatus {
   ACTIVE
   INACTIVE
+}
+
+enum AccountType {
+  PET_OWNER
+  PET_BUSINESS
+  INTERNAL_USER
 }
 
 enum AdminRole {
