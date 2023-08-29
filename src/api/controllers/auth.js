@@ -12,7 +12,8 @@ module.exports = {
             if (!await AuthHelper.authenticatePassword(password, user.password)) {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-            if ((userType == "applicationAdmin" && !user.applicationAdmin) ||
+            if (!userType || 
+                (userType == "applicationAdmin" && !user.applicationAdmin) ||
                 (userType == "petOwner" && !user.petOwner) ||
                 (userType == "petBusiness" && !user.petBusiness)
             ) {
