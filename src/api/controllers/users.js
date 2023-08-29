@@ -63,7 +63,7 @@ module.exports = {
             if (!await UserValidations.isValidPassword(petOwnerPayload.user.create.password)) {
                 return res.status(400).json({ message: 'Invalid password format' });
             }
-            adminPayload.user.create.password = await UserHelper.hashPassword(petOwnerPayload.user.create.password);
+            petOwnerPayload.user.create.password = await UserHelper.hashPassword(petOwnerPayload.user.create.password);
             if (!await UserValidations.isValidEmail(petOwnerPayload.user.create.email)) {
                 return res.status(400).json({ message: 'Invalid email address' });
             }
@@ -74,7 +74,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Invalid Date' });
             }
 
-            UserService.createPetOwner(petOwnerPayload);
+            await UserService.createPetOwner(petOwnerPayload);
             res.sendStatus(201);
         } catch (error) {
             next(error)
@@ -86,7 +86,7 @@ module.exports = {
             if (!await UserValidations.isValidPassword(petBusinessPayload.user.create.password)) {
                 return res.status(400).json({ message: 'Invalid password format' });
             }
-            adminPayload.user.create.password = await UserHelper.hashPassword(petBusinessPayload.user.create.password);
+            petBusinessPayload.user.create.password = await UserHelper.hashPassword(petBusinessPayload.user.create.password);
             if (!await UserValidations.isValidEmail(petBusinessPayload.user.create.email)) {
                 return res.status(400).json({ message: 'Invalid email address' });
             }
@@ -94,7 +94,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Invalid Contact Number format' });
             }
 
-            UserService.createPetBusiness(petBusinessPayload);
+            await UserService.createPetBusiness(petBusinessPayload);
             res.sendStatus(201);
         } catch (error) {
             next(error)
