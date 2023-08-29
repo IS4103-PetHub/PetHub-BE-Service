@@ -23,6 +23,7 @@ app.get("/", async (req, res, next) => {
 });
 
 app.use("/api", require("api/routes/route.js"));
+app.use("/api", require("api/routes/route.js"));
 
 app.use((req, res, next) => {
   next(createError.NotFound());
