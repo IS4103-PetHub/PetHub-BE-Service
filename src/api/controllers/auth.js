@@ -1,5 +1,6 @@
 const UserService = require('../services/users');
 const AuthHelper = require('../helpers/auth');
+const AuthValidation = require('../validations/auth')
 
 module.exports = {
 
@@ -12,11 +13,7 @@ module.exports = {
             if (!await AuthHelper.authenticatePassword(password, user.password)) {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-            if (!userType || 
-                (userType == "applicationAdmin" && !user.applicationAdmin) ||
-                (userType == "petOwner" && !user.petOwner) ||
-                (userType == "petBusiness" && !user.petBusiness)
-            ) {
+            if (!await AuthValidation.validateUserType(userType, user)) {
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
 
