@@ -21,7 +21,7 @@ const bcrypt = require('bcrypt');
 */
 router.post('/login', async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, userType } = req.body;
         const email = username
         const user = await prisma.user.findUnique({
             where: {
@@ -41,7 +41,13 @@ router.post('/login', async (req, res, next) => {
         if (!passwordMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-
+        // prevent authentication for the different platforms. e.g. petowner cannot login to petbusienss portal
+        if ((userType == "applicationAdmin" && !user.applicationAdmin) || 
+        (userType == "petOwner" && !user.petOwner) || 
+        (userType == "petBusiness" && !user.petBusiness)
+        ) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
 
 
         if (user.applicationAdmin) {
@@ -64,7 +70,7 @@ router.post('/login', async (req, res, next) => {
                 role: "petBusiness",
                 userId: user.userId
             }
-            return res.status(200).json(user.petBusiness);
+            return res.status(200).json(petBusiness);
         } else {
             return res.status(401).json({ message: 'Invalid user type' });
         }
