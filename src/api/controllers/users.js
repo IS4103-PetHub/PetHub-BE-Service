@@ -47,7 +47,6 @@ module.exports = {
                 return res.status(400).json({ message: 'Invalid password format' });
             }
             adminPayload.user.create.password = await UserHelper.hashPassword(adminPayload.user.create.password);
-            console.log(adminPayload)
             if (!await UserValidations.isValidEmail(adminPayload.user.create.email)) {
                 return res.status(400).json({ message: 'Invalid email address' });
             }
