@@ -52,7 +52,7 @@ module.exports = {
             }
 
             const admin = await UserService.createApplicationAdmin(adminPayload);
-            res.sendStatus(200);
+            res.sendStatus(201);
         } catch (error) {
             next(error)
         }
@@ -75,7 +75,7 @@ module.exports = {
             }
 
             UserService.createPetOwner(petOwnerPayload);
-            res.sendStatus(200);
+            res.sendStatus(201);
         } catch (error) {
             next(error)
         }
@@ -95,7 +95,7 @@ module.exports = {
             }
 
             UserService.createPetBusiness(petBusinessPayload);
-            res.sendStatus(200);
+            res.sendStatus(201);
         } catch (error) {
             next(error)
         }
