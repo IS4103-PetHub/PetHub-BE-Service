@@ -1,7 +1,7 @@
 const InternalUserService = require('../services/user/internalUserService');
 const PetOwnerService = require('../services/user/petOwnerService');
 const PetBusinessService = require('../services/user/petBusinessService');
-const UserValidations = require('../validations/users');
+const UserValidations = require('../validations/userValidation');
 const UserHelper = require('../helpers/users');
 
 const services = {
@@ -11,13 +11,17 @@ const services = {
 };
 
 const getServiceByUserType = (req, res) => {
-  const userType = req.path.split('/').slice(-1)[0];  // Take the last segment after splitting
-  const service = services[userType];
-  if (!service) {
-    res.status(400).json({ error: 'Invalid user type' });
-    return null;
+  const userType = req.path.match(/(internal-users|pet-owners|pet-businesses)/);
+  if (userType && userType[0]) {
+    const service = services[userType[0]];
+    if (!service) {
+      res.status(400).json({ error: 'Invalid user type' });
+      return null;
+    }
+    return service;
   }
-  return service;
+  res.status(400).json({ error: 'Invalid user type' });
+  return null;
 };
 
 // Login and Logout
@@ -67,8 +71,8 @@ exports.createUser = async (req, res, next) => {
     console.log(userPayload)
     // Note: Validation for contact number and date of birth
     // can be performed within the specific service.
-    await service.createUser(userPayload);
-    res.sendStatus(201);
+    const userData = await service.createUser(userPayload);
+    res.status(200).json(userData);
   } catch (error) {
     next(error);
   }
@@ -79,12 +83,29 @@ exports.getAllUsers = async (req, res, next) => {
     const service = getServiceByUserType(req, res);
     if (!service) return;
 
-    const users = await service.getAllPetOwners();
+    const users = await service.getAllUsers();
     res.status(200).json(users);
   } catch (error) {
     next(error);
   }
 };
+
+exports.getUserById = async (req, res, next) => {
+  try {
+    const service = getServiceByUserType(req, res);
+    if (!service) return;
+
+    const userId = req.params.id;
+    if (!await UserValidations.isValidNumericID(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
+    const user = await service.getUserById(Number(userId))
+    res.status(200).json(user)
+  } catch (error) {
+    next(error)
+  }
+}
 
 exports.updateUser = async (req, res, next) => {
   try {
@@ -92,9 +113,13 @@ exports.updateUser = async (req, res, next) => {
     if (!service) return;
 
     const userId = req.params.id;
+    if (!await UserValidations.isValidNumericID(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
     const updateData = req.body;
-    await service.updateUser(userId, updateData);
-    res.status(200).json({ message: 'User updated successfully' });
+    await service.updateUser(Number(userId), updateData);
+    res.status(200).json(updateData);
   } catch (error) {
     next(error);
   }
@@ -107,7 +132,11 @@ exports.deleteUser = async (req, res, next) => {
     if (!service) return;
 
     const userId = req.params.id;
-    await service.deleteUser(userId);
+    if (!await UserValidations.isValidNumericID(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
+    await service.deleteUser(Number(userId));
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     next(error);

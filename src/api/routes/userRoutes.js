@@ -11,7 +11,7 @@ router.get('/', async (req, res, next) => {
 function registerRoutes(controller, userType) {
   router.post(`/${userType}`, controller.createUser);
   router.get(`/${userType}`, controller.getAllUsers);
-  // router.get(`/${userType}/:id`, controller.getUserById);
+  router.get(`/${userType}/:id`, controller.getUserById);
   router.put(`/${userType}/:id`, controller.updateUser);
   router.delete(`/${userType}/:id`, controller.deleteUser);
 }
