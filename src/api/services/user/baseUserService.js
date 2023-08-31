@@ -33,6 +33,15 @@ class BaseUserService {
     // TODO: Invalidate token or destroy session here, depending on your setup
     return true;
   }
+
+  removePassword(user) {
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
+  async hashPassword(password) {
+    return await bcrypt.hash(password, 10);
+  }
 }
 
 module.exports = BaseUserService;
