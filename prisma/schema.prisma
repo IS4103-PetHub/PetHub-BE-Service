@@ -26,28 +26,25 @@ model User {
 }
 
 model InternalUser {
-  internalUserID Int       @id @default(autoincrement())
-  firstName      String
-  lastName       String
-  adminRole      AdminRole
+  firstName String
+  lastName  String
+  adminRole AdminRole
 
-  user   User @relation(fields: [userId], references: [userId])
-  userId Int  @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 }
 
 model PetOwner {
-  petOwnerId    Int      @id @default(autoincrement())
   firstName     String
   lastName      String
   contactNumber String
   dateOfBirth   DateTime
 
-  user   User @relation(fields: [userId], references: [userId])
-  userId Int  @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 }
 
 model PetBusiness {
-  petBusinessId       Int           @id @default(autoincrement())
   companyName         String
   uen                 String
   businessType        BusinessType?
@@ -56,8 +53,8 @@ model PetBusiness {
   websiteURL          String?
   // logo                String // TODO: figure out best way to save logos
 
-  user   User @relation(fields: [userId], references: [userId])
-  userId Int  @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 }
 
 // enums
