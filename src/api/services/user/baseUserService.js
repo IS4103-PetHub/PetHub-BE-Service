@@ -21,8 +21,7 @@ class BaseUserService {
 
       // TODO: Generate token or create session here
       // const token = jwt.sign({ userId: user.id }, 'your_secret_key');
-      // return { user, token };
-
+      // return { user, token }; 
       return user;
     } catch (error) {
       console.error("Error during login:", error);
