@@ -1,48 +1,50 @@
-// const UserService = require('../services/users');
-// const AuthHelper = require('../helpers/auth');
-// const AuthValidation = require('../validations/auth')
+const EmailService = require('../services/eamilService');
+const AuthHelper = require('../helpers/auth');
+const userValidation = require('../validations/userValidation')
+const UserService = require('../services/user/baseUserService')
 
-module.exports = {
+// For NOW its just checking username and password, will pend for prof response to see how the auth is suppose to be done
+exports.authenticateUser = async (req, res, next) => {
+    try {
+        const { username, password } = req.body;
+        const email = username
+        const service = new UserService()
+        const user = await service.login(email, password);
 
-    authenticateUser: async (req, res, next) => {
-        //     try {
-        //         const { username, password, userType } = req.body;
-        //         const email = username
-        //         const user = await UserService.getUserByEmail(email);
+        res.json(user)
+    } catch (error) {
+        next(error)
+    }
+}
 
-        //         if (!await AuthHelper.authenticatePassword(password, user.password)) {
-        //             return res.status(401).json({ message: 'Invalid credentials' });
-        //         }
-        //         if (!await AuthValidation.validateUserType(userType, user)) {
-        //             return res.status(401).json({ message: 'Invalid credentials' });
-        //         }
 
-        //         if (user.applicationAdmin) {
-        //             const admin = {
-        //                 name: user.applicationAdmin.firstName,
-        //                 role: "applicationAdmin",
-        //                 userId: user.userId
-        //             }
-        //             return res.status(200).json(admin);
-        //         } else if (user.petOwner) {
-        //             const petOwner = {
-        //                 name: user.petOwner.firstName,
-        //                 role: "petOwner",
-        //                 userId: user.userId
-        //             }
-        //             return res.status(200).json(petOwner);
-        //         } else if (user.petBusiness) {
-        //             const petBusiness = {
-        //                 name: user.petBusiness.companyName,
-        //                 role: "petBusiness",
-        //                 userId: user.userId
-        //             }
-        //             return res.status(200).json(petBusiness);
-        //         } else {
-        //             return res.status(401).json({ message: 'Invalid user type' });
-        //         }
-        //     } catch (error) {
-        //         next(error)
-        //     }
+exports.forgetPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!userValidation.isValidEmail(email)) {
+            return res.status(400).json({ message: 'Invalid email address' });
+        }
+        
+        const service = new UserService()
+        const user = await service.verifyEmail(email)
+        
+        const newPassword = AuthHelper.generateNewPassword();
+        await service.resetPassword(user, newPassword);
+
+        const body = `
+            Hello,
+            
+            The password for your pethub account with email ${email} has been reset to "${newPassword}". 
+            Please login with the new password and change it to a new password immediately.
+            
+            Regards,
+            Pethub
+        `;
+
+        await EmailService.sendEmail(email, 'PetHub Forget Password', body)
+
+        res.status(200).json({ message: 'Email sent successfully' });
+    } catch (error) {
+        next(error)
     }
 }
