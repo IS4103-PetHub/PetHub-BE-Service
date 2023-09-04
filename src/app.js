@@ -50,25 +50,6 @@ const swaggerSpec = swaggerJSDoc(options);
 // Serve Swagger UI and API documentation
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
-
-// // Autogen
-// const swaggerAutogen = require('swagger-autogen')();
-
-// const outputFile = './swagger.json';
-// const endpointsFiles = ['./api/routes/*.js'];
-
-// const config = {
-//   info: {
-//       title: 'API Documentation',
-//       description: '',
-//   },
-//   host: 'localhost:3000/api'
-// };
-
-// swaggerAutogen(outputFile, endpointsFiles, config);
-
-// app.use('/autogen/docs', swaggerUi.serve, swaggerUi.setup(require(outputFile), { explorer: true }));
-
 app.use("/api", require('./api/routes/index'));
 
 app.use((req, res, next) => {

@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 
-
 /**
  * @swagger
- * /api/user:
+ * /api/users:
  *   get:
  *     summary: Check API health
  *     description: Check if the user API is working.
@@ -39,55 +38,19 @@ function registerRoutes(controller, userType) {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             properties:
-   *               firstName:
-   *                 type: string
-   *               lastName:
-   *                 type: string
-   *               adminRole:
-   *                 type: string
-   *               email:
-   *                 type: string
-   *               password:
-   *                 type: string
-   *             example:
-   *               firstName: "John1"
-   *               lastName: "Doe1"
-   *               adminRole: "ADMINISTRATOR"
-   *               email: "admin14@example.com"
-   *               password: "password1"
+   *             $ref: '#/definitions/PostInternalUser'
    *     responses:
    *       201:
    *         description: User created successfully
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 userId:
-   *                   type: integer
-   *                   description: The user ID
-   *                 email:
-   *                   type: string
-   *                   description: The user's email
-   *                 accountType:
-   *                   type: string
-   *                   description: The type of user account
-   *                 accountStatus:
-   *                   type: string
-   *                   description: The account status
-   *                 dateCreated:
-   *                   type: string
-   *                   format: date-time
-   *                   description: The date and time when the user was created
-   *                 lastUpdated:
-   *                   type: string
-   *                   format: date-time
-   *                   description: The date and time of the last update (can be null)
+   *               $ref: '#/definitions/UserResponse'
    *     tags:
    *       - Users
    */
+
+
 
   /**
    * @swagger
@@ -101,56 +64,14 @@ function registerRoutes(controller, userType) {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             properties:
-   *               companyName:
-   *                 type: string
-   *               contactNumber:
-   *                 type: string
-   *               uen:
-   *                 type: string
-   *               email:
-   *                 type: string
-   *               password:
-   *                 type: string
-   *               dateOfBirth:
-   *                 type: string
-   *                 format: date-time
-   *             example:
-   *               companyName: "abcd company"
-   *               contactNumber: "12345678"
-   *               uen: "1234568798"
-   *               email: "petBusiness65@example.com"
-   *               password: "password1"
-   *               dateOfBirth: "1990-01-15T00:00:00Z"
+   *             $ref: '#/definitions/PostPetBusiness'
    *     responses:
    *       201:
    *         description: Pet business created successfully
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 userId:
-   *                   type: integer
-   *                   description: The user ID
-   *                 email:
-   *                   type: string
-   *                   description: The user's email
-   *                 accountType:
-   *                   type: string
-   *                   description: The type of user account
-   *                 accountStatus:
-   *                   type: string
-   *                   description: The account status
-   *                 dateCreated:
-   *                   type: string
-   *                   format: date-time
-   *                   description: The date and time when the user was created
-   *                 lastUpdated:
-   *                   type: string
-   *                   format: date-time
-   *                   description: The date and time of the last update (can be null)
+   *               $ref: '#/definitions/UserResponse'
    *     tags:
    *       - Users
    */
@@ -167,55 +88,14 @@ function registerRoutes(controller, userType) {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             properties:
-   *               firstName:
-   *                 type: string
-   *               lastName:
-   *                 type: string
-   *               contactNumber:
-   *                 type: string
-   *               dateOfBirth:
-   *                 type: date
-   *               email:
-   *                 type: string
-   *               password:
-   *                 type: string
-   *             example:
-   *               firstName: "John1"
-   *               lastName: "Doe1"
-   *               contactNumber: "12345678"
-   *               dateOfBirth: "1990-01-15T00:00:00Z"
-   *               email: "petowner@example.com"
-   *               password: "password1"
+   *             $ref: '#/definitions/PostPetOwner'
    *     responses:
    *       201:
    *         description: User created successfully
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 userId:
-   *                   type: integer
-   *                   description: The user ID
-   *                 email:
-   *                   type: string
-   *                   description: The user's email
-   *                 accountType:
-   *                   type: string
-   *                   description: The type of user account
-   *                 accountStatus:
-   *                   type: string
-   *                   description: The account status
-   *                 dateCreated:
-   *                   type: string
-   *                   format: date-time
-   *                   description: The date and time when the user was created
-   *                 lastUpdated:
-   *                   type: string
-   *                   format: date-time
-   *                   description: The date and time of the last update (can be null)
+   *               $ref: '#/definitions/UserResponse'
    *     tags:
    *       - Users
    */
@@ -235,39 +115,7 @@ function registerRoutes(controller, userType) {
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   firstName:
- *                     type: string
- *                   lastName:
- *                     type: string
- *                   adminRole:
- *                     type: string
- *                   userId:
- *                     type: integer
- *                   user:
- *                     type: object
- *                     properties:
- *                       userId:
- *                         type: integer
- *                         description: The user ID
- *                       email:
- *                         type: string
- *                         description: The user's email
- *                       accountType:
- *                         type: string
- *                         description: The type of user account
- *                       accountStatus:
- *                         type: string
- *                         description: The account status
- *                       dateCreated:
- *                         type: string
- *                         format: date-time
- *                         description: The date and time when the user was created
- *                       lastUpdated:
- *                         type: string
- *                         format: date-time
- *                         description: The date and time of the last update (can be null)
+ *                 $ref: '#/definitions/InternalUserResponse'
  *     tags:
  *       - Users
  */
@@ -286,42 +134,7 @@ function registerRoutes(controller, userType) {
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   firstName:
- *                     type: string
- *                   lastName:
- *                     type: string
- *                   contactNumber:
- *                     type: string
- *                   dateOfBirth:
- *                     type: string
- *                     format: date-time
- *                   userId:
- *                     type: integer
- *                   user:
- *                     type: object
- *                     properties:
- *                       userId:
- *                         type: integer
- *                         description: The user ID
- *                       email:
- *                         type: string
- *                         description: The user's email
- *                       accountType:
- *                         type: string
- *                         description: The type of user account
- *                       accountStatus:
- *                         type: string
- *                         description: The account status
- *                       dateCreated:
- *                         type: string
- *                         format: date-time
- *                         description: The date and time when the user was created
- *                       lastUpdated:
- *                         type: string
- *                         format: date-time
- *                         description: The date and time of the last update (can be null)
+ *                 $ref: '#/definitions/PetOwnerResponse'
  *     tags:
  *       - Users
  */
@@ -340,45 +153,7 @@ function registerRoutes(controller, userType) {
    *             schema:
    *               type: array
    *               items:
-   *                 type: object
-   *                 properties:
-   *                   companyName:
-   *                     type: string
-   *                   uen:
-   *                     type: string
-   *                   businessType:
-   *                     type: string
-   *                   businessDescription:
-   *                     type: string
-   *                   contactNumber:
-   *                     type: string
-   *                   websiteURL:
-   *                     type: string
-   *                   userId:
-   *                     type: integer
-   *                   user:
-   *                     type: object
-   *                     properties:
-   *                       userId:
-   *                         type: integer
-   *                         description: The user ID
-   *                       email:
-   *                         type: string
-   *                         description: The user's email
-   *                       accountType:
-   *                         type: string
-   *                         description: The type of user account
-   *                       accountStatus:
-   *                         type: string
-   *                         description: The account status
-   *                       dateCreated:
-   *                         type: string
-   *                         format: date-time
-   *                         description: The date and time when the user was created
-   *                       lastUpdated:
-   *                         type: string
-   *                         format: date-time
-   *                         description: The date and time of the last update (can be null)
+   *                 $ref: '#/definitions/PetBusinessResponse'
    *     tags:
    *       - Users
    */
@@ -402,39 +177,7 @@ function registerRoutes(controller, userType) {
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 firstName:
-   *                   type: string
-   *                 lastName:
-   *                   type: string
-   *                 adminRole:
-   *                   type: string
-   *                 userId:
-   *                   type: integer
-   *                 user:
-   *                   type: object
-   *                   properties:
-   *                     userId:
-   *                       type: integer
-   *                       description: The user ID
-   *                     email:
-   *                       type: string
-   *                       description: The user's email
-   *                     accountType:
-   *                       type: string
-   *                       description: The type of user account
-   *                     accountStatus:
-   *                       type: string
-   *                       description: The account status
-   *                     dateCreated:
-   *                       type: string
-   *                       format: date-time
-   *                       description: The date and time when the user was created
-   *                     lastUpdated:
-   *                       type: string
-   *                       format: date-time
-   *                       description: The date and time of the last update
+   *               $ref: '#/definitions/InternalUserResponse'
    *       404:
    *         description: Internal user not found.
    *     tags:
@@ -460,42 +203,7 @@ function registerRoutes(controller, userType) {
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 firstName:
-   *                   type: string
-   *                 lastName:
-   *                   type: string
-   *                 contactNumber:
-   *                   type: string
-   *                 dateOfBirth:
-   *                   type: string
-   *                   format: date-time
-   *                 userId:
-   *                   type: integer
-   *                 user:
-   *                   type: object
-   *                   properties:
-   *                     userId:
-   *                       type: integer
-   *                       description: The user ID
-   *                     email:
-   *                       type: string
-   *                       description: The user's email
-   *                     accountType:
-   *                       type: string
-   *                       description: The type of user account
-   *                     accountStatus:
-   *                       type: string
-   *                       description: The account status
-   *                     dateCreated:
-   *                       type: string
-   *                       format: date-time
-   *                       description: The date and time when the user was created
-   *                     lastUpdated:
-   *                       type: string
-   *                       format: date-time
-   *                       description: The date and time of the last update
+   *               $ref: '#/definitions/PetOwnerResponse'
    *       404:
    *         description: Pet owner not found.
    *     tags:
@@ -522,45 +230,7 @@ function registerRoutes(controller, userType) {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 companyName:
- *                   type: string
- *                 uen:
- *                   type: string
- *                 businessType:
- *                   type: string
- *                 businessDescription:
- *                   type: string
- *                 contactNumber:
- *                   type: string
- *                 websiteURL:
- *                   type: string
- *                 userId:
- *                   type: integer
- *                 user:
- *                   type: object
- *                   properties:
- *                     userId:
- *                       type: integer
- *                       description: The user ID
- *                     email:
- *                       type: string
- *                       description: The user's email
- *                     accountType:
- *                       type: string
- *                       description: The type of user account
- *                     accountStatus:
- *                       type: string
- *                       description: The account status
- *                     dateCreated:
- *                       type: string
- *                       format: date-time
- *                       description: The date and time when the user was created
- *                     lastUpdated:
- *                       type: string
- *                       format: date-time
- *                       description: The date and time of the last update (can be null)
+ *               $ref: '#/definitions/PetBusinessResponse'
  *       404:
  *         description: Pet business not found.
  *     tags:
@@ -587,38 +257,14 @@ function registerRoutes(controller, userType) {
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               adminRole:
- *                 type: string
- *                 enum:
- *                   - MANAGER
- *                   - ADMINISTRATOR
- *             example:
- *               firstName: "John1"
- *               lastName: "Doe1"
- *               adminRole: "ADMINISTRATOR"
+ *             $ref: '#/definitions/PutInternalUser'
  *     responses:
  *       200:
  *         description: Internal user updated successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 firstName:
- *                   type: string
- *                   description: The updated first name
- *                 lastName:
- *                   type: string
- *                   description: The updated last name
- *                 adminRole:
- *                   type: string
- *                   description: The updated admin role
+ *               $ref: '#/definitions/PutInternalUser'
  *       404:
  *         description: Internal user not found.
  *     tags:
@@ -643,43 +289,14 @@ function registerRoutes(controller, userType) {
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               contactNumber:
- *                 type: string
- *               dateOfBirth:
- *                 type: string
- *                 format: date-time
- *             example:
- *               firstName: "John1"
- *               lastName: "Doe1"
- *               contactNumber: "12345678"
- *               dateOfBirth: "1990-01-15T00:00:00Z"
+ *             $ref: '#/definitions/PutPetOwner'
  *     responses:
  *       200:
  *         description: Pet owner updated successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 firstName:
- *                   type: string
- *                   description: The updated first name
- *                 lastName:
- *                   type: string
- *                   description: The updated last name
- *                 contactNumber:
- *                   type: string
- *                   description: The updated contact number
- *                 dateOfBirth:
- *                   type: string
- *                   format: date-time
- *                   description: The updated date of birth
+ *               $ref: '#/definitions/PutPetOwner'
  *       404:
  *         description: Pet owner not found.
  *     tags:
@@ -705,57 +322,14 @@ function registerRoutes(controller, userType) {
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               companyName:
- *                 type: string
- *               uen:
- *                 type: string
- *               businessType:
- *                 type: string
- *                 enum:
- *                   - FNB
- *                   - SERVICES
- *                   - HEALTHCARE
- *               businessDescription:
- *                 type: string
- *               contactNumber:
- *                 type: string
- *               websiteURL:
- *                 type: string
- *             example:
- *               companyName: "abcd company"
- *               uen: "1234568798"
- *               businessType: "SERVICE"
- *               businessDescription: "a pet service company"
- *               contactNumber: "12345678"
- *               websiteURL: "www.abd.com"
+ *             $ref: '#/definitions/PutPetBusiness'
  *     responses:
  *       200:
  *         description: Pet business updated successfully.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 companyName:
- *                   type: string
- *                   description: The updated company name
- *                 uen:
- *                   type: string
- *                   description: The updated UEN
- *                 businessType:
- *                   type: string
- *                   description: The updated business type (FNB, SERVICES, or HEALTHCARE)
- *                 businessDescription:
- *                   type: string
- *                   description: The updated business description
- *                 contactNumber:
- *                   type: string
- *                   description: The updated contact number
- *                 websiteURL:
- *                   type: string
- *                   description: The updated website URL
+ *               $ref: '#/definitions/PutPetBusiness'
  *       404:
  *         description: Pet business not found.
  *     tags:
@@ -861,3 +435,253 @@ registerRoutes(userController, 'pet-owners');
 registerRoutes(userController, 'pet-businesses');
 
 module.exports = router;
+
+/**
+ * @swagger
+ * definitions:
+ *   PostInternalUser:
+ *     type: object
+ *     properties:
+ *       firstName:
+ *         type: string
+ *       lastName:
+ *         type: string
+ *       adminRole:
+ *         type: string
+ *       email:
+ *         type: string
+ *       password:
+ *         type: string
+ *     example:
+ *       firstName: "John1"
+ *       lastName: "Doe1"
+ *       adminRole: "ADMINISTRATOR"
+ *       email: "admin1@example.com"
+ *       password: "password1"
+ *
+ *   PostPetBusiness:
+ *     type: object
+ *     properties:
+ *       companyName:
+ *         type: string
+ *       contactNumber:
+ *         type: string
+ *       uen:
+ *         type: string
+ *       email:
+ *         type: string
+ *       password:
+ *         type: string
+ *       dateOfBirth:
+ *         type: string
+ *         format: date-time
+ *     example:
+ *       companyName: "abcd company"
+ *       contactNumber: "12345678"
+ *       uen: "1234568798"
+ *       email: "petBusiness65@example.com"
+ *       password: "password1"
+ *       dateOfBirth: "1990-01-15T00:00:00Z"
+ * 
+ *   PostPetOwner:
+ *     type: object
+ *     properties:
+ *       firstName:
+ *         type: string
+ *       lastName:
+ *         type: string
+ *       contactNumber:
+ *         type: string
+ *       dateOfBirth:
+ *         type: string
+ *         format: date-time
+ *       email:
+ *         type: string
+ *       password:
+ *         type: string
+ *     example:
+ *       firstName: "John1"
+ *       lastName: "Doe1"
+ *       contactNumber: "12345678"
+ *       dateOfBirth: "1990-01-15T00:00:00Z"
+ *       email: "petowner@example.com"
+ *       password: "password1"
+ * 
+ *   UserResponse:
+ *     type: object
+ *     properties:
+ *       userId:
+ *         type: integer
+ *         description: The user ID
+ *       email:
+ *         type: string
+ *         description: The user's email
+ *       accountType:
+ *         type: string
+ *         description: The type of user account
+ *       accountStatus:
+ *         type: string
+ *         description: The account status
+ *       dateCreated:
+ *         type: string
+ *         format: date-time
+ *         description: The date and time when the user was created
+ *       lastUpdated:
+ *         type: string
+ *         format: date-time
+ *         description: The date and time of the last update (can be null)
+ *
+ *   PetOwnerResponse:
+ *     type: object
+ *     properties:
+ *       firstName:
+ *         type: string
+ *       lastName:
+ *         type: string
+ *       contactNumber:
+ *         type: string
+ *       dateOfBirth:
+ *         type: string
+ *         format: date-time
+ *       userId:
+ *         type: integer
+ *       user:
+ *         $ref: '#/definitions/UserResponse'
+ *     example:
+ *       firstName: "John1"
+ *       lastName: "Doe1"
+ *       contactNumber: "12345678"
+ *       dateOfBirth: "1990-01-15T00:00:00Z"
+ *       userId: 1
+ *       user:
+ *         userId: 1
+ *         email: "petowner@example.com"
+ *         accountType: "Pet Owner"
+ *         accountStatus: "Active"
+ *         dateCreated: "2023-09-04T10:00:00Z"
+ *         lastUpdated: "2023-09-04T10:30:00Z"
+ * 
+ *   InternalUserResponse:
+ *     type: object
+ *     properties:
+ *       firstName:
+ *         type: string
+ *       lastName:
+ *         type: string
+ *       adminRole:
+ *         type: string
+ *       userId:
+ *         type: integer
+ *       user:
+ *         $ref: '#/definitions/UserResponse'
+ *     example:
+ *       firstName: "John1"
+ *       lastName: "Doe1"
+ *       adminRole: "ADMINISTRATOR"
+ *       userId: 1
+ *       user:
+ *         userId: 1
+ *         email: "internaluser@example.com"
+ *         accountType: "Internal User"
+ *         accountStatus: "Active"
+ *         dateCreated: "2023-09-04T10:00:00Z"
+ *         lastUpdated: "2023-09-04T10:30:00Z"
+ * 
+ *   PetBusinessResponse:
+ *     type: object
+ *     properties:
+ *       companyName:
+ *         type: string
+ *       uen:
+ *         type: string
+ *       businessType:
+ *         type: string
+ *       businessDescription:
+ *         type: string
+ *       contactNumber:
+ *         type: string
+ *       websiteURL:
+ *         type: string
+ *       userId:
+ *         type: integer
+ *       user:
+ *         $ref: '#/definitions/UserResponse'
+ *     example:
+ *       companyName: "ABC Pet Services"
+ *       uen: "123456789A"
+ *       businessType: "Pet Grooming"
+ *       businessDescription: "We provide pet grooming services."
+ *       contactNumber: "98765432"
+ *       websiteURL: "https://www.abcpetservices.com"
+ *       userId: 1
+ *       user:
+ *         userId: 1
+ *         email: "petbusiness@example.com"
+ *         accountType: "Pet Business"
+ *         accountStatus: "Active"
+ *         dateCreated: "2023-09-04T10:00:00Z"
+ *         lastUpdated: "2023-09-04T10:30:00Z"
+ * 
+ *   PutInternalUser:
+ *     type: object
+ *     properties:
+ *       firstName:
+ *         type: string
+ *       lastName:
+ *         type: string
+ *       adminRole:
+ *         type: string
+ *         enum:
+ *           - MANAGER
+ *           - ADMINISTRATOR
+ *     example:
+ *       firstName: "John1"
+ *       lastName: "Doe1"
+ *       adminRole: "ADMINISTRATOR"
+ * 
+ *   PutPetOwner:
+ *     type: object
+ *     properties:
+ *       firstName:
+ *         type: string
+ *       lastName:
+ *         type: string
+ *       contactNumber:
+ *         type: string
+ *       dateOfBirth:
+ *         type: string
+ *         format: date-time
+ *     example:
+ *       firstName: "John1"
+ *       lastName: "Doe1"
+ *       contactNumber: "12345678"
+ *       dateOfBirth: "1990-01-15T00:00:00Z"
+ * 
+ *   PutPetBusiness:
+ *     type: object
+ *     properties:
+ *       companyName:
+ *         type: string
+ *       uen:
+ *         type: string
+ *       businessType:
+ *         type: string
+ *         enum:
+ *           - FNB
+ *           - SERVICES
+ *           - HEALTHCARE
+ *       businessDescription:
+ *         type: string
+ *       contactNumber:
+ *         type: string
+ *       websiteURL:
+ *         type: string
+ *     example:
+ *       companyName: "abcd company"
+ *       uen: "1234568798"
+ *       businessType: "SERVICES"
+ *       businessDescription: "Updated pet service company"
+ *       contactNumber: "98765432"
+ *       websiteURL: "www.updatedabcd.com"
+ * 
+ */
