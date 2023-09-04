@@ -17,6 +17,9 @@ RUN npm install
 # copy the rest of the application to the container
 COPY . .
 
+# consolidate all modifications across prisma files and automatically generate a new schema.prisma
+RUN npx prisma-multischema
+
 # Create and apply database migrations in your Prisma prisma/migrations
 RUN npx prisma migrate dev
 

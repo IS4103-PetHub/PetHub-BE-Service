@@ -1,0 +1,22 @@
+// enums
+enum AccountStatus {
+    ACTIVE
+    INACTIVE
+}
+
+enum AccountType {
+    PET_OWNER
+    PET_BUSINESS
+    INTERNAL_USER
+}
+
+enum AdminRole {
+    MANAGER
+    ADMINISTRATOR
+}
+
+enum BusinessType {
+    FNB
+    SERVICE
+    HEALTHCARE
+}
