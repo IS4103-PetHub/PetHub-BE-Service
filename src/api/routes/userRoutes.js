@@ -242,7 +242,7 @@ function registerRoutes(controller, userType) {
   /**
  * @swagger
  * /api/users/internal-users/{id}:
- *   put:
+ *   patch:
  *     summary: Update a specific internal user by ID.
  *     description: Update the details of a specific internal user by their unique ID.
  *     parameters:
@@ -274,7 +274,7 @@ function registerRoutes(controller, userType) {
   /**
  * @swagger
  * /api/users/pet-owners/{id}:
- *   put:
+ *   patch:
  *     summary: Update a specific pet owner by ID.
  *     description: Update the details of a specific pet owner by their unique ID.
  *     parameters:
@@ -307,7 +307,7 @@ function registerRoutes(controller, userType) {
   /**
  * @swagger
  * /api/users/pet-businesses/{id}:
- *   put:
+ *   patch:
  *     summary: Update a specific pet business by ID.
  *     description: Update the details of a specific pet business by their unique ID.
  *     parameters:
@@ -337,7 +337,7 @@ function registerRoutes(controller, userType) {
  */
 
 
-  router.put(`/${userType}/:id`, controller.updateUser);
+  router.patch(`/${userType}/:id`, controller.updateUser);
 
   /**
  * @swagger
@@ -472,16 +472,12 @@ module.exports = router;
  *         type: string
  *       password:
  *         type: string
- *       dateOfBirth:
- *         type: string
- *         format: date-time
  *     example:
  *       companyName: "abcd company"
  *       contactNumber: "12345678"
  *       uen: "1234568798"
  *       email: "petBusiness65@example.com"
  *       password: "password1"
- *       dateOfBirth: "1990-01-15T00:00:00Z"
  * 
  *   PostPetOwner:
  *     type: object
@@ -668,7 +664,7 @@ module.exports = router;
  *         type: string
  *         enum:
  *           - FNB
- *           - SERVICES
+ *           - SERVICE
  *           - HEALTHCARE
  *       businessDescription:
  *         type: string
@@ -679,7 +675,7 @@ module.exports = router;
  *     example:
  *       companyName: "abcd company"
  *       uen: "1234568798"
- *       businessType: "SERVICES"
+ *       businessType: "SERVICE"
  *       businessDescription: "Updated pet service company"
  *       contactNumber: "98765432"
  *       websiteURL: "www.updatedabcd.com"
