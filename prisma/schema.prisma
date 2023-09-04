@@ -81,3 +81,9 @@ model PetBusiness {
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
 }
+
+model ResetPassword {
+  token String @unique
+  expiryDate DateTime
+  email String 
+}

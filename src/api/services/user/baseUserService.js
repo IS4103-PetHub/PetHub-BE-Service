@@ -34,7 +34,7 @@ class BaseUserService {
     return true;
   }
 
-  async verifyEmail(email) {
+  async getUserByEmail(email) {
     try {
       const user = await this.model.findUnique({ where: { email } });
       if (!user) {
@@ -46,17 +46,12 @@ class BaseUserService {
     }
   }
 
-  async resetPassword(user, newPassword) {
+  async resetPassword(email, newPassword) {
     try {
-      const userId = user.userId
       const updatedUser = await prisma.user.update({
-        where: { userId },
+        where: { email },
         data: {
-          email: user.email,
           password: await this.hashPassword(newPassword),
-          accountType: user.accountType,
-          accountStatus: user.accountStatus,
-          dateCreated: user.dateCreated,
           lastUpdated: new Date()
         },
       })

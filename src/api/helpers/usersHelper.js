@@ -1,12 +1,8 @@
-const bcrypt = require('bcrypt');
-
-exports.authenticatePassword = async (inputPassword, password) => {
-    return await bcrypt.compare(inputPassword, password)
-}
+const bcrypt = require('bcryptjs'); // bcrypt for password hashing
 
 
-exports.generateNewPassword = () => {
-    const length = 8;
+exports.generateUniqueToken = () => {
+    const length = 16;
     const numbers = '0123456789'; 
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let password = numbers.charAt(Math.floor(Math.random() * numbers.length));

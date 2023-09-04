@@ -2,7 +2,9 @@ const InternalUserService = require('../services/user/internalUserService');
 const PetOwnerService = require('../services/user/petOwnerService');
 const PetBusinessService = require('../services/user/petBusinessService');
 const UserValidations = require('../validations/userValidation');
-const UserHelper = require('../helpers/users');
+const UserHelper = require('../helpers/usersHelper');
+const EmailService = require('../services/eamilService');
+const PasswordResetService = require('../services/resetPasswordService')
 
 const services = {
   'internal-users': InternalUserService,
@@ -143,3 +145,76 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const service = getServiceByUserType(req, res);
+    if (!service) return;
+
+    const token = req.params.token;
+
+    const { email, newPassword } = req.body;
+    if (!await UserValidations.isValidPassword(newPassword)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+    if (!await UserValidations.isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    const record = await PasswordResetService.getResetPasswordRecord(token)
+    if(record.expiryDate < new Date()) return res.status(401).json({ message: 'Password Reset Token has expired'})
+    
+    await service.resetPassword(email, newPassword);
+    await PasswordResetService.deleteResetPasswordRecord(token);
+    res.status(200).json({ message: "Password Reset successfulyy"})
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const service = getServiceByUserType(req, res);
+    if (!service) return;
+
+    const { email } = req.body;
+    if (!await UserValidations.isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    const user = await service.getUserByEmail(email);
+
+    const token = UserHelper.generateUniqueToken();
+    
+    // TODO: route to main or admin portal
+    const baseurl = (user.accountType == "INTERNAL_USER") ? "http://localhost:3001" : "http://localhost:3002"
+    
+    const link = `${baseurl}/forget-password/${token}`
+    const body = `
+    Hello,
+    
+      We received a request to reset your password for your PetHub account. To reset your password, please click on the link below. This link will expire in 15 minutes for security reasons:
+      
+      Reset Password Link:
+      ${link}
+      
+      If you did not request this password reset, please ignore this email, and your password will remain unchanged.
+      
+      For security reasons, please do not share this link with anyone. 
+
+      Thank you for using PetHub!
+      
+      Regards,
+      Pethub
+    `;
+    
+    // Save the details on the resetpassword table
+    await PasswordResetService.createResetPasswordRecrod(token, email)
+    console.log("token", token)
+
+    // sends email with link
+    await EmailService.sendEmail(email, 'PetHub Forget Password', body)
+    res.status(200).json({ message: "Password Reset Email sent successfulyy"})
+  } catch (error) {
+    next(error)
+  }
+}
