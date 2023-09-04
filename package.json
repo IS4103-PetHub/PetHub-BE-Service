@@ -5,18 +5,23 @@
   "main": "app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "generate-docs": "swagger-jsdoc -d ./swaggerOptions.js -o ./swagger.json"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.2.0",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "http-errors": "^2.0.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "swagger-autogen": "^2.23.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "bcryptjs": "^2.4.3",
