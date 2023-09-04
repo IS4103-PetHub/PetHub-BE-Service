@@ -1,3 +1,5 @@
+//🧩Don't Edit this file.✨Generated in Tue Sep 05 2023 01:41:56 GMT+0800 (GMT+08:00)✨
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -5,6 +7,29 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// enums
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AccountType {
+  PET_OWNER
+  PET_BUSINESS
+  INTERNAL_USER
+}
+
+enum AdminRole {
+  MANAGER
+  ADMINISTRATOR
+}
+
+enum BusinessType {
+  FNB
+  SERVICE
+  HEALTHCARE
 }
 
 // Entities
@@ -55,27 +80,4 @@ model PetBusiness {
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
-}
-
-// enums
-enum AccountStatus {
-  ACTIVE
-  INACTIVE
-}
-
-enum AccountType {
-  PET_OWNER
-  PET_BUSINESS
-  INTERNAL_USER
-}
-
-enum AdminRole {
-  MANAGER
-  ADMINISTRATOR
-}
-
-enum BusinessType {
-  FNB
-  SERVICE
-  HEALTHCARE
 }
