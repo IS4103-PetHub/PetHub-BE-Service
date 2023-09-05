@@ -186,7 +186,7 @@ exports.forgetPassword = async (req, res, next) => {
     
     const link = `${baseurl}/resetpassword?token=${token}`
     const body = `
-    Hello,
+      Hello,
     
       We received a request to reset your password for your PetHub account. To reset your password, please click on the link below. This link will expire in 15 minutes for security reasons:
       
