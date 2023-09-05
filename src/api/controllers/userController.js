@@ -185,7 +185,7 @@ exports.forgetPassword = async (req, res, next) => {
     // TODO: route to main or admin portal
     const baseurl = (user.accountType == "INTERNAL_USER") ? "http://localhost:3001" : "http://localhost:3002"
     
-    const link = `${baseurl}/forget-password/?token=${token}`
+    const link = `${baseurl}/resetpassword?token=${token}`
     const body = `
     Hello,
     
