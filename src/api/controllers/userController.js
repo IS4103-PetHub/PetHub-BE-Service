@@ -152,18 +152,15 @@ exports.resetPassword = async (req, res, next) => {
 
     const token = req.params.token;
 
-    const { email, newPassword } = req.body;
+    const { newPassword } = req.body;
     if (!await UserValidations.isValidPassword(newPassword)) {
       return res.status(400).json({ message: 'Invalid password format' });
-    }
-    if (!await UserValidations.isValidEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email address' });
     }
 
     const record = await PasswordResetService.getResetPasswordRecord(token)
     if(record.expiryDate < new Date()) return res.status(401).json({ message: 'Password Reset Token has expired'})
     
-    await service.resetPassword(email, newPassword);
+    await service.resetPassword(record.email, newPassword);
     await PasswordResetService.deleteResetPasswordRecord(token);
     res.status(200).json({ message: "Password Reset successfulyy"})
   } catch (error) {
@@ -188,7 +185,7 @@ exports.forgetPassword = async (req, res, next) => {
     // TODO: route to main or admin portal
     const baseurl = (user.accountType == "INTERNAL_USER") ? "http://localhost:3001" : "http://localhost:3002"
     
-    const link = `${baseurl}/forget-password/${token}`
+    const link = `${baseurl}/forget-password/?token=${token}`
     const body = `
     Hello,
     
