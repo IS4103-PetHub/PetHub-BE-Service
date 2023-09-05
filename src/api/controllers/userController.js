@@ -4,7 +4,8 @@ const PetBusinessService = require('../services/user/petBusinessService');
 const UserValidations = require('../validations/userValidation');
 const UserHelper = require('../helpers/usersHelper');
 const EmailService = require('../services/eamilService');
-const PasswordResetService = require('../services/resetPasswordService')
+const PasswordResetService = require('../services/resetPasswordService');
+const BaseUserService = require('../services/user/baseUserService')
 
 const services = {
   'internal-users': InternalUserService,
@@ -147,8 +148,7 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
   try {
-    const service = getServiceByUserType(req, res);
-    if (!service) return;
+    const service = new BaseUserService();
 
     const token = req.params.token;
 
@@ -157,8 +157,8 @@ exports.resetPassword = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid password format' });
     }
 
-    const record = await PasswordResetService.getResetPasswordRecord(token)
-    if(record.expiryDate < new Date()) return res.status(401).json({ message: 'Password Reset Token has expired'})
+    const record = await PasswordResetService.getResetPasswordRecord(token);
+    if(record.expiryDate < new Date()) return res.status(401).json({ message: 'Password Reset Token has expired'});
     
     await service.resetPassword(record.email, newPassword);
     await PasswordResetService.deleteResetPasswordRecord(token);
@@ -170,8 +170,7 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.forgetPassword = async (req, res, next) => {
   try {
-    const service = getServiceByUserType(req, res);
-    if (!service) return;
+    const service = new BaseUserService();
 
     const { email } = req.body;
     if (!await UserValidations.isValidEmail(email)) {
