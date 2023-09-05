@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Tue Sep 05 2023 01:41:56 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Tue Sep 05 2023 23:04:57 GMT+0800 (GMT+08:00)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -80,4 +80,10 @@ model PetBusiness {
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
+}
+
+model ResetPassword {
+  token      String   @unique
+  expiryDate DateTime
+  email      String
 }

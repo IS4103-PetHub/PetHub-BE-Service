@@ -427,6 +427,8 @@ function registerRoutes(controller, userType) {
  */
 
   router.delete(`/${userType}/:id`, controller.deleteUser);
+  router.post(`/forget-password`, controller.forgetPassword);
+  router.post(`/reset-password/:token`, controller.resetPassword);
 }
 
 // Register routes for each user type
