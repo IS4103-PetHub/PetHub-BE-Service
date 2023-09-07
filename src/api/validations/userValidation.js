@@ -2,6 +2,10 @@ exports.isValidNumber = async (number) => {
     return /^\d{8}$/.test(number);
 };
 
+exports.isValidUEN = async (uen) => {
+    return /^.{8,9}[A-Z]$/.test(uen)
+}
+
 exports.isValidEmail = async (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);

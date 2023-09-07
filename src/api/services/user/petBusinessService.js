@@ -3,6 +3,7 @@ const prisma = require('../../../../prisma/prisma');
 const { AccountType, AccountStatus } = require('@prisma/client');
 const UserError = require('../../errors/userError');
 const CustomError = require('../../errors/customError');
+const validations = require('../../validations')
 
 // Shared selection fields
 const petBusinessSelectFields = {
@@ -33,6 +34,11 @@ class PetBusinessService extends BaseUserService {
     async createUser(data) {
         try {
             const hashedPassword = await this.hashPassword(data.password);
+
+            if (!await validations.isValidUEN(data.uen)) {
+                throw new CustomError('Invalid UEN Format', 400)
+            }
+
             const user = await prisma.user.create({
                 data: {
                     email: data.email,
