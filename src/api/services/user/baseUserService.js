@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs'); // bcrypt for password hashing
 // const jwt = require('jsonwebtoken'); // TODO: use JWTs for authentication
 const prisma = require('../../../../prisma/prisma');
+const UserError = require('../../errors/userError')
+const CustomError = require('../../errors/customError')
 
 class BaseUserService {
   constructor() {
@@ -37,12 +39,12 @@ class BaseUserService {
   async getUserByEmail(email) {
     try {
       const user = await this.model.findUnique({ where: { email } });
-      if (!user) {
-        throw new Error('User not found');
-      }
+      if (!user) throw new CustomError('User not found', 404);
       return user
     } catch (error) {
-      throw error;
+      if (error instanceof CustomError) throw error;
+      console.error("Error fetching user by email:", error);
+      throw new UserError(error);
     }
   }
 
@@ -56,9 +58,11 @@ class BaseUserService {
         },
       })
       if (!updatedUser) throw new CustomError('User not found', 404);
-      console.log(`Password successfuly reset to ${newPassword}`)
+      console.log(`Password successfuly reset`)
     } catch (error) {
-      throw error;
+      if (error instanceof CustomError) throw error;
+      console.error("Error resetting password:", error);
+      throw new UserError(error);
     }
   }
 
@@ -72,4 +76,7 @@ class BaseUserService {
   }
 }
 
-module.exports = BaseUserService;
+module.exports = {
+  BaseUserService,
+  baseUserServiceInstance: new BaseUserService()
+};

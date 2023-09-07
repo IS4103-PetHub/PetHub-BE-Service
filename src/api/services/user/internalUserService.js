@@ -1,4 +1,4 @@
-const BaseUserService = require('./baseUserService');
+const { BaseUserService } = require('./baseUserService');
 const prisma = require('../../../../prisma/prisma');
 const { AccountType, AccountStatus } = require('@prisma/client');
 const UserError = require('../../errors/userError')

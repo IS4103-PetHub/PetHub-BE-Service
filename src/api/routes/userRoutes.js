@@ -427,8 +427,89 @@ function registerRoutes(controller, userType) {
  */
 
   router.delete(`/${userType}/:id`, controller.deleteUser);
+
+  /**
+* @swagger
+* /api/users/forget-password:
+*   post:
+*     summary: User forget password and wants to reset reset the password
+*     description: Sends a reset password link to the email.
+*     requestBody:
+*       description: Email details
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/post-forget-password'
+*     responses:
+*       201:
+*         description: forget password email sent successfully
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/post-forget-password-response'
+*     tags:
+*       - Users
+*/
   router.post(`/forget-password`, controller.forgetPassword);
-  router.post(`/reset-password/:token`, controller.resetPassword);
+
+/**
+* @swagger
+* /api/users/reset-password/{token}:
+*   post:
+*     summary: User forget password and wants to reset reset the password via reset password token
+*     description: Resets the password for the user
+*     parameters:
+*       - name: token
+*         in: path
+*         description: Token of the reset-password record.
+*         required: true
+*         type: string
+*     requestBody:
+*       description: new passowrd details
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/post-reset-password-with-token'
+*     responses:
+*       201:
+*         description: reset password successful
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/post-reset-password-response'
+*     tags:
+*       - Users
+*/
+  router.post(`/reset-password/:token`, controller.resetPasswordFromEmail);
+
+
+/**
+* @swagger
+* /api/users/change-password:
+*   post:
+*     summary: User wants to change their password
+*     description: Change password for user
+*     requestBody:
+*       description: Authorization details and new password
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/post-change-password'
+*     responses:
+*       201:
+*         description: Change password successful
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/post-change-password-response'
+*     tags:
+*       - Users
+*/
+  router.post(`/change-password`, controller.changePassword)
+  router.post(`/${userType}/login`, controller.loginUser);
 }
 
 // Register routes for each user type
@@ -681,5 +762,59 @@ module.exports = router;
  *       businessDescription: "Updated pet service company"
  *       contactNumber: "98765432"
  *       websiteURL: "www.updatedabcd.com"
+ * 
+ *   post-forget-password:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *     example:
+ *       email: "abc@example.com"
+ * 
+ *   post-forget-password-response:
+ *     type: object
+ *     properties:
+ *       message:
+ *         type: string
+ *     example:
+ *       message: "Password Reset Email sent successfully"
+ * 
+ *   post-reset-password-with-token:
+ *     type: object
+ *     properties:
+ *       newPassword:
+ *         type: string
+ *     example:
+ *       newPassword: "password123"
+ * 
+ *   post-reset-password-response:
+ *     type: object
+ *     properties:
+ *       message:
+ *         type: string
+ *     example:
+ *       message: "Password Reset successfully"
+ * 
+ *   post-change-password:
+ *     type: object
+ *     properties:
+ *       email:
+ *         type: string
+ *       password:
+ *         type: string
+ *       newPassword:
+ *         type: string
+ *     example:
+ *       email: "abc@example.com"
+ *       password: "password1"
+ *       newPassword: "password123"
+ * 
+ *   post-change-password-response:
+ *     type: object
+ *     properties:
+ *       message:
+ *         type: string
+ *     example:
+ *       message: "Change Password successfully"
  * 
  */
