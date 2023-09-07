@@ -76,4 +76,7 @@ class BaseUserService {
   }
 }
 
-module.exports = new BaseUserService();
+module.exports = {
+  BaseUserService,
+  baseUserServiceInstance: new BaseUserService()
+};

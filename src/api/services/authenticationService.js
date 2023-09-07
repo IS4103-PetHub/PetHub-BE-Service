@@ -2,7 +2,7 @@ const prisma = require('../../../prisma/prisma');
 const CustomError = require('../errors/customError');
 const emailTemplate = require('../resource/emailTemplate');
 const RESET_PASSWORD_EXPIRY_TIME = 15 * 60 * 1000; // 15 Minutes
-const BaseUserService = require('./user/baseUserService')
+const { baseUserServiceInstance } = require('./user/baseUserService');
 
 
 class AuthenticationService {
@@ -13,7 +13,7 @@ class AuthenticationService {
                 throw new CustomError('Password Reset Token has expired', 401);
             }
 
-            await BaseUserService.resetPassword(record.email, newPassword);
+            await baseUserServiceInstance.resetPassword(record.email, newPassword);
             await this.deleteResetPasswordRecord(token);
         } catch (error) {
             if (error instanceof CustomError || error instanceof UserError) throw error; // rethrow error
@@ -24,7 +24,7 @@ class AuthenticationService {
 
     async handleForgetPassword(email) {
         try {
-            const user = await BaseUserService.getUserByEmail(email);
+            const user = await baseUserServiceInstance.getUserByEmail(email);
             const accountType = user.accountType
 
             const token = UserHelper.generateUniqueToken();
