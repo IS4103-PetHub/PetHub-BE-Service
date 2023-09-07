@@ -3,6 +3,8 @@ const PetOwnerService = require('../services/user/petOwnerService');
 const PetBusinessService = require('../services/user/petBusinessService');
 const UserValidations = require('../validations/userValidation');
 const AuthenticationService = require('../services/authenticationService');
+const CustomError = require('../errors/customError');
+const baseUserService = require('../services/user/baseUserService');
 
 const services = {
   'internal-users': InternalUserService,
@@ -139,7 +141,7 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-exports.resetPassword = async (req, res, next) => {
+exports.resetPasswordFromEmail = async (req, res, next) => {
   try {
     const token = req.params.token;
     const { newPassword } = req.body;
@@ -158,7 +160,7 @@ exports.forgetPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!await UserValidations.isValidEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email address' });
+      return new CustomError('Invalid email address', 400)
     }
 
     await AuthenticationService.handleForgetPassword(email);
@@ -167,3 +169,17 @@ exports.forgetPassword = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { email, password, newPassword } = req.body;
+    if (!await UserValidations.isValidPassword(newPassword) || !await UserValidations.isValidPassword(newPassword)) throw new CustomError('Invalid password format', 400);
+    if (!await UserValidations.isValidEmail(email)) return new CustomError('Invalid email address', 400)
+
+    await baseUserService.baseUserServiceInstance.login(email, password)
+    await baseUserService.baseUserServiceInstance.resetPassword(email, newPassword)
+    res.status(200).json({ message: "Change Password successfullyy" });
+  } catch (error) {
+    next(error)
+  }
+}

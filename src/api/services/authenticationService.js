@@ -1,9 +1,11 @@
 const prisma = require('../../../prisma/prisma');
+const UserError = require('../errors/userError')
 const CustomError = require('../errors/customError');
+const UserHelper = require('../helpers/usersHelper')
 const emailTemplate = require('../resource/emailTemplate');
 const RESET_PASSWORD_EXPIRY_TIME = 15 * 60 * 1000; // 15 Minutes
 const { baseUserServiceInstance } = require('./user/baseUserService');
-
+const EmailService = require('../services/emailService')
 
 class AuthenticationService {
     async handleResetPassword(token, newPassword) {
@@ -64,6 +66,18 @@ class AuthenticationService {
             });
         } catch (error) {
             throw error;
+        }
+    }
+
+    async getResetPasswordRecord(token) {
+        try {
+            const record  = await prisma.resetPassword.findUnique({
+                where: {token}
+            })
+            if(!record) throw new CustomError('Rest Password Record Not found', 404);
+            return record
+        } catch (error) {
+            throw error
         }
     }
 }
