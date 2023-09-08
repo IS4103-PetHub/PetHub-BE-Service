@@ -8,10 +8,12 @@ router.get('/', async (req, res, next) => {
 
 // Import route modules
 const userRoutes = require('./userRoutes');
+const rbacRoutes = require('./rbacRoutes');
 const authRoutes = require('./auth');
 
 // Use route modules
 router.use('/users', userRoutes);
+router.use('/rbac', rbacRoutes);
 router.use('/', authRoutes);
 
 module.exports = router;

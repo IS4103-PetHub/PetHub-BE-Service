@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Tue Sep 05 2023 23:04:57 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Thu Sep 07 2023 21:51:21 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -32,6 +32,47 @@ enum BusinessType {
   HEALTHCARE
 }
 
+// models for Role Based Access Control (RBAC)
+// UserGroup: Represents user groups in your system.
+// Permission: Represents the permissions that can be granted to user groups.
+// UserGroupMembership: Links a User to a UserGroup. Represents the many-to-many relationship between Users and UserGroups.
+// UserGroupPermission: Links a UserGroup to a Permission. Represents the many-to-many relationship between UserGroups and Permissions.
+
+model UserGroup {
+  groupId                Int                   @id @default(autoincrement())
+  name                   String                @unique
+  description            String?
+  user_group_memberships UserGroupMembership[]
+  user_group_permissions UserGroupPermission[]
+}
+
+model Permission {
+  permissionId        Int                   @id @default(autoincrement())
+  name                String                @unique
+  description         String
+  endpoint            String
+  method              String
+  UserGroupPermission UserGroupPermission[]
+}
+
+model UserGroupMembership {
+  user      User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userGroup UserGroup @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+  userId    Int
+  groupId   Int
+
+  @@id([userId, groupId])
+}
+
+model UserGroupPermission {
+  userGroup    UserGroup  @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [permissionId], onDelete: Cascade)
+  groupId      Int
+  permissionId Int
+
+  @@id([groupId, permissionId])
+}
+
 // Entities
 model User {
   userId        Int           @id @default(autoincrement())
@@ -45,9 +86,10 @@ model User {
   // Enforcement of email being associated only with one type of account
   // must be implemented in your application logic as Prisma does not
   // support multi-table unique constraints
-  internalUser InternalUser?
-  petOwner     PetOwner?
-  petBusiness  PetBusiness?
+  internalUser        InternalUser?
+  petOwner            PetOwner?
+  petBusiness         PetBusiness?
+  UserGroupMembership UserGroupMembership[]
 }
 
 model InternalUser {
