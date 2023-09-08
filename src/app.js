@@ -36,7 +36,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ['src/api/resource/swagger/*.js'],
+  apis: ['src/api/resource/swagger/*.js', 'src/api/resource/swagger/*.yaml'],
   servers: [
     {
       url: 'http://localhost:3000',

@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Sep 07 2023 21:51:21 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Sep 08 2023 14:39:37 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -48,7 +48,8 @@ model UserGroup {
 
 model Permission {
   permissionId        Int                   @id @default(autoincrement())
-  name                String                @unique
+  code                String                @unique
+  name                String
   description         String
   endpoint            String
   method              String

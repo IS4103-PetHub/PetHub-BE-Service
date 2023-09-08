@@ -13,7 +13,7 @@ exports.createUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid payload. Both name and description must be valid.' });
         }
         const userGroupData = await userGroupService.createUserGroup(userGroupPayload);
-        res.status(200).json(userGroupData);
+        res.status(201).json(userGroupData);
     } catch (error) {
         next(error);
     }
@@ -114,7 +114,7 @@ exports.attachPermissionToUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid Permission IDs Format' });
         }
 
-        const permissions = await rbacService.attachPermissionToUserGroup(userGroupId, permissionIds);
+        const permissions = await rbacService.attachPermissionToUserGroup(Number(userGroupId), permissionIds);
         res.status(200).json(permissions);
     } catch (error) {
         next(error);
@@ -134,7 +134,7 @@ exports.detachPermissionFromUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid Permission IDs Format' });
         }
 
-        const permissions = await rbacService.detachPermissionFromUserGroup(userGroupId, permissionIds);
+        const permissions = await rbacService.detachPermissionFromUserGroup(Number(userGroupId), permissionIds);
         res.status(200).json(permissions);
     } catch (error) {
         next(error);
@@ -159,15 +159,13 @@ exports.getUserGroupPermissions = async (req, res, next) => {
 // Add a User to a User Group
 exports.addUserToUserGroup = async (req, res, next) => {
     try {
-
-
         const { id, userId } = req.params;
 
         if (!await validations.isValidNumericID(id) || !await validations.isValidNumericID(userId)) {
             return res.status(400).json({ message: 'Invalid ID Format' });
         }
 
-        await rbacService.addUserToUserGroup(userId, id);
+        await rbacService.addUserToUserGroup(Number(userId), Number(id));
 
         res.status(200).json({ message: 'User added to user group successfully' });
     } catch (error) {
@@ -184,7 +182,7 @@ exports.removeUserFromUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid ID Format' });
         }
 
-        await rbacService.removeUserFromUserGroup(userId, id);
+        await rbacService.removeUserFromUserGroup(Number(userId), Number(id));
 
         res.status(200).json({ message: 'User removed from user group successfully' });
     } catch (error) {
@@ -201,7 +199,7 @@ exports.getUserPermissions = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid ID Format' });
         }
 
-        const permissions = await rbacService.getUserPermissions(userId);
+        const permissions = await rbacService.getUserPermissions(Number(userId));
 
         res.status(200).json(permissions);
     } catch (error) {

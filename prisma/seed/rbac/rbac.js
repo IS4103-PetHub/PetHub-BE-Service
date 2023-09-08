@@ -29,7 +29,7 @@ async function seedRBAC(prisma) {
     // Seed permissions
     for (const permission of permissions) {
         await prisma.permission.upsert({
-            where: { name: permission.name },
+            where: { code: permission.code },
             update: {},
             create: permission
         });

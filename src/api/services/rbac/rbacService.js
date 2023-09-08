@@ -1,101 +1,82 @@
 // src/api/domain/rbacService.js
 
 const prisma = require('../../../../prisma/prisma');
+const internalUserService = require('../user/internalUserService')
 const CustomError = require('../../errors/customError');
 const RbacError = require('../../errors/rbacError');
+const UserError = require('../../errors/userError');
 
 class RbacService {
 
     constructor() { }
 
     async attachPermissionToUserGroup(groupId, permissionIds) {
-        try {
-            const transactions = [];
-            const failedPermissions = [];
+        const failedPermissionIds = [];
 
-            permissionIds.forEach(permissionId => {
-                transactions.push(prisma.userGroupPermission.create({
-                    data: {
-                        groupId: groupId,
-                        permissionId: permissionId
+        try {
+            const existingPermissions = await this.getUserGroupPermissions(groupId);
+            const existingPermissionIds = existingPermissions.map((entry) => entry.permissionId);
+
+            await prisma.$transaction(async (prismaClient) => {
+                for (const permissionId of permissionIds) {
+                    if (!existingPermissionIds.includes(permissionId)) {
+                        try {
+                            await prismaClient.userGroupPermission.create({
+                                data: {
+                                    groupId: groupId,
+                                    permissionId: permissionId,
+                                },
+                            });
+                        } catch (error) {
+                            failedPermissionIds.push(permissionId);
+                        }
                     }
-                }).catch(error => {
-                    if (error.code === 'P2002') {  // Unique constraint error (association already exists)
-                        console.error("Error attaching individual permission to user group - Permissions already attached to specified group:", error);
-                        failedPermissions.push({
-                            permissionId,
-                            reason: 'Permissions already attached to specified group'
-                        });
-                    } else if (error.code === 'P2003') {  // Foreign key constraint error (permissionId doesn't exist)
-                        console.error("Error attaching individual permission to user group - Permission doesn't exist:", error);
-                        failedPermissions.push({
-                            permissionId,
-                            reason: 'Permission doesn\'t exist'
-                        });
-                    } else {
-                        console.error("Unknown error attaching individual permission to user group:", error);
-                    }
-                }));
+                }
             });
 
-            await Promise.all(transactions);
-
-            if (failedPermissions.length > 0) {
-                throw new CustomError(`Failed to attach permissions. Details: ${JSON.stringify(failedPermissions)}`, 400);
+            if (failedPermissionIds.length > 0) {
+                throw new CustomError(`Failed to attach permissions for permission IDs: ${failedPermissionIds.join(', ')}.`, 400);
             }
 
             return await this.getUserGroupPermissions(groupId);
         } catch (error) {
             if (error instanceof CustomError) throw error;
             console.error("Error in attachPermissionToUserGroup:", error);
-            throw new RbacError("Failed to attach permissions due to an unexpected error", 500);
+            throw new CustomError("Failed to attach permissions due to an unexpected error", 500);
         }
     }
 
 
     async detachPermissionFromUserGroup(groupId, permissionIds) {
+        const failedPermissionIds = [];
+
         try {
-            const transactions = [];
-            const failedPermissions = [];
+            await prisma.$transaction(async (prismaClient) => {
+                for (const permissionId of permissionIds) {
+                    try {
+                        await prismaClient.userGroupPermission.delete({
+                            where: {
+                                groupId_permissionId: {
+                                    groupId: groupId,
+                                    permissionId: permissionId
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        failedPermissionIds.push(permissionId);
+                    }
+                }
 
-            permissionIds.forEach(permissionId => {
-                transactions.push(prisma.userGroupPermission.delete({
-                    where: {
-                        groupId_permissionId: {
-                            groupId: groupId,
-                            permissionId: permissionId
-                        }
-                    }
-                }).catch(error => {
-                    if (error.code === 'P2025') {  // Error code for "Record does not exist"
-                        console.error("Error detaching individual permission from user group - Permission not attached to specified group:", error);
-                        failedPermissions.push({
-                            permissionId,
-                            reason: 'Permission not attached to specified group'
-                        });
-                    } else if (error.code === 'P2003') {  // Foreign key constraint error (permissionId doesn't exist)
-                        console.error("Error detaching individual permission from user group - Permission doesn't exist:", error);
-                        failedPermissions.push({
-                            permissionId,
-                            reason: 'Permission doesn\'t exist'
-                        });
-                    } else {
-                        console.error("Unknown error detaching individual permission from user group:", error);
-                    }
-                }));
+                if (failedPermissionIds.length > 0) {
+                    throw new CustomError(`Failed to attach permissions for permission IDs: ${failedPermissionIds.join(', ')}.`, 400);
+                }
             });
-
-            await Promise.all(transactions);
-
-            if (failedPermissions.length > 0) {
-                throw new CustomError(`Failed to detach permissions. Details: ${JSON.stringify(failedPermissions)}`, 400);
-            }
 
             return await this.getUserGroupPermissions(groupId);
         } catch (error) {
             if (error instanceof CustomError) throw error;
             console.error("Error in detachPermissionFromUserGroup:", error);
-            throw new RbacError("Failed to detach permissions due to an unexpected error", 500);
+            throw new CustomError("Failed to detach permissions due to an unexpected error", 500);
         }
     }
 
@@ -128,12 +109,14 @@ class RbacService {
         } catch (error) {
             if (error instanceof CustomError) throw error;
             console.error("Error fetching permissions for user group:", error);
-            throw new RbacError("Error fetching permissions for user group", 500);
+            throw new CustomError("Error fetching permissions for user group", 500);
         }
     }
 
     async addUserToUserGroup(userId, groupId) {
         try {
+            // Ensure that the user is an internal user
+            // await internalUserService.getUserById(userId)
             await prisma.userGroupMembership.create({
                 data: {
                     userId: userId,
@@ -141,8 +124,9 @@ class RbacService {
                 }
             });
         } catch (error) {
+            // if (error instanceof CustomError || error instanceof UserError) throw error;
             console.error("Error adding user to user group:", error);
-            throw new RbacError("Failed to add user to user group due to an unexpected error", 500);
+            throw new RbacError(error);
         }
     }
 
@@ -158,7 +142,7 @@ class RbacService {
             });
         } catch (error) {
             console.error("Error removing user from user group:", error);
-            throw new RbacError("Failed to remove user from user group due to an unexpected error", 500);
+            throw new RbacError(error);
         }
     }
 
@@ -193,7 +177,7 @@ class RbacService {
             return [...permissionsSet];
         } catch (error) {
             console.error("Error fetching user permissions:", error);
-            throw new RbacError("Failed to fetch user permissions due to an unexpected error", 500);
+            throw new CustomError("Failed to fetch user permissions due to an unexpected error", 500);
         }
     }
 
