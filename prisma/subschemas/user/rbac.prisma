@@ -19,8 +19,6 @@ model Permission {
     code                String                @unique
     name                String
     description         String
-    endpoint            String
-    method              String
     UserGroupPermission UserGroupPermission[]
 }
 
