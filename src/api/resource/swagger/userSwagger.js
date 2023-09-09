@@ -408,7 +408,7 @@
 *       - Users
 */
 
-  /**
+/**
 * @swagger
 * /api/users/forget-password:
 *   post:

@@ -1,0 +1,321 @@
+swagger: '2.0'
+definitions:
+  UserGroupRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The unique name of the user group.
+      description:
+        type: string
+        description: An optional description for the user group.
+        
+  UserGroupResponse:
+    type: object
+    properties:
+      groupId:
+        type: integer
+        description: The unique identifier of the user group.
+      name:
+        type: string
+        description: The unique name of the user group.
+      description:
+        type: string
+        description: An optional description for the user group.
+
+  PermissionResponse:
+    type: object
+    properties:
+      permissionId:
+        type: integer
+        description: The unique identifier of the permission.
+      code:
+        type: string
+        description: A unique code representing the permission.
+      name:
+        type: string
+        description: The name of the permission.
+      description:
+        type: string
+        description: A description for the permission.
+      endpoint:
+        type: string
+        description: The endpoint to which this permission relates.
+      method:
+        type: string
+        description: The HTTP method (e.g., GET, POST) for the permission.
+
+  ErrorMessage:
+    type: object
+    properties:
+      message:
+        type: string
+
+responses:
+  InvalidPayload:
+    description: Invalid payload format
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/ErrorMessage'
+        examples:
+          example1:
+            value:
+              message: "The provided payload is not valid."
+            
+  InvalidIdFormat:
+    description: Invalid ID format
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/ErrorMessage'
+        examples:
+          example1:
+            value:
+              message: "The provided ID is not in a valid format."
+
+  NotFound:
+    description: User group not found
+    content:
+      application/json:
+        schema:
+          $ref: '#/definitions/ErrorMessage'
+        examples:
+          example1:
+            value:
+              message: "User group with the given ID was not found."
+
+paths:
+  /api/rbac:
+    get:
+      summary: Test endpoint to check if the RBAC API is working
+      responses:
+        200:
+          description: API is working
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups:
+    post:
+      summary: Create a new user group
+      requestBody:
+        description: User group details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/UserGroupRequest'
+      responses:
+        201:
+          description: User group created successfully
+          schema:
+            $ref: '#/definitions/UserGroupResponse'
+      tags:
+        - RBAC
+    get:
+      summary: Retrieve all user groups
+      responses:
+        200:
+          description: An array of user groups
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserGroupResponse'
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}:
+    get:
+      summary: Retrieve a user group by ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the user group to retrieve.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User group details
+          schema:
+            $ref: '#/definitions/UserGroupResponse'
+      tags:
+        - RBAC
+    patch:
+      summary: Update a user group by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      requestBody:
+        description: User group details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/UserGroupRequest'
+      responses:
+        200:
+          description: Updated user group details
+          schema:
+            $ref: '#/definitions/UserGroupResponse'
+      tags:
+        - RBAC
+    delete:
+      summary: Delete a user group by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User group deleted successfully
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}/attach-permission:
+    post:
+      summary: Attach permission to a user group
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      requestBody:
+        description: Permission IDs to attach to the user group.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: Attached permissions
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}/detach-permission:
+    post:
+      summary: Detach permission from a user group
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      requestBody:
+        description: Permission IDs to detach from the user group.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: Detached permissions
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}/permissions:
+    get:
+      summary: Get permissions of a user group by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: List of permissions for the user group
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}/add-user/{userId}:
+    post:
+      summary: Add a user to a user group
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+        - in: path
+          name: userId
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User added to user group successfully
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}/remove-user/{userId}:
+    post:
+      summary: Remove a user from a user group
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+        - in: path
+          name: userId
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User removed from user group successfully
+      tags:
+        - RBAC
+
+  /api/rbac/users/{userId}/permissions:
+    get:
+      summary: Get permissions of a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: integer
+      responses:
+        200:
+          description: List of permissions for the user
+      tags:
+        - RBAC
+
+  /api/rbac/permissions:
+    get:
+      summary: Retrieve all permissions
+      responses:
+        200:
+          description: An array of permissions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PermissionResponse'
+      tags:
+        - RBAC
+
+  /api/rbac/permissions/{id}:
+    get:
+      summary: Retrieve a permission by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Permission details
+          schema:
+            $ref: '#/definitions/PermissionResponse'
+      tags:
+        - RBAC
+

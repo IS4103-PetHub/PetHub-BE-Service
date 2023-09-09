@@ -1,5 +1,5 @@
 import {AccountType, AdminRole, AccountStatus, BusinessType} from "../enums/accountEnums"
-
+import {UserGroupMembership} from "./rbac"
 // Entities
 model User {
     userId        Int           @id @default(autoincrement())
@@ -13,9 +13,10 @@ model User {
     // Enforcement of email being associated only with one type of account
     // must be implemented in your application logic as Prisma does not
     // support multi-table unique constraints
-    internalUser InternalUser?
-    petOwner     PetOwner?
-    petBusiness  PetBusiness?
+    internalUser        InternalUser?
+    petOwner            PetOwner?
+    petBusiness         PetBusiness?
+    UserGroupMembership UserGroupMembership[]
 }
 
 model InternalUser {

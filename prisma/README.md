@@ -37,6 +37,8 @@ To sync Prisma schema with direct changes in the database
 ```prisma db pull```
 This aligns your Prisma schema with your database schema.
 
+#### Manually Seed DB
+```prisma db seed```
 
 ## More information in our documentation:
 - Prisma: https://pris.ly/d/getting-started
