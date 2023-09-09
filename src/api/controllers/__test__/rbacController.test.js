@@ -44,7 +44,7 @@ describe('RBAC Controller', () => {
         userGroupService.createUserGroup.mockResolvedValue({ id: 1, name: 'Test Group', description: 'Test Description' });
 
         await createUserGroup(req, res, next);
-        expect(res.statusCode).toBe(200);
+        expect(res.statusCode).toBe(201);
         expect(res.body).toEqual({ id: 1, name: 'Test Group', description: 'Test Description' });
     });
 
