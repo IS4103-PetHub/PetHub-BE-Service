@@ -54,8 +54,8 @@ exports.updateUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid payload. Provide a valid name or description.' });
         }
 
-        const updatedDate = await userGroupService.updateUserGroup(Number(userGroupId), updateData);
-        res.status(200).json(updatedDate);
+        const updatedData = await userGroupService.updateUserGroup(Number(userGroupId), updateData);
+        res.status(200).json(updatedData);
     } catch (error) {
         next(error);
     }
