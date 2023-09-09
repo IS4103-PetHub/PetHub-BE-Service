@@ -23,7 +23,7 @@ const permissions = [
 // Root Administrator User Data
 const rootAdminData = {
     email: 'rootadmin@pethub.com',
-    password: 'password',
+    password: 'password123',
     firstName: 'Root',
     lastName: 'Administrator',
     adminRole: 'ADMINISTRATOR',

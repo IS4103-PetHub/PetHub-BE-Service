@@ -124,6 +124,7 @@ class PetBusinessService extends BaseUserService {
             throw new UserError(error);
         }
     }
+
 }
 
 module.exports = new PetBusinessService();
