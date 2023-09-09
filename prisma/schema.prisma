@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sat Sep 09 2023 11:29:12 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Sep 10 2023 00:42:50 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -39,11 +39,11 @@ enum BusinessType {
 // UserGroupPermission: Links a UserGroup to a Permission. Represents the many-to-many relationship between UserGroups and Permissions.
 
 model UserGroup {
-  groupId                Int                   @id @default(autoincrement())
-  name                   String                @unique
-  description            String?
-  user_group_memberships UserGroupMembership[]
-  user_group_permissions UserGroupPermission[]
+  groupId              Int                   @id @default(autoincrement())
+  name                 String                @unique
+  description          String?
+  userGroupMemberships UserGroupMembership[]
+  userGroupPermissions UserGroupPermission[]
 }
 
 model Permission {

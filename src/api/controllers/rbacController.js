@@ -110,7 +110,7 @@ exports.attachPermissionToUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid User Group ID Format' });
         }
 
-        if (!Array.isArray(permissionIds) || !permissionIds.every(validations.isValidNumericID)) {
+        if (!Array.isArray(permissionIds) || ! await permissionIds.every(validations.isValidNumericID)) {
             return res.status(400).json({ message: 'Invalid Permission IDs Format' });
         }
 
@@ -130,7 +130,7 @@ exports.detachPermissionFromUserGroup = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid User Group ID Format' });
         }
 
-        if (!Array.isArray(permissionIds) || !permissionIds.every(validations.isValidNumericID)) {
+        if (!Array.isArray(permissionIds) || ! await permissionIds.every(validations.isValidNumericID)) {
             return res.status(400).json({ message: 'Invalid Permission IDs Format' });
         }
 
