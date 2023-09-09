@@ -486,6 +486,63 @@
 *       - Users
 */
 
+/**
+* @swagger
+* /api/users/{id}/activate-user:
+*   patch:
+*     summary: User wants to activate their account
+*     description: Activate user account
+*     parameters:
+*       - name: id
+*         in: path
+*         description: id of the user to activate.
+*         required: true
+*         type: integer
+*     requestBody:
+*       description: Authorization details
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/patch-de-activate-user'
+*     responses:
+*       200:
+*         description: User activated successfully
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/UserResponse'
+*     tags:
+*       - Users
+
+* /api/users/{id}/deactivate-user:
+*   patch:
+*     summary: User wants to deactivate their account
+*     description: Deactivate user account
+*     parameters:
+*       - name: id
+*         in: path
+*         description: id of the user to deactivate.
+*         required: true
+*         type: integer
+*     requestBody:
+*       description: Authorization details
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/patch-de-activate-user'
+*     responses:
+*       200:
+*         description: User deactivated successfully
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/UserResponse'
+*     tags:
+*       - Users
+*/
+
 
 /**
  * @swagger
@@ -785,4 +842,12 @@
  *     example:
  *       message: "Change Password successfully"
  * 
+ *   patch-de-activate-user:
+ *     type: object
+ *     properties:
+ *       password:
+ *         type: string
+ *       description: The user's password for authentication.
+ *     example:
+ *       password: "password1"
  */

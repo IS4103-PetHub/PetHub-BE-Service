@@ -124,6 +124,61 @@ class PetBusinessService extends BaseUserService {
             throw new UserError(error);
         }
     }
+
+    async activateUser(userId, data) {
+        try {
+            const user = await this.getUserById(userId)
+
+            if (!data || !await validations.isValidPassword(data.password)) {
+                throw new CustomError("Invalid password format", 400);
+            }
+
+            if (this.hashPassword(data.password) != user.password) {
+                throw new CustomError("Unable to activate account. Wrong password", 400);
+            }
+
+            const updatedUser = await prisma.petBusiness.update({
+                where: { userId },
+                data: {
+                    accountStatus: AccountStatus.ACTIVE
+                },
+            });
+
+            return this.removePassword(updatedUser);
+        } catch (error) {
+            if (error instanceof CustomError || error instanceof UserError) throw error;
+            console.error("Error during user activation:", error);
+            throw new UserError(error);
+        }
+    }
+
+    async deactivateUser(userId, data) {
+        try {
+            const user = await this.getUserById(userId)
+
+            if (!data || !await validations.isValidPassword(data.password)) {
+                throw new CustomError("Invalid password format", 400);
+            }
+
+            if (this.hashPassword(data.password) != user.password) {
+                throw new CustomError("Unable to activate account. Wrong password", 400);
+            }
+
+            const updatedUser = await prisma.petBusiness.update({
+                where: { userId },
+                data: {
+                    accountStatus: AccountStatus.INACTIVE
+                },
+            });
+
+            return this.removePassword(updatedUser);
+        } catch (error) {
+            if (error instanceof CustomError || error instanceof UserError) throw error;
+            console.error("Error during user activation:", error);
+            throw new UserError(error);
+        }
+    }
+
 }
 
 module.exports = new PetBusinessService();
