@@ -167,7 +167,6 @@ class BaseUserService {
   }
 
   async activateUser(userId, password) {
-    console.log("DEBUG GGGGGGG: ", password)
     return this.handleUserStatusChange(userId, password, AccountStatus.ACTIVE);
   }
 
