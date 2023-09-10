@@ -1,9 +1,11 @@
-const InternalUserService = require("../services/user/internalUserService");
-const PetOwnerService = require("../services/user/petOwnerService");
-const PetBusinessService = require("../services/user/petBusinessService");
-const UserValidations = require("../validations/userValidation");
+const InternalUserService = require('../services/user/internalUserService');
+const PetOwnerService = require('../services/user/petOwnerService');
+const PetBusinessService = require('../services/user/petBusinessService');
+const UserValidations = require('../validations/userValidation');
 const BaseValidations = require("../validations/baseValidation");
-const UserHelper = require("../helpers/users");
+const AuthenticationService = require('../services/authenticationService');
+const CustomError = require('../errors/customError');
+const { baseUserServiceInstance } = require('../services/user/baseUserService');
 
 const services = {
   "internal-users": InternalUserService,
@@ -15,11 +17,7 @@ const getServiceByUserType = (req, res) => {
   const userType = req.path.match(/(internal-users|pet-owners|pet-businesses)/);
   if (userType && userType[0]) {
     const service = services[userType[0]];
-    if (!service) {
-      res.status(400).json({ error: "Invalid user type" });
-      return null;
-    }
-    return service;
+    if (service) return service;
   }
   res.status(400).json({ error: "Invalid user type" });
   return null;
@@ -137,6 +135,191 @@ exports.deleteUser = async (req, res, next) => {
 
     await service.deleteUser(Number(userId));
     res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/*
+***************************************************************************
+ * COMMON USER FUNCTIONS
+**************************************************************************
+*/
+exports.resetPasswordFromEmail = async (req, res, next) => {
+  try {
+    const token = req.params.token;
+    const { newPassword } = req.body;
+    if (!await UserValidations.isValidPassword(newPassword)) {
+      throw new CustomError('Invalid password format', 400);
+    }
+
+    await AuthenticationService.handleResetPassword(token, newPassword);
+    res.status(200).json({ message: "Password Reset successfully" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!await UserValidations.isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    await AuthenticationService.handleForgetPassword(email);
+    res.status(200).json({ message: "Password Reset Email sent successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { email, password, newPassword } = req.body;
+    if (!await UserValidations.isValidPassword(newPassword) || !await UserValidations.isValidPassword(newPassword)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+
+    if (!await UserValidations.isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    await baseUserServiceInstance.login(email, password)
+    await baseUserServiceInstance.resetPassword(email, newPassword)
+    res.status(200).json({ message: "Change Password successfullyy" });
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.activateUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    if (!await BaseValidations.isValidNumber(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
+    const activateUserPayload = req.body;
+    if (!activateUserPayload || !await UserValidations.isValidPassword(activateUserPayload.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+
+    await baseUserServiceInstance.activateUser(Number(userId), activateUserPayload.password);
+    res.status(200).json({ message: 'User activated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deactivateUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    if (!await BaseValidations.isValidNumber(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
+    const deactivateUserPayload = req.body;
+
+    if (!deactivateUserPayload || !await UserValidations.isValidPassword(deactivateUserPayload.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+
+    await baseUserServiceInstance.deactivateUser(Number(userId), deactivateUserPayload.password);
+    res.status(200).json({ message: 'User deactivated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/*
+***************************************************************************
+ * COMMON USER FUNCTIONS
+**************************************************************************
+*/
+exports.resetPasswordFromEmail = async (req, res, next) => {
+  try {
+    const token = req.params.token;
+    const { newPassword } = req.body;
+    if (!await UserValidations.isValidPassword(newPassword)) {
+      throw new CustomError('Invalid password format', 400);
+    }
+
+    await AuthenticationService.handleResetPassword(token, newPassword);
+    res.status(200).json({ message: "Password Reset successfully" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!await UserValidations.isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    await AuthenticationService.handleForgetPassword(email);
+    res.status(200).json({ message: "Password Reset Email sent successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { email, password, newPassword } = req.body;
+    if (!await UserValidations.isValidPassword(newPassword) || !await UserValidations.isValidPassword(newPassword)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+
+    if (!await UserValidations.isValidEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    await baseUserServiceInstance.login(email, password)
+    await baseUserServiceInstance.resetPassword(email, newPassword)
+    res.status(200).json({ message: "Change Password successfullyy" });
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.activateUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    if (!await BaseValidations.isValidNumber(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
+    const activateUserPayload = req.body;
+    if (!activateUserPayload || !await UserValidations.isValidPassword(activateUserPayload.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+
+    await baseUserServiceInstance.activateUser(Number(userId), activateUserPayload.password);
+    res.status(200).json({ message: 'User activated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deactivateUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    if (!await BaseValidations.isValidNumber(userId)) {
+      return res.status(400).json({ message: 'Invalid ID Format' });
+    }
+
+    const deactivateUserPayload = req.body;
+
+    if (!deactivateUserPayload || !await UserValidations.isValidPassword(deactivateUserPayload.password)) {
+      return res.status(400).json({ message: 'Invalid password format' });
+    }
+
+    await baseUserServiceInstance.deactivateUser(Number(userId), deactivateUserPayload.password);
+    res.status(200).json({ message: 'User deactivated successfully' });
   } catch (error) {
     next(error);
   }

@@ -1,0 +1,58 @@
+import {AccountType, AdminRole, AccountStatus, BusinessType} from "../enums/accountEnums"
+import {UserGroupMembership} from "./rbac"
+// Entities
+model User {
+    userId        Int           @id @default(autoincrement())
+    email         String        @unique
+    password      String
+    accountType   AccountType
+    accountStatus AccountStatus @default(ACTIVE)
+    dateCreated   DateTime      @default(now())
+    lastUpdated   DateTime?
+
+    // Enforcement of email being associated only with one type of account
+    // must be implemented in your application logic as Prisma does not
+    // support multi-table unique constraints
+    internalUser        InternalUser?
+    petOwner            PetOwner?
+    petBusiness         PetBusiness?
+    UserGroupMembership UserGroupMembership[]
+}
+
+model InternalUser {
+    firstName String
+    lastName  String
+    adminRole AdminRole
+
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    userId Int  @id @unique
+}
+
+model PetOwner {
+    firstName     String
+    lastName      String
+    contactNumber String
+    dateOfBirth   DateTime
+
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    userId Int  @id @unique
+}
+
+model PetBusiness {
+    companyName         String
+    uen                 String
+    businessType        BusinessType?
+    businessDescription String?
+    contactNumber       String
+    websiteURL          String?
+    // logo                String // TODO: figure out best way to save logos
+
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    userId Int  @id @unique
+}
+
+model ResetPassword {
+  token String @unique
+  expiryDate DateTime
+  email String 
+}

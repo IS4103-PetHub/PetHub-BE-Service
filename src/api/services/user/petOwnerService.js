@@ -1,4 +1,4 @@
-const BaseUserService = require('./baseUserService');
+const { BaseUserService } = require('./baseUserService');
 const prisma = require('../../../../prisma/prisma');
 const { AccountType, AccountStatus } = require('@prisma/client');
 const UserError = require('../../errors/userError');
@@ -37,7 +37,7 @@ class PetOwnerService extends BaseUserService {
                     email: data.email,
                     password: hashedPassword,
                     accountType: AccountType.PET_OWNER,
-                    accountStatus: AccountStatus.INACTIVE,
+                    accountStatus: AccountStatus.ACTIVE,
                     petOwner: {
                         create: {
                             firstName: data.firstName,

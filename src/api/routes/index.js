@@ -10,12 +10,14 @@ router.get("/", async (req, res, next) => {
 const userRoutes = require("./userRoutes");
 const serviceListingRoutes = require("./serviceListing");
 const adminRoutes = require("./admin");
+const rbacRoutes = require('./rbacRoutes');
 const authRoutes = require("./auth");
 
 // Use route modules
 router.use("/users", userRoutes);
 router.use("/serviceListing", serviceListingRoutes);
 router.use("/admin", adminRoutes);
+router.use('/rbac', rbacRoutes);
 router.use("/", authRoutes);
 
 module.exports = router;
