@@ -20,9 +20,6 @@ class ServiceListingError extends CustomError {
       }
 
       statusCode = 404;
-    } else if (error.code === "P2002" && error.meta?.target?.includes("name")) {
-      message = "Duplicated tag name!";
-      statusCode = 400;
     }
     super(message, statusCode);
   }

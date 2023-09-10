@@ -14,7 +14,7 @@ const petBusinesses = [
   {
     id: 2,
     email: "jane.smith@example.com",
-    password: "pass12345", // Updated to meet criteria
+    password: "pass12345", 
     companyName: "Smith's Pet Shop",
     uen: "987654321",
     contactNumber: "5551234",
@@ -22,7 +22,7 @@ const petBusinesses = [
   {
     id: 3,
     email: "mike.petbiz@example.com",
-    password: "secure1234", // Updated to meet criteria
+    password: "secure1234", 
     companyName: "Mike's Pet Business",
     uen: "1122334455",
     contactNumber: "12345678",
@@ -30,7 +30,7 @@ const petBusinesses = [
   {
     id: 4,
     email: "susan.animalstore@example.com",
-    password: "mypets123", // Updated to meet criteria
+    password: "mypets123", 
     companyName: "Susan's Animal Store",
     uen: "987654321",
     contactNumber: "98765432",
@@ -38,7 +38,7 @@ const petBusinesses = [
   {
     id: 5,
     email: "petstore123@example.com",
-    password: "pets12345", // Updated to meet criteria
+    password: "pets12345", 
     companyName: "PetStore123",
     uen: "9988776655",
     contactNumber: "99999999",
