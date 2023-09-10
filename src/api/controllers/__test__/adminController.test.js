@@ -4,11 +4,11 @@ const {
   getTagById,
   getAllTags,
   deleteTag,
-} = require("./adminController");
+} = require("../adminController");
 const { Response } = require("jest-express/lib/response");
 const { Request } = require("jest-express/lib/request");
-const TagService = require("../services/admin/tagService");
-const constants = require("../../constants/common");
+const TagService = require("../../services/admin/tagService");
+const constants = require("../../../constants/common");
 const errorMessages = constants.errorMessages;
 
 // Mocks
@@ -16,7 +16,7 @@ const mockDateCreated = new Date();
 const mockDateUpdated = new Date(mockDateCreated.getTime() + 1000); // 1 second later
 const mockError = new Error("TagService error");
 
-jest.mock("../services/admin/tagService.js");
+jest.mock("../../services/admin/tagService.js");
 let req, res, next;
 
 beforeEach(() => {

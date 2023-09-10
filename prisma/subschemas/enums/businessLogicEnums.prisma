@@ -1,0 +1,7 @@
+enum Category {
+  PET_GROOMING
+  DINING
+  VETERINARY
+  PET_RETAIL
+  PET_BOARDING
+}

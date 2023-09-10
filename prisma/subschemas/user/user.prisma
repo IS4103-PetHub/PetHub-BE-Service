@@ -1,5 +1,6 @@
 import {AccountType, AdminRole, AccountStatus, BusinessType} from "../enums/accountEnums"
 import {UserGroupMembership} from "./rbac"
+import {ServiceListing} from "../serviceListing/serviceListing"
 // Entities
 model User {
     userId        Int           @id @default(autoincrement())
@@ -45,6 +46,7 @@ model PetBusiness {
     businessDescription String?
     contactNumber       String
     websiteURL          String?
+    serviceListings ServiceListing[]
     // logo                String // TODO: figure out best way to save logos
 
     user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
