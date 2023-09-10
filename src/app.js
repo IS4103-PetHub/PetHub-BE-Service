@@ -49,7 +49,6 @@ const swaggerSpec = swaggerJSDoc(options);
 
 // Serve Swagger UI and API documentation
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
-
 app.use("/api", require('./api/routes/index'));
 
 app.use((req, res, next) => {

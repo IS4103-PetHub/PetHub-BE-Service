@@ -1,0 +1,317 @@
+swagger: '2.0'
+definitions:
+  TagIds:
+    type: array
+    items:
+      type: integer
+    example: [1, 2, 3]
+
+  ServiceListingRequest:
+    type: object
+    properties:
+      title:
+        type: string
+        description: The title of the service listing.
+      description:
+        type: string
+        description: The description of the service listing.
+      petBusinessId:
+        type: string
+        description: The unique identifier of the pet business associated with this service listing.
+      category:
+        type: string
+        description: The category of the service listing.
+      basePrice:
+        type: string
+        description: The base price of the service listing.
+      tagIds:
+        type: string
+        description: TagIds to attach to this service listing
+    example:
+      title: "I love to groom for dogs!"
+      description: "I love pets"
+      petBusinessId: "3"
+      category: "PET_GROOMING"
+      basePrice: "40"
+      tagIds: "1, 2"
+
+  ServiceListingResponse:
+    type: object
+    properties:
+      serviceListingId:
+        type: integer
+        description: The unique identifier of the service listing.
+      title:
+        type: string
+        description: The title of the service listing.
+      description:
+        type: string
+        description: The description of the service listing.
+      basePrice:
+        type: number
+        description: The base price of the service listing.
+      dateCreated:
+        type: string
+        format: date-time
+        description: The date and time when the service listing was created.
+      lastUpdated:
+        type: string
+        format: date-time
+        description: The date and time of the last update (can be null).
+      category:
+        type: string
+        description: The category of the service listing.
+      petBusinessId:
+        type: integer
+        description: The unique identifier of the pet business associated with this service listing.
+      tags:
+        type: array
+        items:
+          type: object
+          properties:
+            tagId:
+              type: integer
+              description: The unique identifier of the tag.
+            name:
+              type: string
+              description: The name of the tag.
+            dateCreated:
+              type: string
+              format: date-time
+              description: The date and time when the tag was created.
+            lastUpdated:
+              type: string
+              format: date-time
+              description: The date and time of the last update (can be null).
+    example:
+      serviceListingId: 16
+      title: "I love to groom for dogs 123!"
+      description: "I love pets"
+      basePrice: 40
+      dateCreated: "2023-09-09T17:17:16.485Z"
+      lastUpdated: null
+      category: "PET_GROOMING"
+      petBusinessId: 3
+      tags:
+        - tagId: 4
+          name: "Free"
+          dateCreated: "2023-09-01T08:29:02.262Z"
+          lastUpdated: null
+        - tagId: 7
+          name: "Not Free"
+          dateCreated: "2023-09-02T01:33:10.287Z"
+          lastUpdated: null
+  
+  GetAllServiceListingResponse:
+    type: array
+    items:
+      $ref: '#/definitions/ServiceListingResponse'
+    example:
+      - serviceListingId: 1
+        title: "Professional Pet Grooming"
+        description: "Top-quality pet grooming services for your furry friend"
+        basePrice: 40
+        dateCreated: "2023-09-10T17:18:11.134Z"
+        lastUpdated: null
+        category: "PET_GROOMING"
+        petBusinessId: 1
+      - serviceListingId: 2
+        title: "Dog Training Session"
+        description: "Expert dog training to teach your pet new tricks"
+        basePrice: 60
+        dateCreated: "2023-09-10T17:18:11.155Z"
+        lastUpdated: null
+        category: "PET_RETAIL"
+        petBusinessId: 1
+
+  ServiceListingUpdateRequest:
+    type: object
+    properties:
+      title:
+        type: string
+        description: The updated title of the service listing.
+      description:
+        type: string
+        description: The updated description of the service listing.
+      category:
+        type: string
+        description: The updated category of the service listing.
+      basePrice:
+        type: string
+        description: The updated base price of the service listing.
+      tagIds:
+        type: string
+        description: Updated tagIds to attach to this service listing.
+    example:
+      title: "I love to groom for dogs!"
+      description: "I love pets"
+      category: "PET_GROOMING"
+      basePrice: "40"
+      tagIds: "1, 2"
+
+paths:
+  /api/serviceListing:
+    get:
+        summary: Test endpoint to check if the Service Listing API is working
+        responses:
+          200:
+            description: API is working
+        tags:
+          - Service Listing
+    post:
+      summary: Create a new service listing
+      description: Create a new service listing with the specified details.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters: []
+      requestBody:
+        description: Service listing details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/ServiceListingRequest'
+      responses:
+        201:
+          description: Service listing created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
+
+  /api/serviceListing/all:
+    get:
+      summary: Get all service listings
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/GetAllServiceListingResponse'
+      tags:
+        - Service Listing
+
+  /api/serviceListing/{id}:
+    get:
+      summary: Get a service listing by ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the service listing to retrieve.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Service listing details
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
+
+    put:
+      summary: Update a service listing by ID
+      description: Update a service listing with the specified details.
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the service listing to update.
+          required: true
+          type: integer
+      requestBody:
+        description: Service listing update details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/ServiceListingUpdateRequest'
+            example:
+              title: "2"
+              description: "updated"
+              category: "DINING"
+              basePrice: "10"
+              tagIds: "3, 7"
+      responses:
+        200:
+          description: Service listing updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
+
+  /api/serviceListing/category/{category}:
+    get:
+      summary: Get service listings by category
+      description: Retrieve service listings that belong to a specific category.
+      parameters:
+        - in: path
+          name: category
+          description: The category to filter service listings by.
+          required: true
+          type: string
+          example: PET_RETAIL
+      responses:
+        200:
+          description: Successful response containing service listings by category.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
+
+  /api/serviceListing/tag/{tagId}:
+    get:
+      summary: Get service listings by tag
+      parameters:
+        - in: path
+          name: tagId
+          description: The ID of the tag to filter service listings.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
+
+  /api/serviceListing/pet-business/{id}:
+    get:
+      summary: Get service listings by pet business ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the pet business to filter service listings.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/GetAllServiceListingResponse'
+      tags:
+        - Service Listing
+
+

@@ -1,0 +1,117 @@
+swagger: '2.0'
+definitions:
+  TagRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The unique name of the tag.
+
+  TagResponse:
+    type: object
+    properties:
+      tagId:
+        type: integer
+        description: The unique identifier of the tag.
+      name:
+        type: string
+        description: The unique name of the tag.
+      dateCreated:
+        type: string
+        format: date-time
+        description: The date and time when the tag was created
+      lastUpdated:
+        type: string
+        format: date-time
+        description: The date and time of the last update (can be null)
+
+paths:
+  /api/admin/tag:
+    post:
+      summary: Create a new tag
+      requestBody:
+        description: Tag name.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/TagRequest'
+      responses:
+        201:
+          description: Tag created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/TagResponse'
+      tags:
+        - Tags
+  /api/admin/tag/all:
+    get:
+      summary: Retrieve all tags
+      responses:
+        200:
+          description: Details of all tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/TagResponse'
+      tags:
+        - Tags
+  /api/admin/tag/{id}:
+    get:
+      summary: Retrieve a tag by ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the tag to retrieve.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Tag details
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/TagResponse'
+      tags:
+        - Tags
+    put:
+      summary: Update a tag by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      requestBody:
+        description: Tag name to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/TagRequest'
+      responses:
+        200:
+          description: Updated tag details
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/TagResponse'
+      tags:
+        - Tags
+    delete:
+      summary: Delete a tag by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Tag deleted successfully
+      tags:
+        - Tags
+
+
+
