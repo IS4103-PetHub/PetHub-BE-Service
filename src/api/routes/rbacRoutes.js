@@ -19,8 +19,6 @@ function registerRBACRoutes(controller) {
     router.delete(`${userGroupBasePath}/:id`, controller.deleteUserGroup);
 
     // Routes related to permissions attached to UserGroups
-    router.post(`${userGroupBasePath}/:id/attach-permission`, controller.attachPermissionToUserGroup);
-    router.post(`${userGroupBasePath}/:id/detach-permission`, controller.detachPermissionFromUserGroup);
     router.get(`${userGroupBasePath}/:id/permissions`, controller.getUserGroupPermissions);
 
     // // Routes related to users in UserGroups

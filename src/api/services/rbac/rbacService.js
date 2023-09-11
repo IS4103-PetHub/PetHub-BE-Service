@@ -86,10 +86,8 @@ class RbacService {
             const userGroup = await prisma.userGroup.findUnique({
                 where: { groupId: groupId },
                 include: {
-                    user_group_permissions: {
-                        include: {
-                            permission: true
-                        }
+                    userGroupPermissions: {
+                        include: { permission: true }
                     }
                 }
             });
@@ -100,7 +98,7 @@ class RbacService {
 
             const permissionsSet = new Set();
 
-            userGroup.user_group_permissions.forEach(permission => {
+            userGroup.userGroupPermissions.forEach(permission => {
                 permissionsSet.add(permission.permission);
             });
 
@@ -156,7 +154,7 @@ class RbacService {
                 include: {
                     userGroup: {
                         include: {
-                            user_group_permissions: {
+                            userGroupPermissions: {
                                 include: {
                                     permission: true
                                 }
@@ -169,7 +167,7 @@ class RbacService {
             const permissionsSet = new Set();
 
             userGroupsPermissions.forEach(ugp => {
-                ugp.userGroup.user_group_permissions.forEach(permission => {
+                ugp.userGroup.userGroupPermissions.forEach(permission => {
                     permissionsSet.add(permission.permission);
                 });
             });

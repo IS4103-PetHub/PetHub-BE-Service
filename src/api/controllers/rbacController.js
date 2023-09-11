@@ -10,7 +10,7 @@ exports.createUserGroup = async (req, res, next) => {
         const userGroupPayload = req.body;
 
         if (!validations.isValidUserGroupPayload(userGroupPayload)) {
-            return res.status(400).json({ message: 'Invalid payload. Both name and description must be valid.' });
+            return res.status(400).json({ message: 'Invalid input: Name must not be empty and all permission IDs should be numeric.' });
         }
         const userGroupData = await userGroupService.createUserGroup(userGroupPayload);
         res.status(201).json(userGroupData);
@@ -50,8 +50,8 @@ exports.updateUserGroup = async (req, res, next) => {
         }
 
         const updateData = req.body;
-        if (!validations.isValidUpdateUserGroupPayload(updateData)) {
-            return res.status(400).json({ message: 'Invalid payload. Provide a valid name or description.' });
+        if (!validations.isValidUserGroupPayload(updateData)) {
+            return res.status(400).json({ message: 'Invalid input: Name must not be empty and all permission IDs should be numeric.' });
         }
 
         const updatedData = await userGroupService.updateUserGroup(Number(userGroupId), updateData);

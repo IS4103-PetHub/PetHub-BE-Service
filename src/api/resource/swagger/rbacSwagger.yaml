@@ -9,6 +9,11 @@ definitions:
       description:
         type: string
         description: An optional description for the user group.
+      permissionIds:
+        type: array
+        description: An optional array of permission ids to be attached to the user group.
+        items:
+          type: integer
         
   UserGroupResponse:
     type: object
