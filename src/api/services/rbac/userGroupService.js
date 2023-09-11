@@ -12,11 +12,24 @@ class UserGroupService {
                 include: {
                     userGroupPermissions: {
                         include: { permission: true }
-                    }
+                    },
+                    userGroupMemberships: {
+                        include: { user: true }
+                    },
                 }
             });
 
             if (!userGroup) throw new CustomError('User group not found', 404);
+
+            // Sanitize user data
+            if (userGroup.userGroupMemberships) {
+                userGroup.userGroupMemberships.forEach(membership => {
+                    if (membership.user) {
+                        delete membership.user.password;
+                    }
+                });
+            }
+
             return userGroup;
         } catch (error) {
             if (error instanceof CustomError) throw error;
