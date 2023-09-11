@@ -11,7 +11,7 @@ definitions:
         description: An optional description for the user group.
       permissionIds:
         type: array
-        description: An optional array of permission ids to be attached to the user group.
+        description: An array of permission ids to be attached to the user group.
         items:
           type: integer
         
@@ -179,57 +179,57 @@ paths:
       tags:
         - RBAC
 
-  /api/rbac/user-groups/{id}/attach-permission:
-    post:
-      summary: Attach permission to a user group
-      parameters:
-        - in: path
-          name: id
-          required: true
-          type: integer
-      requestBody:
-        description: Permission IDs to attach to the user group.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                permissionIds:
-                  type: array
-                  items:
-                    type: integer
-      responses:
-        200:
-          description: Attached permissions
-      tags:
-        - RBAC
+  # /api/rbac/user-groups/{id}/attach-permission:
+  #   post:
+  #     summary: Attach permission to a user group
+  #     parameters:
+  #       - in: path
+  #         name: id
+  #         required: true
+  #         type: integer
+  #     requestBody:
+  #       description: Permission IDs to attach to the user group.
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               permissionIds:
+  #                 type: array
+  #                 items:
+  #                   type: integer
+  #     responses:
+  #       200:
+  #         description: Attached permissions
+  #     tags:
+  #       - RBAC
 
-  /api/rbac/user-groups/{id}/detach-permission:
-    post:
-      summary: Detach permission from a user group
-      parameters:
-        - in: path
-          name: id
-          required: true
-          type: integer
-      requestBody:
-        description: Permission IDs to detach from the user group.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                permissionIds:
-                  type: array
-                  items:
-                    type: integer
-      responses:
-        200:
-          description: Detached permissions
-      tags:
-        - RBAC
+  # /api/rbac/user-groups/{id}/detach-permission:
+  #   post:
+  #     summary: Detach permission from a user group
+  #     parameters:
+  #       - in: path
+  #         name: id
+  #         required: true
+  #         type: integer
+  #     requestBody:
+  #       description: Permission IDs to detach from the user group.
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               permissionIds:
+  #                 type: array
+  #                 items:
+  #                   type: integer
+  #     responses:
+  #       200:
+  #         description: Detached permissions
+  #     tags:
+  #       - RBAC
 
   /api/rbac/user-groups/{id}/permissions:
     get:
@@ -242,6 +242,32 @@ paths:
       responses:
         200:
           description: List of permissions for the user group
+      tags:
+        - RBAC
+
+  /api/rbac/user-groups/{id}/add-users:
+    post:
+      summary: Add multiple users to a user group
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      requestBody:
+        description: User IDs to attach to the user group.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: User added to user group successfully
       tags:
         - RBAC
 

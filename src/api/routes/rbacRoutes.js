@@ -22,6 +22,7 @@ function registerRBACRoutes(controller) {
     router.get(`${userGroupBasePath}/:id/permissions`, controller.getUserGroupPermissions);
 
     // // Routes related to users in UserGroups
+    router.post(`${userGroupBasePath}/:id/add-users`, controller.addUsersToUserGroup); // to add multiple users to group
     router.post(`${userGroupBasePath}/:id/add-user/:userId`, controller.addUserToUserGroup);
     router.post(`${userGroupBasePath}/:id/remove-user/:userId`, controller.removeUserFromUserGroup);
 

@@ -156,6 +156,28 @@ exports.getUserGroupPermissions = async (req, res, next) => {
     }
 };
 
+exports.addUsersToUserGroup = async (req, res, next) => {
+    try {
+        const groupId = req.params.id;
+
+        const { userIds } = req.body;  // Destructure the userIds from the payload
+
+        if (!await validations.isValidNumericID(groupId)) {
+            return res.status(400).json({ message: 'Invalid Group ID Format' });
+        }
+
+        if (!Array.isArray(userIds) || userIds.some(id => !(typeof id === 'number' && id > 0))) {
+            return res.status(400).json({ message: 'Invalid User IDs Format' });
+        }
+
+        await rbacService.addMultipleUsersToUserGroup(userIds, Number(groupId));
+        res.status(200).json({ message: 'Users added to user group successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 // Add a User to a User Group
 exports.addUserToUserGroup = async (req, res, next) => {
     try {
