@@ -10,7 +10,7 @@ exports.createUserGroup = async (req, res, next) => {
         const userGroupPayload = req.body;
 
         if (!validations.isValidUserGroupPayload(userGroupPayload)) {
-            return res.status(400).json({ message: 'Invalid payload. Both name and description must be valid.' });
+            return res.status(400).json({ message: 'Invalid input: Name must not be empty and all permission IDs should be numeric.' });
         }
         const userGroupData = await userGroupService.createUserGroup(userGroupPayload);
         res.status(201).json(userGroupData);
@@ -50,8 +50,8 @@ exports.updateUserGroup = async (req, res, next) => {
         }
 
         const updateData = req.body;
-        if (!validations.isValidUpdateUserGroupPayload(updateData)) {
-            return res.status(400).json({ message: 'Invalid payload. Provide a valid name or description.' });
+        if (!validations.isValidUserGroupPayload(updateData)) {
+            return res.status(400).json({ message: 'Invalid input: Name must not be empty and all permission IDs should be numeric.' });
         }
 
         const updatedData = await userGroupService.updateUserGroup(Number(userGroupId), updateData);
@@ -155,6 +155,28 @@ exports.getUserGroupPermissions = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.addUsersToUserGroup = async (req, res, next) => {
+    try {
+        const groupId = req.params.id;
+
+        const { userIds } = req.body;  // Destructure the userIds from the payload
+
+        if (!await validations.isValidNumericID(groupId)) {
+            return res.status(400).json({ message: 'Invalid Group ID Format' });
+        }
+
+        if (!Array.isArray(userIds) || userIds.some(id => !(typeof id === 'number' && id > 0))) {
+            return res.status(400).json({ message: 'Invalid User IDs Format' });
+        }
+
+        await rbacService.addMultipleUsersToUserGroup(userIds, Number(groupId));
+        res.status(200).json({ message: 'Users added to user group successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 // Add a User to a User Group
 exports.addUserToUserGroup = async (req, res, next) => {

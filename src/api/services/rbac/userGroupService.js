@@ -1,6 +1,7 @@
 const UserGroupError = require('../../errors/userGroupError');
 const CustomError = require('../../errors/customError');
 const prisma = require('../../../../prisma/prisma');
+const rbacService = require('./rbacService');
 
 class UserGroupService {
 
@@ -8,9 +9,27 @@ class UserGroupService {
         try {
             const userGroup = await prisma.userGroup.findUnique({
                 where: { groupId: id },
+                include: {
+                    userGroupPermissions: {
+                        include: { permission: true }
+                    },
+                    userGroupMemberships: {
+                        include: { user: true }
+                    },
+                }
             });
 
             if (!userGroup) throw new CustomError('User group not found', 404);
+
+            // Sanitize user data
+            if (userGroup.userGroupMemberships) {
+                userGroup.userGroupMemberships.forEach(membership => {
+                    if (membership.user) {
+                        delete membership.user.password;
+                    }
+                });
+            }
+
             return userGroup;
         } catch (error) {
             if (error instanceof CustomError) throw error;
@@ -29,32 +48,100 @@ class UserGroupService {
             throw new UserGroupError(error);
         }
     }
-
-    async updateUserGroup(id, data) {
+    async updateUserGroup(groupId, data) {
         try {
-            return await prisma.userGroup.update({
-                where: { groupId: id },
-                data: {
-                    name: data.name,
-                    description: data.description,
-                },
+            const existingPermissions = await rbacService.getUserGroupPermissions(groupId);
+            const existingPermissionIdsSet = new Set(existingPermissions.map(entry => entry.permissionId));
+            const newPermissionIdsSet = new Set(data.permissionIds);
+            const permissionIdsToRemove = [...existingPermissionIdsSet].filter(permissionId => !newPermissionIdsSet.has(permissionId));
+
+            const updatedUserGroup = await prisma.$transaction(async (prismaClient) => {
+                // Update User Group Details
+                const updatedGroup = await prismaClient.userGroup.update({
+                    where: { groupId: groupId },
+                    data: {
+                        name: data.name,
+                        description: data.description,
+                    },
+                });
+
+                // Delete existing permissionIDs that are not part of the payload
+                for (const permissionId of permissionIdsToRemove) {
+                    try {
+                        await prismaClient.userGroupPermission.delete({
+                            where: {
+                                groupId_permissionId: {
+                                    groupId: groupId,
+                                    permissionId: permissionId
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        throw new CustomError(`Failed to detach permissions for permission ID: ${permissionId}.`, 400);
+                    }
+                }
+
+                // Add additional permissionIDs that are not part of the existing permissions
+                for (const permissionId of data.permissionIds) {
+                    if (!existingPermissionIdsSet.has(permissionId)) {
+                        try {
+                            await prismaClient.userGroupPermission.create({
+                                data: {
+                                    groupId: groupId,
+                                    permissionId: permissionId,
+                                },
+                            });
+                        } catch (error) {
+                            throw new CustomError(`Failed to attach new permissions for permission ID: ${permissionId}.`, 400);
+                        }
+                    }
+                }
+
+                return updatedGroup;
             });
+
+            // Fetch and return the updated user group along with its permissions
+            return await this.getUserGroupById(updatedUserGroup.groupId);
         } catch (error) {
+            if (error instanceof CustomError) throw error
             console.error("Error during user group update:", error);
             throw new UserGroupError(error);
         }
     }
 
+
     async createUserGroup(data) {
+
         try {
-            const userGroup = await prisma.userGroup.create({
-                data: {
-                    name: data.name,
-                    description: data.description,
-                },
+            const createdUserGroup = await prisma.$transaction(async (prismaClient) => {
+                // Create new user group
+                const userGroup = await prismaClient.userGroup.create({
+                    data: {
+                        name: data.name,
+                        description: data.description,
+                    },
+                });
+
+                for (const permissionId of data.permissionIds) {
+                    try {
+                        await prismaClient.userGroupPermission.create({
+                            data: {
+                                groupId: userGroup.groupId,
+                                permissionId: permissionId,
+                            },
+                        });
+                    } catch (error) {
+                        throw new CustomError(`Failed to attach permissions for permission ID: ${permissionId}.`, 400);
+                    }
+                }
+
+                return userGroup;
             });
-            return userGroup;
+
+            // Fetch and return the created user group along with its permissions
+            return await this.getUserGroupById(createdUserGroup.groupId);
         } catch (error) {
+            if (error instanceof CustomError) throw error
             console.error("Error during internal user group creation:", error);
             throw new UserGroupError(error);
         }

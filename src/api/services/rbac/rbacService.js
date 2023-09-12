@@ -86,10 +86,8 @@ class RbacService {
             const userGroup = await prisma.userGroup.findUnique({
                 where: { groupId: groupId },
                 include: {
-                    user_group_permissions: {
-                        include: {
-                            permission: true
-                        }
+                    userGroupPermissions: {
+                        include: { permission: true }
                     }
                 }
             });
@@ -98,18 +96,41 @@ class RbacService {
                 throw new CustomError("User Group not found", 404);
             }
 
-            const permissionsSet = new Set();
+            const permissionsMap = new Map();
 
-            userGroup.user_group_permissions.forEach(permission => {
-                permissionsSet.add(permission.permission);
+            userGroup.userGroupPermissions.forEach(ugPermission => {
+                const permission = ugPermission.permission;
+                permissionsMap.set(permission.permissionId, permission);
             });
 
-            return [...permissionsSet];
-
+            return Array.from(permissionsMap.values());
         } catch (error) {
             if (error instanceof CustomError) throw error;
             console.error("Error fetching permissions for user group:", error);
             throw new CustomError("Error fetching permissions for user group", 500);
+        }
+    }
+
+    async addMultipleUsersToUserGroup(userIds, groupId) {
+        try {
+            // Make use of prisma's transactional capabilities to ensure 
+            // that all operations are committed to the database at once.
+            await prisma.$transaction(userIds.map(userId => {
+                try {
+                    return prisma.userGroupMembership.create({
+                        data: {
+                            userId: userId,
+                            groupId: groupId
+                        }
+                    });
+                } catch (error) {
+                    throw new CustomError(`Failed to add user to the group, user ID: ${userId}.`, 400);
+                }
+            }));
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            console.error("Error adding users to user group:", error);
+            throw new RbacError(error);
         }
     }
 
@@ -156,7 +177,7 @@ class RbacService {
                 include: {
                     userGroup: {
                         include: {
-                            user_group_permissions: {
+                            userGroupPermissions: {
                                 include: {
                                     permission: true
                                 }
@@ -166,15 +187,16 @@ class RbacService {
                 }
             });
 
-            const permissionsSet = new Set();
+            const permissionsMap = new Map();
 
             userGroupsPermissions.forEach(ugp => {
-                ugp.userGroup.user_group_permissions.forEach(permission => {
-                    permissionsSet.add(permission.permission);
+                ugp.userGroup.userGroupPermissions.forEach(ugPermission => {
+                    const permission = ugPermission.permission;
+                    permissionsMap.set(permission.permissionId, permission);
                 });
             });
 
-            return [...permissionsSet];
+            return Array.from(permissionsMap.values());
         } catch (error) {
             console.error("Error fetching user permissions:", error);
             throw new CustomError("Failed to fetch user permissions due to an unexpected error", 500);

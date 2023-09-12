@@ -66,7 +66,6 @@ exports.createUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid email address" });
     }
 
-    console.log(userPayload);
     // Note: Validation for contact number and date of birth
     // can be performed within the specific service.
     const userData = await service.createUser(userPayload);
