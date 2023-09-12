@@ -1,11 +1,5 @@
 swagger: '2.0'
 definitions:
-  TagIds:
-    type: array
-    items:
-      type: integer
-    example: [1, 2, 3]
-
   ServiceListingRequest:
     type: object
     properties:
@@ -25,7 +19,7 @@ definitions:
         type: string
         description: The base price of the service listing.
       tagIds:
-        type: string
+        type: array
         description: TagIds to attach to this service listing
     example:
       title: "I love to groom for dogs!"
@@ -33,7 +27,7 @@ definitions:
       petBusinessId: "3"
       category: "PET_GROOMING"
       basePrice: "40"
-      tagIds: "1, 2"
+      tagIds: [1, 2, 3]
 
   ServiceListingResponse:
     type: object
@@ -140,24 +134,39 @@ definitions:
         type: string
         description: The updated base price of the service listing.
       tagIds:
-        type: string
+        type: array
         description: Updated tagIds to attach to this service listing.
     example:
       title: "I love to groom for dogs!"
       description: "I love pets"
       category: "PET_GROOMING"
       basePrice: "40"
-      tagIds: "1, 2"
+      tagIds: [1, 2, 3]
 
 paths:
-  /api/serviceListing:
+  /api/service-listings/health-check:
     get:
         summary: Test endpoint to check if the Service Listing API is working
         responses:
           200:
             description: API is working
         tags:
-          - Service Listing
+          - Health
+
+  /api/service-listings:
+    get:
+      summary: Get all service listings
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/GetAllServiceListingResponse'
+      tags:
+        - Service Listing
     post:
       summary: Create a new service listing
       description: Create a new service listing with the specified details.
@@ -173,6 +182,13 @@ paths:
           application/json:
             schema:
               $ref: '#/definitions/ServiceListingRequest'
+            example:
+              title: "Dog Grooming!"
+              description: "I love to groom"
+              petBusinessId: "3"
+              category: "PET_GROOMING"
+              basePrice: "40"
+              tagIds: [4, 8]
       responses:
         201:
           description: Service listing created successfully
@@ -183,22 +199,7 @@ paths:
       tags:
         - Service Listing
 
-  /api/serviceListing/all:
-    get:
-      summary: Get all service listings
-      responses:
-        200:
-          description: An array of service listings
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/definitions/GetAllServiceListingResponse'
-      tags:
-        - Service Listing
-
-  /api/serviceListing/{id}:
+  /api/service-listings/{id}:
     get:
       summary: Get a service listing by ID
       parameters:
@@ -217,7 +218,7 @@ paths:
       tags:
         - Service Listing
 
-    put:
+    patch:
       summary: Update a service listing by ID
       description: Update a service listing with the specified details.
       parameters:
@@ -234,11 +235,11 @@ paths:
             schema:
               $ref: '#/definitions/ServiceListingUpdateRequest'
             example:
-              title: "2"
+              title: "Pet Grooming updated"
               description: "updated"
               category: "DINING"
               basePrice: "10"
-              tagIds: "3, 7"
+              tagIds: [3, 7]
       responses:
         200:
           description: Service listing updated successfully
@@ -248,8 +249,21 @@ paths:
                 $ref: '#/definitions/ServiceListingResponse'
       tags:
         - Service Listing
+    delete:
+      summary: Delete a service listing by ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the service listing to retrieve.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Service listing deleted successfully
+      tags:
+        - Service Listing
 
-  /api/serviceListing/category/{category}:
+  /api/service-listings/category/{category}:
     get:
       summary: Get service listings by category
       description: Retrieve service listings that belong to a specific category.
@@ -272,7 +286,7 @@ paths:
       tags:
         - Service Listing
 
-  /api/serviceListing/tag/{tagId}:
+  /api/service-listings/tag/{tagId}:
     get:
       summary: Get service listings by tag
       parameters:
@@ -293,7 +307,7 @@ paths:
       tags:
         - Service Listing
 
-  /api/serviceListing/pet-business/{id}:
+  /api/service-listings/pet-businesses/{id}:
     get:
       summary: Get service listings by pet business ID
       parameters:
@@ -310,7 +324,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/GetAllServiceListingResponse'
+                  $ref: '#/definitions/ServiceListingResponse'
       tags:
         - Service Listing
 

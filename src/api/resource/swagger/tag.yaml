@@ -26,7 +26,16 @@ definitions:
         description: The date and time of the last update (can be null)
 
 paths:
-  /api/admin/tag:
+  /api/tags/health-check:
+    get:
+        summary: Test endpoint to check if the Tag API is working
+        responses:
+          200:
+            description: API is working
+        tags:
+          - Health
+
+  /api/tags:
     post:
       summary: Create a new tag
       requestBody:
@@ -45,7 +54,6 @@ paths:
                 $ref: '#/definitions/TagResponse'
       tags:
         - Tags
-  /api/admin/tag/all:
     get:
       summary: Retrieve all tags
       responses:
@@ -59,7 +67,8 @@ paths:
                   $ref: '#/definitions/TagResponse'
       tags:
         - Tags
-  /api/admin/tag/{id}:
+
+  /api/tags/{id}:
     get:
       summary: Retrieve a tag by ID
       parameters:
@@ -77,7 +86,7 @@ paths:
                 $ref: '#/definitions/TagResponse'
       tags:
         - Tags
-    put:
+    patch:
       summary: Update a tag by ID
       parameters:
         - in: path
