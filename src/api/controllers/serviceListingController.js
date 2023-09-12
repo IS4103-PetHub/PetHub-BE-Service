@@ -39,7 +39,7 @@ exports.createServiceListing = async (req, res, next) => {
     const serviceListing = await ServiceListingService.createServiceListing(
       data
     );
-    res.status(200).json(serviceListing);
+    res.status(201).json(serviceListing);
   } catch (error) {
     next(error);
   }
@@ -168,6 +168,25 @@ exports.getServiceListingByPBId = async (req, res, next) => {
       Number(petBusinessId)
     );
     res.status(200).json(serviceListings);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteServiceListing = async (req, res, next) => {
+  try {
+    const petBusinessId = req.params.id;
+    if (!petBusinessId) {
+      return res
+        .status(400)
+        .json({ message: "Pet Business ID cannot be empty" });
+    }
+    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
+
+    await ServiceListingService.deleteServiceListing(Number(petBusinessId));
+    res.status(200).json({ message: "Service listing deleted successfully" });
   } catch (error) {
     next(error);
   }

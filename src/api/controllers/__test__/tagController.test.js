@@ -4,10 +4,10 @@ const {
   getTagById,
   getAllTags,
   deleteTag,
-} = require("../adminController");
+} = require("../tagController");
 const { Response } = require("jest-express/lib/response");
 const { Request } = require("jest-express/lib/request");
-const TagService = require("../../services/admin/tagService");
+const TagService = require("../../services/serviceListing/tagService");
 const constants = require("../../../constants/common");
 const errorMessages = constants.errorMessages;
 
@@ -16,7 +16,7 @@ const mockDateCreated = new Date();
 const mockDateUpdated = new Date(mockDateCreated.getTime() + 1000); // 1 second later
 const mockError = new Error("TagService error");
 
-jest.mock("../../services/admin/tagService.js");
+jest.mock("../../services/serviceListing/tagService.js");
 let req, res, next;
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ describe("createTag", () => {
     {
       description: "should create a valid tag",
       input: { name: "Tag 1" },
-      expectedStatusCode: 200,
+      expectedStatusCode: 201,
       expectedResponseBody: {
         id: 1,
         name: "Tag 1",

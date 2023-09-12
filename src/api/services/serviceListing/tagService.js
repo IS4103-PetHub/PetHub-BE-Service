@@ -68,7 +68,7 @@ exports.deleteTag = async (tagId) => {
       where: { tagId },
     });
   } catch (error) {
-    console.error("Error fetching all tags:", error);
+    console.error("Error deleting tag:", error);
     throw new TagError(error);
   }
 };

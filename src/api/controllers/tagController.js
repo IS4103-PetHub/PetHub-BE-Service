@@ -1,5 +1,5 @@
 const BaseValidations = require("../validations/baseValidation");
-const TagService = require("../services/admin/tagService");
+const TagService = require("../services/serviceListing/tagService");
 const constants = require("../../constants/common");
 const limitations = constants.limitations;
 const errorMessages = constants.errorMessages;
@@ -15,7 +15,7 @@ exports.createTag = async (req, res, next) => {
       });
     }
     const tag = await TagService.createTag(data);
-    res.status(200).json(tag);
+    res.status(201).json(tag);
   } catch (error) {
     next(error);
   }

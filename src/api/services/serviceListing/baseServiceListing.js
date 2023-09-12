@@ -8,9 +8,7 @@ exports.createServiceListing = async (data) => {
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     let tagIdsArray = [];
     if (data.tagIds) {
-      tagIdsArray = data.tagIds
-        .split(",")
-        .map((id) => ({ tagId: parseInt(id.trim(), 10) }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
     }
     const serviceListing = await prisma.serviceListing.create({
       data: {
@@ -149,10 +147,26 @@ exports.getServiceListingByPBId = async (id) => {
   try {
     const serviceListings = await prisma.serviceListing.findMany({
       where: { petBusinessId: id },
+      include: {
+        tags: true,
+      },
     });
     return serviceListings;
   } catch (error) {
     console.error("Error fetching all service listings:", error);
+    throw new ServiceListingError(error);
+  }
+};
+
+exports.deleteServiceListing = async (serviceListingId) => {
+  // TODO: Add logic to check for existing unfulfilled orders when order management is done
+  // Current logic: Disasicaite a particular service listing from existing connections (tag, PB) and delete 
+  try {
+    await prisma.serviceListing.delete({
+      where: { serviceListingId },
+    });
+  } catch (error) {
+    console.error("Error deleting service listing:", error);
     throw new ServiceListingError(error);
   }
 };

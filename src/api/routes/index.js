@@ -8,15 +8,15 @@ router.get("/", async (req, res, next) => {
 
 // Import route modules
 const userRoutes = require("./userRoutes");
-const serviceListingRoutes = require("./serviceListing");
-const adminRoutes = require("./admin");
+const serviceListingRoutes = require("./serviceListingRoutes");
+const tagRoutes = require("./tagRoutes");
 const rbacRoutes = require('./rbacRoutes');
 const authRoutes = require("./auth");
 
 // Use route modules
 router.use("/users", userRoutes);
-router.use("/serviceListing", serviceListingRoutes);
-router.use("/admin", adminRoutes);
+router.use("/service-listings", serviceListingRoutes);
+router.use("/tags", tagRoutes);
 router.use('/rbac', rbacRoutes);
 router.use("/", authRoutes);
 
