@@ -5,6 +5,7 @@ class UserGroupError extends CustomError {
         let message = "Unknown error";
         let statusCode = 500;
 
+        console.log(error)
         if (error.code === 'P2025') {
             message = 'User Group not found';
             statusCode = 404;

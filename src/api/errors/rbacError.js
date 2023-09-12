@@ -5,7 +5,6 @@ class RbacError extends CustomError {
         let message = "Unknown RBAC error";
         let statusCode = 500;
         console.log(error)
-        console.log("DEBUGGGGGG: ", error.code)
         if (error.code === 'P2025') {
             message = 'Record not found';
             statusCode = 404;
@@ -20,7 +19,7 @@ class RbacError extends CustomError {
                 message = 'The specified permission does not exist.';
                 statusCode = 404;
             } else if (error.meta?.field_name?.includes('UserGroupMembership_userId_fkey (index)')) {
-                message = 'The specified user does not exist.';
+                message = 'The specified user or user group does not exist.';
                 statusCode = 404;
             } else if (error.meta?.field_name?.includes('UserGroupMembership_groupId_fkey (index)')) {
                 message = 'The specified user group does not exist.';
