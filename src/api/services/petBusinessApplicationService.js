@@ -1,6 +1,7 @@
 const prisma = require("../../../prisma/prisma");
 const CustomError = require("../errors/customError");
 const PetBusinessApplicationError = require("../errors/petBusinessApplicationError");
+const AddressService = require("./user/addressService");
 
 exports.register = async (data) => {
   try {
@@ -8,14 +9,7 @@ exports.register = async (data) => {
     let addressIds = [];
     if (data.businessAddresses && data.businessAddresses.length > 0) {
       for (let address of data.businessAddresses) {
-        const newAddress = await prisma.address.create({
-          data: {
-            addressName: address.addressName,
-            line1: address.line1,
-            line2: address.line2 || null,
-            postalCode: address.postalCode,
-          },
-        });
+        const newAddress = await AddressService.createAddress(address);
         addressIds.push(newAddress.addressId);
       }
     }
@@ -60,23 +54,14 @@ exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedD
 
     // Delete the old addresses if they exist (these addresses are not linked to the pet business!)
     for (let address of existingApplication.businessAddresses) {
-      await prisma.address.delete({
-        where: { addressId: address.addressId },
-      });
+      AddressService.deleteAddress(address.addressId);
     }
 
-    // (Abstract to its own addressService if have time) Create new addresses if any
+    // Make addresses
     let addressIds = [];
     if (updatedData.businessAddresses && updatedData.businessAddresses.length > 0) {
       for (let address of updatedData.businessAddresses) {
-        const newAddress = await prisma.address.create({
-          data: {
-            addressName: address.addressName,
-            line1: address.line1,
-            line2: address.line2 || null,
-            postalCode: address.postalCode,
-          },
-        });
+        const newAddress = await AddressService.createAddress(address);
         addressIds.push(newAddress.addressId);
       }
     }
@@ -99,7 +84,11 @@ exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedD
     return updatedPetBusinessApplication;
   } catch (error) {
     console.error("Error during pet business application update:", error);
-    throw new PetBusinessApplicationError(error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
   }
 };
 
@@ -112,7 +101,11 @@ exports.getAllPetBusinessApplications = async () => {
     });
   } catch (error) {
     console.error("Error fetching all pet business applications:", error);
-    throw new PetBusinessApplicationError(error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
   }
 };
 
@@ -149,7 +142,11 @@ exports.getPetBusinessApplicationByStatus = async (applicationStatus) => {
     return petBusinessApplication;
   } catch (error) {
     console.error("Error fetching pet business applications by application status:", error);
-    throw new PetBusinessApplicationError(error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
   }
 };
 
@@ -157,6 +154,9 @@ exports.getPetBusinessApplicationByPBId = async (id) => {
   try {
     const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
       where: { petBusinessId: id },
+      include: {
+        businessAddresses: true,
+      },
     });
     if (!petBusinessApplication) {
       throw new CustomError("Pet Business Application not found.");
@@ -164,6 +164,10 @@ exports.getPetBusinessApplicationByPBId = async (id) => {
     return petBusinessApplication;
   } catch (error) {
     console.error("Error fetching Business Application:", error);
-    throw new PetBusinessApplicationError(error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
   }
 };
