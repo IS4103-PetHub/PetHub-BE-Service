@@ -16,7 +16,7 @@ definitions:
         type: string
         description: The category of the service listing.
       basePrice:
-        type: string
+        type: number
         description: The base price of the service listing.
       tagIds:
         type: array
@@ -26,7 +26,7 @@ definitions:
       description: "I love pets"
       petBusinessId: "3"
       category: "PET_GROOMING"
-      basePrice: "40"
+      basePrice: 40
       tagIds: [1, 2, 3]
 
   ServiceListingResponse:
@@ -131,7 +131,7 @@ definitions:
         type: string
         description: The updated category of the service listing.
       basePrice:
-        type: string
+        type: number
         description: The updated base price of the service listing.
       tagIds:
         type: array
@@ -140,7 +140,7 @@ definitions:
       title: "I love to groom for dogs!"
       description: "I love pets"
       category: "PET_GROOMING"
-      basePrice: "40"
+      basePrice: 40
       tagIds: [1, 2, 3]
 
 paths:

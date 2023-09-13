@@ -175,17 +175,17 @@ exports.getServiceListingByPBId = async (req, res, next) => {
 
 exports.deleteServiceListing = async (req, res, next) => {
   try {
-    const petBusinessId = req.params.id;
-    if (!petBusinessId) {
+    const serviceListingId = req.params.id;
+    if (!serviceListingId) {
       return res
         .status(400)
-        .json({ message: "Pet Business ID cannot be empty" });
+        .json({ message: "Service Listing ID cannot be empty" });
     }
-    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+    if (!(await BaseValidations.isValidNumber(serviceListingId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
-    await ServiceListingService.deleteServiceListing(Number(petBusinessId));
+    await ServiceListingService.deleteServiceListing(Number(serviceListingId));
     res.status(200).json({ message: "Service listing deleted successfully" });
   } catch (error) {
     next(error);
