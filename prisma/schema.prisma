@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Sep 10 2023 00:42:50 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Mon Sep 11 2023 00:32:05 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -30,6 +30,42 @@ enum BusinessType {
   FNB
   SERVICE
   HEALTHCARE
+}
+
+enum Category {
+  PET_GROOMING
+  DINING
+  VETERINARY
+  PET_RETAIL
+  PET_BOARDING
+}
+
+model ServiceListing {
+  serviceListingId Int       @id @default(autoincrement())
+  title            String
+  description      String
+  basePrice        Int       @default(0)
+  dateCreated      DateTime  @default(now())
+  lastUpdated      DateTime?
+
+  category Category
+
+  // tags that a service listing has (implicit many-to-many relationship)
+  tags          Tag[]
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId Int
+}
+
+// m-n relation type between Tag and ServiceListing: implicit
+// https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#implicit-many-to-many-relations
+model Tag {
+  tagId       Int       @id @default(autoincrement())
+  name        String    @unique
+  dateCreated DateTime  @default(now())
+  lastUpdated DateTime?
+
+  // service listings with this tag (implicit many-to-many relationship)
+  serviceListings ServiceListing[]
 }
 
 // models for Role Based Access Control (RBAC)
@@ -117,6 +153,7 @@ model PetBusiness {
   businessDescription String?
   contactNumber       String
   websiteURL          String?
+  serviceListings     ServiceListing[]
   // logo                String // TODO: figure out best way to save logos
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
