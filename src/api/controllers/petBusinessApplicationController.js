@@ -54,6 +54,63 @@ exports.register = async (req, res, next) => {
   }
 };
 
+exports.updatePetBusinessApplication = async (req, res, next) => {
+  try {
+    const petBusinessApplicationId = req.params.id;
+    if (!(await BaseValidations.isValidNumber(petBusinessApplicationId))) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const mandatoryFields = [
+      "businessEmail",
+      "businessDescription",
+      "websiteURL",
+      "petBusinessId",
+      "businessType",
+    ];
+
+    const data = req.body; // This body should contain the full data
+    let errorMessage;
+
+    /*
+        Not validated for now: attachments
+    */
+    switch (true) {
+      case !(await PetBusinessApplicationValidations.mandatoryFieldsCheck(mandatoryFields, data)):
+        errorMessage = `One of these fields are missing: ${mandatoryFields}`;
+        break;
+      case !(await PetBusinessApplicationValidations.validAddressFieldsPresent(data.businessAddresses)):
+        errorMessage = "Invalid address format";
+        break;
+      case !(await BaseValidations.isValidNumber(data.petBusinessId)):
+        errorMessage = "Invalid ID format";
+        break;
+      case !(await PetBusinessApplicationValidations.isValidBusinessType(data.businessType)):
+        errorMessage = "Invalid BusinessType";
+        break;
+      case !(await UserValidations.isValidEmail(data.businessEmail)):
+        errorMessage = "Invalid email address";
+        break;
+      case !(await UserValidations.isValidURL(data.websiteURL)):
+        errorMessage = "Invalid website URL";
+        break;
+      default:
+        break;
+    }
+    // Error with request payload, bad format (400)
+    if (errorMessage) {
+      return res.status(400).json({ errorMessage });
+    }
+    const petBusinessApplication = await PetBusinessApplicationService.updatePetBusinessApplication(
+      Number(petBusinessApplicationId),
+      data
+    );
+    res.status(200).json(petBusinessApplication);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getAllPetBusinessApplications = async (req, res, next) => {
   try {
     const petBusinessApplications = await PetBusinessApplicationService.getAllPetBusinessApplications();

@@ -7,10 +7,7 @@ router.get("/health-check", async (req, res, next) => {
 });
 
 router.post("/register", petBusinessApplicationController.register);
-// router.patch(
-//   "/update/:applicationId",
-//   petBusinessApplicationController.updateApplication
-// );
+router.put("/update/:id", petBusinessApplicationController.updatePetBusinessApplication);
 router.get("/", petBusinessApplicationController.getAllPetBusinessApplications);
 router.get("/application-id/:id", petBusinessApplicationController.getPetBusinessApplicationById);
 router.get("/filter-status/:status", petBusinessApplicationController.getPetBusinessApplicationByStatus);

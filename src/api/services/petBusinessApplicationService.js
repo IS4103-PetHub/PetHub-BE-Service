@@ -4,9 +4,8 @@ const PetBusinessApplicationError = require("../errors/petBusinessApplicationErr
 
 exports.register = async (data) => {
   try {
+    // Abstract to its own addressService if have time
     let addressIds = [];
-
-    // Put in its own addressService if have time
     if (data.businessAddresses && data.businessAddresses.length > 0) {
       for (let address of data.businessAddresses) {
         const newAddress = await prisma.address.create({
@@ -45,6 +44,61 @@ exports.register = async (data) => {
     return petBusinessApplication;
   } catch (error) {
     console.error("Error during pet business application creation:", error);
+    throw new PetBusinessApplicationError(error);
+  }
+};
+
+exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedData) => {
+  try {
+    const existingApplication = await prisma.petBusinessApplication.findUnique({
+      where: { petBusinessApplicationId },
+      include: { businessAddresses: true },
+    });
+    if (!existingApplication) {
+      throw new CustomError("Pet Business Application not found", 404);
+    }
+
+    // Delete the old addresses if they exist (these addresses are not linked to the pet business!)
+    for (let address of existingApplication.businessAddresses) {
+      await prisma.address.delete({
+        where: { addressId: address.addressId },
+      });
+    }
+
+    // (Abstract to its own addressService if have time) Create new addresses if any
+    let addressIds = [];
+    if (updatedData.businessAddresses && updatedData.businessAddresses.length > 0) {
+      for (let address of updatedData.businessAddresses) {
+        const newAddress = await prisma.address.create({
+          data: {
+            addressName: address.addressName,
+            line1: address.line1,
+            line2: address.line2 || null,
+            postalCode: address.postalCode,
+          },
+        });
+        addressIds.push(newAddress.addressId);
+      }
+    }
+
+    const updatedPetBusinessApplication = await prisma.petBusinessApplication.update({
+      where: { petBusinessApplicationId },
+      data: {
+        ...updatedData, // Keep all the old data (including remarks etc) except the bottom 2 fields
+        applicationStatus: "PENDING", // Status goes back to PENDING so InternalUser can go review it again
+        businessAddresses: {
+          connect: addressIds.map((id) => ({ addressId: id })),
+        },
+      },
+
+      include: {
+        businessAddresses: true,
+      },
+    });
+
+    return updatedPetBusinessApplication;
+  } catch (error) {
+    console.error("Error during pet business application update:", error);
     throw new PetBusinessApplicationError(error);
   }
 };
