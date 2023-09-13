@@ -1,10 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Category` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Product` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "AccountStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 
@@ -17,15 +10,6 @@ CREATE TYPE "AdminRole" AS ENUM ('MANAGER', 'ADMINISTRATOR');
 -- CreateEnum
 CREATE TYPE "BusinessType" AS ENUM ('FNB', 'SERVICE', 'HEALTHCARE');
 
--- DropForeignKey
-ALTER TABLE "Product" DROP CONSTRAINT "Product_categoryId_fkey";
-
--- DropTable
-DROP TABLE "Category";
-
--- DropTable
-DROP TABLE "Product";
-
 -- CreateTable
 CREATE TABLE "User" (
     "userId" SERIAL NOT NULL,
@@ -34,37 +18,34 @@ CREATE TABLE "User" (
     "accountType" "AccountType" NOT NULL,
     "accountStatus" "AccountStatus" NOT NULL DEFAULT 'ACTIVE',
     "dateCreated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "lastUpdated" TIMESTAMP(3) NOT NULL,
+    "lastUpdated" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("userId")
 );
 
 -- CreateTable
 CREATE TABLE "InternalUser" (
-    "internalUserID" SERIAL NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "adminRole" "AdminRole" NOT NULL,
     "userId" INTEGER NOT NULL,
 
-    CONSTRAINT "InternalUser_pkey" PRIMARY KEY ("internalUserID")
+    CONSTRAINT "InternalUser_pkey" PRIMARY KEY ("userId")
 );
 
 -- CreateTable
 CREATE TABLE "PetOwner" (
-    "petOwnerId" SERIAL NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "contactNumber" TEXT NOT NULL,
     "dateOfBirth" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER NOT NULL,
 
-    CONSTRAINT "PetOwner_pkey" PRIMARY KEY ("petOwnerId")
+    CONSTRAINT "PetOwner_pkey" PRIMARY KEY ("userId")
 );
 
 -- CreateTable
 CREATE TABLE "PetBusiness" (
-    "petBusinessId" SERIAL NOT NULL,
     "companyName" TEXT NOT NULL,
     "uen" TEXT NOT NULL,
     "businessType" "BusinessType",
@@ -73,7 +54,14 @@ CREATE TABLE "PetBusiness" (
     "websiteURL" TEXT,
     "userId" INTEGER NOT NULL,
 
-    CONSTRAINT "PetBusiness_pkey" PRIMARY KEY ("petBusinessId")
+    CONSTRAINT "PetBusiness_pkey" PRIMARY KEY ("userId")
+);
+
+-- CreateTable
+CREATE TABLE "ResetPassword" (
+    "token" TEXT NOT NULL,
+    "expiryDate" TIMESTAMP(3) NOT NULL,
+    "email" TEXT NOT NULL
 );
 
 -- CreateIndex
@@ -88,11 +76,14 @@ CREATE UNIQUE INDEX "PetOwner_userId_key" ON "PetOwner"("userId");
 -- CreateIndex
 CREATE UNIQUE INDEX "PetBusiness_userId_key" ON "PetBusiness"("userId");
 
--- AddForeignKey
-ALTER TABLE "InternalUser" ADD CONSTRAINT "InternalUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "ResetPassword_token_key" ON "ResetPassword"("token");
 
 -- AddForeignKey
-ALTER TABLE "PetOwner" ADD CONSTRAINT "PetOwner_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "InternalUser" ADD CONSTRAINT "InternalUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PetBusiness" ADD CONSTRAINT "PetBusiness_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PetOwner" ADD CONSTRAINT "PetOwner_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PetBusiness" ADD CONSTRAINT "PetBusiness_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE;

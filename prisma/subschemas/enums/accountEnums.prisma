@@ -20,3 +20,9 @@ enum BusinessType {
     SERVICE
     HEALTHCARE
 }
+
+enum BusinessApplicationStatus {
+    PENDING
+    REJECTED // This means require changes, but is named `REJECTED` in all of our external documentation
+    APPROVED
+}

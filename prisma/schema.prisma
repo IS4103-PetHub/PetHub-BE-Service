@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Mon Sep 11 2023 00:32:05 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Sep 13 2023 16:57:34 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -30,6 +30,12 @@ enum BusinessType {
   FNB
   SERVICE
   HEALTHCARE
+}
+
+enum BusinessApplicationStatus {
+  PENDING
+  REJECTED // This means require changes, but is named `REJECTED` in all of our external documentation
+  APPROVED
 }
 
 enum Category {
@@ -128,9 +134,10 @@ model User {
 }
 
 model InternalUser {
-  firstName String
-  lastName  String
-  adminRole AdminRole
+  firstName                       String
+  lastName                        String
+  adminRole                       AdminRole
+  approvedPetBusinessApplications PetBusinessApplication[]
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
@@ -147,13 +154,15 @@ model PetOwner {
 }
 
 model PetBusiness {
-  companyName         String
-  uen                 String
-  businessType        BusinessType?
-  businessDescription String?
-  contactNumber       String
-  websiteURL          String?
-  serviceListings     ServiceListing[]
+  companyName            String
+  uen                    String
+  businessType           BusinessType?
+  businessDescription    String?
+  contactNumber          String
+  websiteURL             String?
+  serviceListings        ServiceListing[]
+  businessAddresses      Address[]
+  petBusinessApplication PetBusinessApplication?
   // logo                String // TODO: figure out best way to save logos
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -164,4 +173,35 @@ model ResetPassword {
   token      String   @unique
   expiryDate DateTime
   email      String
+}
+
+model Address {
+  addressId                Int                     @id @default(autoincrement())
+  addressName              String
+  line1                    String
+  line2                    String?
+  postalCode               String
+  // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
+  petBusinessId            Int?
+  PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId])
+  petBusinessApplicationId Int?
+  PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+}
+
+model PetBusinessApplication {
+  petBusinessApplicationId Int                       @id @default(autoincrement())
+  businessType             BusinessType?
+  businessEmail            String
+  businessAddresses        Address[]
+  attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
+  applicationStatus        BusinessApplicationStatus @default(PENDING)
+  adminRemarks             String[]
+  dateCreated              DateTime                  @default(now())
+  lastUpdated              DateTime?
+
+  petBusinessId Int         @unique
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade)
+
+  approverId Int?
+  approver   InternalUser? @relation(fields: [approverId], references: [userId])
 }
