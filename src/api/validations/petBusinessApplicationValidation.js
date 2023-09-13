@@ -1,10 +1,21 @@
-const { BusinessType } = require("@prisma/client");
+const { BusinessType, BusinessApplicationStatus } = require("@prisma/client");
 
 exports.isValidBusinessType = async (strData) => {
   switch (strData) {
     case BusinessType.FNB:
     case BusinessType.HEALTHCARE:
     case BusinessType.SERVICE:
+      return true;
+    default:
+      return false;
+  }
+};
+
+exports.isValidApplicationStatus = async (strData) => {
+  switch (strData) {
+    case BusinessApplicationStatus.APPROVED:
+    case BusinessApplicationStatus.REJECTED:
+    case BusinessApplicationStatus.PENDING:
       return true;
     default:
       return false;

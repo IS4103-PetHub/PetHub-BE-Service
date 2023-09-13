@@ -11,10 +11,10 @@ router.post("/register", petBusinessApplicationController.register);
 //   "/update/:applicationId",
 //   petBusinessApplicationController.updateApplication
 // );
-// router.get("/:status", petBusinessApplicationController.getApplicationByStatus);
-// router.get("/", petBusinessApplicationController.getAllApplications);
-// router.get("/:id", petBusinessApplicationController.getApplicationById);
-// router.get("/status/:id", petBusinessApplicationController.getStatusByPBId);
+router.get("/", petBusinessApplicationController.getAllPetBusinessApplications);
+router.get("/application-id/:id", petBusinessApplicationController.getPetBusinessApplicationById);
+router.get("/filter-status/:status", petBusinessApplicationController.getPetBusinessApplicationByStatus);
+router.get("/pet-business-id/:id", petBusinessApplicationController.getPetBusinessApplicationByPBId);
 // // Remember to do the email for PH-56 for the below
 // router.get("/reject/:id", petBusinessApplicationController.rejectApplication);
 // router.get("/approve/:id", petBusinessApplicationController.approveApplication);

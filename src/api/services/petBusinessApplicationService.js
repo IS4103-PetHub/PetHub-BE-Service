@@ -48,3 +48,68 @@ exports.register = async (data) => {
     throw new PetBusinessApplicationError(error);
   }
 };
+
+exports.getAllPetBusinessApplications = async () => {
+  try {
+    return await prisma.petBusinessApplication.findMany({
+      include: {
+        businessAddresses: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching all pet business applications:", error);
+    throw new PetBusinessApplicationError(error);
+  }
+};
+
+exports.getPetBusinessApplicationById = async (petBusinessApplicationId) => {
+  try {
+    const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
+      where: { petBusinessApplicationId },
+      include: {
+        businessAddresses: true,
+      },
+    });
+    if (!petBusinessApplication) {
+      throw new CustomError("Pet Business Application not found", 404);
+    }
+    return petBusinessApplication;
+  } catch (error) {
+    console.error("Error fetching pet business application by ID:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
+  }
+};
+
+exports.getPetBusinessApplicationByStatus = async (applicationStatus) => {
+  try {
+    const petBusinessApplication = await prisma.petBusinessApplication.findMany({
+      where: { applicationStatus: applicationStatus },
+      include: {
+        businessAddresses: true,
+      },
+    });
+    return petBusinessApplication;
+  } catch (error) {
+    console.error("Error fetching pet business applications by application status:", error);
+    throw new PetBusinessApplicationError(error);
+  }
+};
+
+exports.getPetBusinessApplicationByPBId = async (id) => {
+  try {
+    const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
+      where: { petBusinessId: id },
+    });
+    if (!petBusinessApplication) {
+      throw new CustomError("Pet Business Application not found.");
+    }
+    return petBusinessApplication;
+  } catch (error) {
+    console.error("Error fetching Business Application:", error);
+    throw new PetBusinessApplicationError(error);
+  }
+};
