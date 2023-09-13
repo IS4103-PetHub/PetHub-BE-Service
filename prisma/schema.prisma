@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Sep 13 2023 16:57:34 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Sep 13 2023 23:09:54 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -192,7 +192,9 @@ model PetBusinessApplication {
   petBusinessApplicationId Int                       @id @default(autoincrement())
   businessType             BusinessType?
   businessEmail            String
+  businessDescription      String
   businessAddresses        Address[]
+  websiteURL               String
   attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
   applicationStatus        BusinessApplicationStatus @default(PENDING)
   adminRemarks             String[]

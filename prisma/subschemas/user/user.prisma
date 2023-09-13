@@ -80,7 +80,9 @@ model PetBusinessApplication {
     petBusinessApplicationId    Int                         @id @default(autoincrement())
     businessType                BusinessType?
     businessEmail               String
+    businessDescription         String
     businessAddresses           Address[]
+    websiteURL                  String
     attachments                 String[] // Assuming that these would be URLs pointing to the S3 bucket                 
     applicationStatus           BusinessApplicationStatus   @default(PENDING)
     adminRemarks                String[]
