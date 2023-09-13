@@ -38,13 +38,11 @@ exports.createServiceListing = async (data) => {
 
 exports.updateServiceListing = async (serviceListingId, data) => {
   try {
-    let tagIdsArray = [];
     // format as "[{ tagId: 8 }, { tagId: 9 }, { tagId: 10 }]"
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
+    let tagIdsArray = [];
     if (data.tagIds) {
-      tagIdsArray = data.tagIds
-        .split(",")
-        .map((id) => ({ tagId: parseInt(id.trim(), 10) }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
     }
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
