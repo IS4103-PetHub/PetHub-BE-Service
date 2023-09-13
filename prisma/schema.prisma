@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Sep 13 2023 23:09:54 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Thu Sep 14 2023 04:04:29 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -13,6 +13,7 @@ datasource db {
 enum AccountStatus {
   ACTIVE
   INACTIVE
+  PENDING
 }
 
 enum AccountType {
@@ -156,12 +157,15 @@ model PetOwner {
 model PetBusiness {
   companyName            String
   uen                    String
-  businessType           BusinessType?
-  businessDescription    String?
   contactNumber          String
+  // This section is for the optional fields that are empty during PB signup, but populated during PB app approval //
+  businessType           BusinessType?
+  businessEmail          String?
+  businessDescription    String?
   websiteURL             String?
-  serviceListings        ServiceListing[]
+  // ------------------------------------------------ Section End ------------------------------------------------ //
   businessAddresses      Address[]
+  serviceListings        ServiceListing[]
   petBusinessApplication PetBusinessApplication?
   // logo                String // TODO: figure out best way to save logos
 

@@ -35,6 +35,13 @@ exports.register = async (data) => {
         businessAddresses: true,
       },
     });
+
+    // AccountStatus: INACTIVE -> PENDING
+    await prisma.user.update({
+      where: { userId: Number(data.petBusinessId) },
+      data: { accountStatus: "PENDING" },
+    });
+
     return petBusinessApplication;
   } catch (error) {
     console.error("Error during pet business application creation:", error);

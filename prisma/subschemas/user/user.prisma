@@ -44,12 +44,15 @@ model PetOwner {
 model PetBusiness {
     companyName         String
     uen                 String
-    businessType        BusinessType?
-    businessDescription String?
     contactNumber       String
+    // This section is for the optional fields that are empty during PB signup, but populated during PB app approval //
+    businessType        BusinessType?
+    businessEmail       String?
+    businessDescription String?
     websiteURL          String?
-    serviceListings     ServiceListing[]
+    // ------------------------------------------------ Section End ------------------------------------------------ //
     businessAddresses   Address[]
+    serviceListings     ServiceListing[]
     petBusinessApplication PetBusinessApplication?
     // logo                String // TODO: figure out best way to save logos
 

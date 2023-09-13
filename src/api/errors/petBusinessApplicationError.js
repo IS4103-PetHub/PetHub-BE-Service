@@ -14,8 +14,8 @@ class PetBusinessApplicationError extends CustomError {
         "There exists a Pet Business application with this ID, but it is tied to a different Pet Business";
       statusCode = 400;
     }
-    if (error.code === "P2003") {
-      message = "Invalid Pet Business ID";
+    if (error.code === "P2003" || error.code === "P2025") {
+      message = "No PetBusiness record was found.";
       statusCode = 400;
     }
     super(message, statusCode);

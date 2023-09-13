@@ -2,6 +2,7 @@
 enum AccountStatus {
     ACTIVE
     INACTIVE
+    PENDING
 }
 
 enum AccountType {
