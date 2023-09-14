@@ -1,6 +1,3 @@
-const bcrypt = require('bcryptjs'); // bcrypt for password hashing
-
-
 exports.generateUniqueToken = () => {
     const length = 16;
     const numbers = '0123456789'; 
@@ -18,6 +15,18 @@ exports.generateUniqueToken = () => {
                 break;
         }
     }
-
     return password;
 }
+
+exports.mapUserType = (userType) => {
+    switch (userType) {
+      case 'internal-users':
+        return 'INTERNAL_USER';
+      case 'pet-owners':
+        return 'PET_OWNER';
+      case 'pet-businesses':
+        return 'PET_BUSINESS';
+      default:
+        return null;
+    }
+  }
