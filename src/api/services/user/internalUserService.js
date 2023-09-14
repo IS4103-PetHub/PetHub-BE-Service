@@ -89,6 +89,9 @@ class InternalUserService extends BaseUserService {
                     lastName: data.lastName,
                     adminRole: data.adminRole,
                 },
+                include: {
+                    user: true
+                }
             });
 
             if (!user) throw new CustomError('User not found', 404);

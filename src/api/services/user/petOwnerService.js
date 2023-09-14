@@ -93,6 +93,9 @@ class PetOwnerService extends BaseUserService {
                     contactNumber: data.contactNumber,
                     dateOfBirth: data.dateOfBirth,
                 },
+                include: {
+                    user: true
+                }
             });
             if (!user) throw new CustomError('User not found', 404);
             return this.removePassword(user);

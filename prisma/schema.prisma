@@ -44,7 +44,7 @@ model ServiceListing {
   serviceListingId Int       @id @default(autoincrement())
   title            String
   description      String
-  basePrice        Int       @default(0)
+  basePrice        Float       @default(0)
   dateCreated      DateTime  @default(now())
   lastUpdated      DateTime?
 
