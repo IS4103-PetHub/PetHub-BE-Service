@@ -195,53 +195,6 @@ exports.getPetBusinessApplicationByStatus = async (applicationStatus) => {
   }
 };
 
-exports.getPetBusinessApplicationByPBId = async (id) => {
-  try {
-    const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
-      where: { petBusinessId: id },
-      include: {
-        businessAddresses: true,
-        approver: true,
-      },
-    });
-    if (!petBusinessApplication) {
-      throw new CustomError("Pet Business Application not found.", 404);
-    }
-    return petBusinessApplication;
-  } catch (error) {
-    console.error("Error fetching Business Application:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
-  }
-};
-
-exports.getPetBusinessApplicationStatusByPBId = async (id) => {
-  try {
-    const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
-      where: { petBusinessId: id },
-      select: {
-        applicationStatus: true,
-      },
-    });
-
-    if (!petBusinessApplication) {
-      throw new CustomError("Pet Business Application not found.", 404);
-    }
-
-    return petBusinessApplication.applicationStatus;
-  } catch (error) {
-    console.error("Error fetching Business Application Status:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
-  }
-};
-
 exports.approvePetBusinessApplication = async (id, approverId) => {
   try {
     // just a quick check to terminate early + return custom message if invalid + check that the tied PB's AccountStatus is PENDING only + get email details later

@@ -1,5 +1,13 @@
 const { BusinessType, BusinessApplicationStatus } = require("@prisma/client");
 
+exports.mandatoryFields = [
+  "businessEmail",
+  "businessDescription",
+  "websiteURL",
+  "petBusinessId",
+  "businessType",
+];
+
 exports.isValidBusinessType = (strData) => {
   return Object.values(BusinessType).includes(strData);
 };
@@ -21,6 +29,6 @@ exports.validAddressFieldsPresent = async (addresses) => {
   return true;
 };
 
-exports.mandatoryFieldsCheck = async (mandatoryFields, data) => {
-  return mandatoryFields.every((field) => field in data);
+exports.mandatoryFieldsCheck = async (data) => {
+  return exports.mandatoryFields.every((field) => field in data);
 };

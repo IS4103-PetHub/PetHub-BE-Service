@@ -5,14 +5,6 @@ const PetBusinessApplicationService = require("../services/petBusinessApplicatio
 
 exports.register = async (req, res, next) => {
   try {
-    const mandatoryFields = [
-      "businessEmail",
-      "businessDescription",
-      "websiteURL",
-      "petBusinessId",
-      "businessType",
-    ];
-
     const data = req.body;
     let errorMessage;
 
@@ -20,8 +12,8 @@ exports.register = async (req, res, next) => {
         Not validated for now: attachments
     */
     switch (true) {
-      case !(await PetBusinessApplicationValidations.mandatoryFieldsCheck(mandatoryFields, data)):
-        errorMessage = `One of these fields are missing: ${mandatoryFields}`;
+      case !(await PetBusinessApplicationValidations.mandatoryFieldsCheck(data)):
+        errorMessage = `One of these fields are missing: ${PetBusinessApplicationValidations.mandatoryFields}`;
         break;
       case !(await PetBusinessApplicationValidations.validAddressFieldsPresent(data.businessAddresses)):
         errorMessage = "Invalid address format";
@@ -60,24 +52,15 @@ exports.updatePetBusinessApplication = async (req, res, next) => {
     if (!(await BaseValidations.isValidNumber(petBusinessApplicationId))) {
       return res.status(400).json({ message: "Invalid ID format" });
     }
-
-    const mandatoryFields = [
-      "businessEmail",
-      "businessDescription",
-      "websiteURL",
-      "petBusinessId",
-      "businessType",
-    ];
-
-    const data = req.body; // This body should contain the full data
+    const data = req.body;
     let errorMessage;
 
     /*
         Not validated for now: attachments
     */
     switch (true) {
-      case !(await PetBusinessApplicationValidations.mandatoryFieldsCheck(mandatoryFields, data)):
-        errorMessage = `One of these fields are missing: ${mandatoryFields}`;
+      case !(await PetBusinessApplicationValidations.mandatoryFieldsCheck(data)):
+        errorMessage = `One of these fields are missing: ${PetBusinessApplicationValidations.mandatoryFields}`;
         break;
       case !(await PetBusinessApplicationValidations.validAddressFieldsPresent(data.businessAddresses)):
         errorMessage = "Invalid address format";
@@ -113,7 +96,18 @@ exports.updatePetBusinessApplication = async (req, res, next) => {
 
 exports.getAllPetBusinessApplications = async (req, res, next) => {
   try {
-    const petBusinessApplications = await PetBusinessApplicationService.getAllPetBusinessApplications();
+    const { status } = req.query;
+    console.log("STATUS2", status);
+
+    let petBusinessApplications = [];
+    if (status) {
+      if (!PetBusinessApplicationValidations.isValidApplicationStatus(status)) {
+        return res.status(400).json({ message: "Invalid status { 'PENDING', 'APPROVED', 'REJECTED' }" });
+      }
+      petBusinessApplications = await PetBusinessApplicationService.getPetBusinessApplicationByStatus(status);
+    } else {
+      petBusinessApplications = await PetBusinessApplicationService.getAllPetBusinessApplications();
+    }
     res.status(200).json(petBusinessApplications);
   } catch (error) {
     next(error);
@@ -129,36 +123,6 @@ exports.getPetBusinessApplicationById = async (req, res, next) => {
 
     const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationById(
       Number(petBusinessApplicationId)
-    );
-    res.status(200).json(petBusinessApplication);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getPetBusinessApplicationByStatus = async (req, res, next) => {
-  try {
-    const status = req.params.status;
-    if (!status || !PetBusinessApplicationValidations.isValidApplicationStatus(status)) {
-      return res.status(400).json({ message: "Invalid status { 'PENDING', 'APPROVED', 'REJECTED' }" });
-    }
-    const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationByStatus(
-      status
-    );
-    res.status(200).json(petBusinessApplication);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getPetBusinessApplicationByPBId = async (req, res, next) => {
-  try {
-    const petBusinessId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
-      return res.status(400).json({ message: "Invalid ID Format" });
-    }
-    const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationByPBId(
-      Number(petBusinessId)
     );
     res.status(200).json(petBusinessApplication);
   } catch (error) {

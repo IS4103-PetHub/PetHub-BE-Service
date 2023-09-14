@@ -20,6 +20,6 @@ router.use("/service-listings", serviceListingRoutes);
 router.use("/tags", tagRoutes);
 router.use("/rbac", rbacRoutes);
 router.use("/", authRoutes);
-router.use("/pbapplication", petBusinessApplicationRoutes);
+router.use("/pb-applications", petBusinessApplicationRoutes);
 
 module.exports = router;

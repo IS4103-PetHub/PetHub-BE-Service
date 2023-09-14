@@ -10,7 +10,7 @@ exports.createAddress = async (data) => {
       data: {
         addressName: data.addressName,
         line1: data.line1,
-        line2: data.line2 || null,
+        line2: data.line2,
         postalCode: data.postalCode,
       },
     });
@@ -79,7 +79,7 @@ const updateAddressDetailsForAddressWithAddressId = async (address) => {
       data: {
         addressName: address.addressName,
         line1: address.line1,
-        line2: address.line2 || null,
+        line2: address.line2,
         postalCode: address.postalCode,
       },
     });
