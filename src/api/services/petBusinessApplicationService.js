@@ -168,7 +168,7 @@ exports.getPetBusinessApplicationByPBId = async (id) => {
       },
     });
     if (!petBusinessApplication) {
-      throw new CustomError("Pet Business Application not found.");
+      throw new CustomError("Pet Business Application not found.", 404);
     }
     return petBusinessApplication;
   } catch (error) {
@@ -191,7 +191,7 @@ exports.getPetBusinessApplicationStatusByPBId = async (id) => {
     });
 
     if (!petBusinessApplication) {
-      throw new CustomError("Pet Business Application not found.");
+      throw new CustomError("Pet Business Application not found.", 404);
     }
 
     return petBusinessApplication.applicationStatus;
@@ -207,10 +207,16 @@ exports.getPetBusinessApplicationStatusByPBId = async (id) => {
 
 exports.approvePetBusinessApplication = async (id) => {
   try {
-    // just a quick check to terminate early + return custom message if invalid + check that the tied PB's AccountStatus is PENDING only
+    // just a quick check to terminate early + return custom message if invalid + check that the tied PB's AccountStatus is PENDING only + get email details later
     const associatedPetBusinessApp = await prisma.petBusinessApplication.findUnique({
       where: { petBusinessApplicationId: id },
-      include: { petBusiness: true },
+      include: {
+        petBusiness: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
     if (!associatedPetBusinessApp) {
       throw new CustomError("Pet Business Application not found", 404);
@@ -225,26 +231,30 @@ exports.approvePetBusinessApplication = async (id) => {
       data: { applicationStatus: "APPROVED" },
     });
 
-    // Attempt update - PB - AccountStatus: PENDING only -> ACTIVE, ALSO UPDATE the PB with the new fields frmo the approved application
-    const updatedPetBusiness = await prisma.user.update({
-      where: { userId: updatedApplication.petBusinessId },
+    // Attempt update - PB and User - AccountStatus: PENDING only -> ACTIVE, ALSO UPDATE the PB with the new fields from the approved application
+    await prisma.user.update({
+      where: { userId: associatedPetBusinessApp.petBusiness.userId },
       data: {
         accountStatus: "ACTIVE",
-        businessType: updatedApplication.businessType,
-        websiteURL: updatedApplication.websiteURL,
-        businessDescription: updatedApplication.businessDescription,
-        businessEmail: updatedApplication.businessEmail,
+        petBusiness: {
+          update: {
+            businessType: updatedApplication.businessType,
+            websiteURL: updatedApplication.websiteURL,
+            businessDescription: updatedApplication.businessDescription,
+            businessEmail: updatedApplication.businessEmail,
+          },
+        },
       },
     });
 
     // Notify PB by email
-    const name = updatedPetBusiness.companyName;
+    const name = associatedPetBusinessApp.companyName;
     const link = "http://localhost:3002";
     const body = emailTemplate.petBusinessApplicationApprovalEmail(name, link);
 
     // Don't await the sending of email (will block client), instead promise to catch the error later
     EmailService.sendEmail(
-      updatedPetBusiness.email,
+      associatedPetBusinessApp.petBusiness.user.email,
       "PetHub - Business Partner Application Approved",
       body
     ).catch((error) => {
@@ -264,9 +274,16 @@ exports.approvePetBusinessApplication = async (id) => {
 
 exports.rejectPetBusinessApplication = async (id, remark) => {
   try {
-    // Just a quick check to terminate early + return custom message if invalid
+    // Just a quick check to terminate early + return custom message if invalid + pass in the PB fields for email later
     const associatedPetBusinessApp = await prisma.petBusinessApplication.findUnique({
       where: { petBusinessApplicationId: id },
+      include: {
+        petBusiness: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
     if (!associatedPetBusinessApp) {
       throw new CustomError("Pet Business Application not found", 404);
@@ -278,19 +295,19 @@ exports.rejectPetBusinessApplication = async (id, remark) => {
       data: {
         applicationStatus: "REJECTED",
         adminRemarks: {
-          append: remark,
+          push: remark,
         },
       },
     });
 
     // Notify PB by email
-    const name = updatedPetBusiness.companyName;
+    const name = associatedPetBusinessApp.petBusiness.companyName;
     const link = "http://localhost:3002";
     const body = emailTemplate.petBusinessApplicationRejectionEmail(name, link, remark);
 
     // Don't await the sending of email (will block client), instead promise to catch the error later
     EmailService.sendEmail(
-      updatedPetBusiness.email,
+      associatedPetBusinessApp.petBusiness.user.email,
       "PetHub - Business Partner Application Rejected",
       body
     ).catch((error) => {

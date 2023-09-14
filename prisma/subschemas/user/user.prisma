@@ -50,8 +50,8 @@ model PetBusiness {
     businessEmail       String?
     businessDescription String?
     websiteURL          String?
-    // ------------------------------------------------ Section End ------------------------------------------------ //
     businessAddresses   Address[]
+    // ------------------------------------------------ Section End ------------------------------------------------ //
     serviceListings     ServiceListing[]
     petBusinessApplication PetBusinessApplication?
     // logo                String // TODO: figure out best way to save logos
