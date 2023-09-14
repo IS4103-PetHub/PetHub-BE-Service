@@ -178,3 +178,27 @@ exports.getPetBusinessApplicationByPBId = async (id) => {
     }
   }
 };
+
+exports.getPetBusinessApplicationStatusByPBId = async (id) => {
+  try {
+    const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
+      where: { petBusinessId: id },
+      select: {
+        applicationStatus: true,
+      },
+    });
+
+    if (!petBusinessApplication) {
+      throw new CustomError("Pet Business Application not found.");
+    }
+
+    return petBusinessApplication.applicationStatus;
+  } catch (error) {
+    console.error("Error fetching Business Application Status:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
+  }
+};

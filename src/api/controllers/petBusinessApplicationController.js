@@ -168,3 +168,20 @@ exports.getPetBusinessApplicationByPBId = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getPetBusinessApplicationStatusByPBId = async (req, res, next) => {
+  try {
+    const petBusinessId = req.params.id;
+    if (!petBusinessId) {
+      return res.status(400).json({ message: "Pet Business ID cannot be empty" });
+    }
+    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+      return res.status(400).json({ message: "Invalid ID Format" });
+    }
+    const petBusinessApplicationStatus =
+      await PetBusinessApplicationService.getPetBusinessApplicationStatusByPBId(Number(petBusinessId));
+    res.status(200).json({ status: 200, message: petBusinessApplicationStatus });
+  } catch (error) {
+    next(error);
+  }
+};
