@@ -240,7 +240,7 @@ exports.approvePetBusinessApplication = async (id) => {
     // For each address in the PB app, also link to the PB
     const addresses = await AddressService.getAllAddressesForPetBusinessApplication(id);
     for (let address of addresses) {
-      await AddressService.updateAddressesForPetBusiness(
+      await AddressService.updateAddressIdForPetBusiness(
         address.addressId,
         associatedPetBusinessApp.petBusiness.userId
       );

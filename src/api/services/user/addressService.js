@@ -1,5 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const AddressError = require("../../errors/addressError");
+const CustomError = require("../../errors/customError");
 
 // Unassociated address creation is possible
 exports.createAddress = async (data) => {
@@ -10,14 +12,15 @@ exports.createAddress = async (data) => {
         line1: data.line1,
         line2: data.line2 || null,
         postalCode: data.postalCode,
-        // only add petBusinessId and petBusinessApplicationId if they exist in data
-        ...(data.petBusinessId && { petBusinessId: data.petBusinessId }),
-        ...(data.petBusinessApplicationId && { petBusinessApplicationId: data.petBusinessApplicationId }),
       },
     });
   } catch (error) {
     console.error("Error during address creation:", error);
-    throw new CustomError("Failed to create address");
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError("Failed to create addresses");
+    }
   }
 };
 
@@ -28,7 +31,11 @@ exports.getAllAddressesForPetBusinessApplication = async (petBusinessApplication
     });
   } catch (error) {
     console.error("Error fetching addresses for pet business application:", error);
-    throw new CustomError("Failed to fetch addresses");
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError("Failed to fetch addresses");
+    }
   }
 };
 
@@ -39,11 +46,15 @@ exports.getAllAddressesForPetBusiness = async (petBusinessId) => {
     });
   } catch (error) {
     console.error("Error fetching addresses for pet business:", error);
-    throw new CustomError("Failed to fetch addresses");
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError("Failed to fetch addresses");
+    }
   }
 };
 
-exports.updateAddressesForPetBusiness = async (addressId, petBusinessId) => {
+exports.updateAddressIdForPetBusiness = async (addressId, petBusinessId) => {
   try {
     return await prisma.address.update({
       where: { addressId: addressId },
@@ -53,7 +64,32 @@ exports.updateAddressesForPetBusiness = async (addressId, petBusinessId) => {
     });
   } catch (error) {
     console.error("Error updating address for pet business:", error);
-    throw new CustomError("Failed to update address");
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError("Failed to update address");
+    }
+  }
+};
+
+const updateAddressDetailsForAddressWithAddressId = async (address) => {
+  try {
+    return await prisma.address.update({
+      where: { addressId: address.addressId },
+      data: {
+        addressName: address.addressName,
+        line1: address.line1,
+        line2: address.line2 || null,
+        postalCode: address.postalCode,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating address:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError("Failed to update address");
+    }
   }
 };
 
@@ -64,6 +100,66 @@ exports.deleteAddress = async (addressId) => {
     });
   } catch (error) {
     console.error("Error deleting address:", error);
-    throw new CustomError("Failed to delete address");
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError("Failed to delete addresses");
+    }
+  }
+};
+
+/*
+  For all the address objects in businessAddresses:
+    1. If it has an ID, check PB account if there is an address with that ID linked to it, these references will be kept, just the fields updated if neccessary.
+    2. For all other addresses linked to the PB account, remove them.
+    3. For the addresses provided with no IDs, these are new addresses. Create them.
+  Return a list of IDs of new addresses to link to the PB and a list of IDs of existing addresses to delete from the PB
+*/
+exports.getUpdateAddressDetailsFromAddressArray = async (userId, businessAddresses) => {
+  try {
+    let addressIds = [];
+    let existingAddressIds = [];
+
+    if (businessAddresses && businessAddresses.length > 0) {
+      for (let address of businessAddresses) {
+        // If the address has an ID, update its fields and keep its linkages
+        if (address.addressId) {
+          await updateAddressDetailsForAddressWithAddressId(address);
+          existingAddressIds.push(address.addressId);
+        } else {
+          // If the address does not have an ID, create it
+          const newAddress = await exports.createAddress(address);
+          addressIds.push(newAddress.addressId);
+        }
+      }
+    }
+
+    const currentUser = await prisma.petBusiness.findUnique({
+      where: { userId },
+      select: {
+        businessAddresses: true,
+      },
+    });
+
+    const disconnectAddresses = currentUser.businessAddresses
+      .filter((addr) => !existingAddressIds.includes(addr.addressId))
+      .map((addr) => ({ addressId: addr.addressId }));
+
+    return {
+      newAddressIds: addressIds,
+      disconnectAddresses,
+    };
+  } catch (error) {
+    console.error(
+      "Failed to perform {AddressService: getUpdateAddressDetailsFromAddressArray} when updating a PB's addresses:",
+      error
+    );
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new AddressError(
+        "Failed to perform {AddressService: getUpdateAddressDetailsFromAddressArray} when updating a PB's addresses"
+      );
+    }
   }
 };

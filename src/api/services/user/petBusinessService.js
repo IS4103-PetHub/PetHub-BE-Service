@@ -4,6 +4,7 @@ const { AccountType, AccountStatus } = require("@prisma/client");
 const UserError = require("../../errors/userError");
 const CustomError = require("../../errors/customError");
 const validations = require("../../validations");
+const AddressService = require("./addressService");
 
 // Shared selection fields
 const petBusinessSelectFields = {
@@ -97,6 +98,15 @@ class PetBusinessService extends BaseUserService {
 
   async updateUser(userId, data) {
     try {
+      /*
+        For all the address objects in businessAddresses:
+          1. If it has an ID, check PB account if there is an address with that ID linked to it, these references will be kept, just the fields updated if neccessary.
+          2. For all other addresses linked to the PB account, remove them.
+          3. For the addresses provided with no IDs, these are new addresses. Create them.
+      */
+      const { newAddressIds, disconnectAddresses } =
+        await AddressService.getUpdateAddressDetailsFromAddressArray(userId, data.businessAddresses);
+
       const user = await prisma.petBusiness.update({
         where: { userId },
         data: {
@@ -105,8 +115,15 @@ class PetBusinessService extends BaseUserService {
           businessType: data.businessType,
           businessEmail: data.businessEmail,
           businessDescription: data.businessDescription,
+          businessAddresses: {
+            disconnect: disconnectAddresses, // Disconnect all address that was not provided with an ID
+            connect: newAddressIds.map((id) => ({ addressId: id })), // Link all new addresses (provided with no ID)
+          },
           contactNumber: data.contactNumber,
           websiteURL: data.websiteURL,
+        },
+        include: {
+          businessAddresses: true,
         },
       });
       if (!user) throw new CustomError("User not found", 404);
