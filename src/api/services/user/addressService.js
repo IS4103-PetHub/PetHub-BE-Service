@@ -21,14 +21,49 @@ exports.createAddress = async (data) => {
   }
 };
 
+exports.getAllAddressesForPetBusinessApplication = async (petBusinessApplicationId) => {
+  try {
+    return await prisma.address.findMany({
+      where: { petBusinessApplicationId: petBusinessApplicationId },
+    });
+  } catch (error) {
+    console.error("Error fetching addresses for pet business application:", error);
+    throw new CustomError("Failed to fetch addresses");
+  }
+};
+
 exports.getAllAddressesForPetBusiness = async (petBusinessId) => {
-  return await prisma.address.findMany({
-    where: { petBusinessId: petBusinessId },
-  });
+  try {
+    return await prisma.address.findMany({
+      where: { petBusinessId: petBusinessId },
+    });
+  } catch (error) {
+    console.error("Error fetching addresses for pet business:", error);
+    throw new CustomError("Failed to fetch addresses");
+  }
+};
+
+exports.updateAddressesForPetBusiness = async (addressId, petBusinessId) => {
+  try {
+    return await prisma.address.update({
+      where: { addressId: addressId },
+      data: {
+        petBusinessId: petBusinessId,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating address for pet business:", error);
+    throw new CustomError("Failed to update address");
+  }
 };
 
 exports.deleteAddress = async (addressId) => {
-  await prisma.address.delete({
-    where: { addressId: addressId },
-  });
+  try {
+    await prisma.address.delete({
+      where: { addressId: addressId },
+    });
+  } catch (error) {
+    console.error("Error deleting address:", error);
+    throw new CustomError("Failed to delete address");
+  }
 };

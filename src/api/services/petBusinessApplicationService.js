@@ -60,6 +60,9 @@ exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedD
     if (!existingApplication) {
       throw new CustomError("Pet Business Application not found", 404);
     }
+    if (existingApplication.applicationStatus !== "REJECTED") {
+      throw new CustomError("Only applications with REJECTED status can be updated by the PB");
+    }
 
     // Delete the old addresses if they exist (these addresses are not linked to the pet business!)
     for (let address of existingApplication.businessAddresses) {
@@ -229,7 +232,19 @@ exports.approvePetBusinessApplication = async (id) => {
     const updatedApplication = await prisma.petBusinessApplication.update({
       where: { petBusinessApplicationId: id },
       data: { applicationStatus: "APPROVED" },
+      include: {
+        businessAddresses: true,
+      },
     });
+
+    // For each address in the PB app, also link to the PB
+    const addresses = await AddressService.getAllAddressesForPetBusinessApplication(id);
+    for (let address of addresses) {
+      await AddressService.updateAddressesForPetBusiness(
+        address.addressId,
+        associatedPetBusinessApp.petBusiness.userId
+      );
+    }
 
     // Attempt update - PB and User - AccountStatus: PENDING only -> ACTIVE, ALSO UPDATE the PB with the new fields from the approved application
     await prisma.user.update({
