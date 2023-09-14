@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Sep 14 2023 19:49:12 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Sep 15 2023 01:08:17 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -187,7 +187,7 @@ model Address {
   postalCode               String
   // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
   petBusinessId            Int?
-  PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId])
+  PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
   petBusinessApplicationId Int?
   PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
 }

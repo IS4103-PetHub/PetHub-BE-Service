@@ -74,7 +74,7 @@ model Address {
     postalCode              String
     // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
     petBusinessId           Int?
-    PetBusiness             PetBusiness?            @relation(fields: [petBusinessId], references: [userId])
+    PetBusiness             PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
     petBusinessApplicationId Int?
     PetBusinessApplication  PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
 }
