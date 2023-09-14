@@ -7,7 +7,32 @@ const emailTemplate = require("../resource/emailTemplate");
 
 exports.register = async (data) => {
   try {
-    // Abstract to its own addressService if have time
+    // Quick check to prevent active users (/with preexisting PB app data) from calling this
+    const userWithPetBusinessAndApplication = await prisma.user.findUnique({
+      where: { userId: Number(data.petBusinessId) },
+      include: {
+        petBusiness: {
+          include: {
+            petBusinessApplication: true,
+          },
+        },
+      },
+    });
+    if (!userWithPetBusinessAndApplication) {
+      throw new CustomError("User not found", 404);
+    }
+    if (
+      userWithPetBusinessAndApplication.accountStatus !== "INACTIVE" ||
+      (userWithPetBusinessAndApplication.petBusiness &&
+        userWithPetBusinessAndApplication.petBusiness.petBusinessApplication)
+    ) {
+      throw new CustomError(
+        "Registration not allowed. Account is ACTIVE or already tied with an existing application",
+        400
+      );
+    }
+
+    // Create addresses
     let addressIds = [];
     if (data.businessAddresses && data.businessAddresses.length > 0) {
       for (let address of data.businessAddresses) {
@@ -47,7 +72,11 @@ exports.register = async (data) => {
     return petBusinessApplication;
   } catch (error) {
     console.error("Error during pet business application creation:", error);
-    throw new PetBusinessApplicationError(error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
   }
 };
 
@@ -61,7 +90,7 @@ exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedD
       throw new CustomError("Pet Business Application not found", 404);
     }
     if (existingApplication.applicationStatus !== "REJECTED") {
-      throw new CustomError("Only applications with REJECTED status can be updated by the PB");
+      throw new CustomError("Only applications with REJECTED status can be updated by the PB", 400);
     }
 
     // Delete the old addresses if they exist (these addresses are not linked to the pet business!)
@@ -229,7 +258,6 @@ exports.approvePetBusinessApplication = async (id, approverId) => {
     if (!associatedPetBusinessApp) {
       throw new CustomError("Pet Business Application not found", 404);
     }
-    console.log("HELLSSSSSSSSSSSSSSSSSSSSO", associatedPetBusinessApp.petBusiness.user.accountStatus);
     if (associatedPetBusinessApp.petBusiness.user.accountStatus !== "PENDING") {
       throw new CustomError("Pet Business does not have have accountStatus PENDING", 400);
     }

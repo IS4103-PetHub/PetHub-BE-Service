@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Sep 14 2023 04:04:29 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Thu Sep 14 2023 19:49:12 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -163,8 +163,8 @@ model PetBusiness {
   businessEmail          String?
   businessDescription    String?
   websiteURL             String?
-  // ------------------------------------------------ Section End ------------------------------------------------ //
   businessAddresses      Address[]
+  // ------------------------------------------------ Section End ------------------------------------------------ //
   serviceListings        ServiceListing[]
   petBusinessApplication PetBusinessApplication?
   // logo                String // TODO: figure out best way to save logos
@@ -194,7 +194,7 @@ model Address {
 
 model PetBusinessApplication {
   petBusinessApplicationId Int                       @id @default(autoincrement())
-  businessType             BusinessType?
+  businessType             BusinessType
   businessEmail            String
   businessDescription      String
   businessAddresses        Address[]
