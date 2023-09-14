@@ -2,6 +2,8 @@ const prisma = require("../../../prisma/prisma");
 const CustomError = require("../errors/customError");
 const PetBusinessApplicationError = require("../errors/petBusinessApplicationError");
 const AddressService = require("./user/addressService");
+const EmailService = require("../services/emailService");
+const emailTemplate = require("../resource/emailTemplate");
 
 exports.register = async (data) => {
   try {
@@ -195,6 +197,143 @@ exports.getPetBusinessApplicationStatusByPBId = async (id) => {
     return petBusinessApplication.applicationStatus;
   } catch (error) {
     console.error("Error fetching Business Application Status:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
+  }
+};
+
+exports.approvePetBusinessApplication = async (id) => {
+  try {
+    // just a quick check to terminate early + return custom message if invalid + check that the tied PB's AccountStatus is PENDING only
+    const associatedPetBusinessApp = await prisma.petBusinessApplication.findUnique({
+      where: { petBusinessApplicationId: id },
+      include: { petBusiness: true },
+    });
+    if (!associatedPetBusinessApp) {
+      throw new CustomError("Pet Business Application not found", 404);
+    }
+    if (associatedPetBusinessApp.petBusiness.user.accountStatus !== "PENDING") {
+      throw new CustomError("Pet Business does not have have accountStatus PENDING", 400);
+    }
+
+    // Attempt update - PB APP - BusinessApplicationStatus: PENDING/REJECTED -> APPROVED
+    const updatedApplication = await prisma.petBusinessApplication.update({
+      where: { petBusinessApplicationId: id },
+      data: { applicationStatus: "APPROVED" },
+    });
+
+    // Attempt update - PB - AccountStatus: PENDING only -> ACTIVE, ALSO UPDATE the PB with the new fields frmo the approved application
+    const updatedPetBusiness = await prisma.user.update({
+      where: { userId: updatedApplication.petBusinessId },
+      data: {
+        accountStatus: "ACTIVE",
+        businessType: updatedApplication.businessType,
+        websiteURL: updatedApplication.websiteURL,
+        businessDescription: updatedApplication.businessDescription,
+        businessEmail: updatedApplication.businessEmail,
+      },
+    });
+
+    // Notify PB by email
+    const name = updatedPetBusiness.companyName;
+    const link = "http://localhost:3002";
+    const body = emailTemplate.petBusinessApplicationApprovalEmail(name, link);
+
+    // Don't await the sending of email (will block client), instead promise to catch the error later
+    EmailService.sendEmail(
+      updatedPetBusiness.email,
+      "PetHub - Business Partner Application Approved",
+      body
+    ).catch((error) => {
+      console.error("Error sending approval email:", error);
+    });
+
+    return updatedApplication;
+  } catch (error) {
+    console.error("Error during pet business application approval:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
+  }
+};
+
+exports.rejectPetBusinessApplication = async (id, remark) => {
+  try {
+    // Just a quick check to terminate early + return custom message if invalid
+    const associatedPetBusinessApp = await prisma.petBusinessApplication.findUnique({
+      where: { petBusinessApplicationId: id },
+    });
+    if (!associatedPetBusinessApp) {
+      throw new CustomError("Pet Business Application not found", 404);
+    }
+
+    // Attempt update - PB APP - BusinessApplicationStatus: PENDING/REJECTED -> REJECTED, append remarl
+    const updatedApplication = await prisma.petBusinessApplication.update({
+      where: { petBusinessApplicationId: id },
+      data: {
+        applicationStatus: "REJECTED",
+        adminRemarks: {
+          append: remark,
+        },
+      },
+    });
+
+    // Notify PB by email
+    const name = updatedPetBusiness.companyName;
+    const link = "http://localhost:3002";
+    const body = emailTemplate.petBusinessApplicationRejectionEmail(name, link, remark);
+
+    // Don't await the sending of email (will block client), instead promise to catch the error later
+    EmailService.sendEmail(
+      updatedPetBusiness.email,
+      "PetHub - Business Partner Application Rejected",
+      body
+    ).catch((error) => {
+      console.error("Error sending rejection email:", error);
+    });
+
+    return updatedApplication;
+  } catch (error) {
+    console.error("Error during pet business application rejection:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    } else {
+      throw new PetBusinessApplicationError(error);
+    }
+  }
+};
+
+// This function is for testing
+exports.deletePetBusinessApplicationByPBId = async (id) => {
+  try {
+    const petBusinessApplication = await prisma.petBusinessApplication.findUnique({
+      where: { id },
+      include: { businessAddresses: true },
+    });
+
+    // We don't wanna delete approved applications (those are tied to the PB already)
+    if (!petBusinessApplication) {
+      throw new CustomError("Pet Business Application not found", 404);
+    }
+    if (petBusinessApplication.applicationStatus === "APPROVED") {
+      throw new CustomError("Cannot delete an approved application", 400);
+    }
+
+    // Remove addresses
+    for (let address of petBusinessApplication.businessAddresses) {
+      await AddressService.deleteAddress(address.addressId);
+    }
+
+    await prisma.petBusinessApplication.delete({
+      where: { petBusinessId },
+    });
+  } catch (error) {
+    console.error("Error deleting Pet Business Application", error);
     if (error instanceof CustomError) {
       throw error;
     } else {

@@ -139,7 +139,7 @@ exports.getPetBusinessApplicationById = async (req, res, next) => {
 exports.getPetBusinessApplicationByStatus = async (req, res, next) => {
   try {
     const status = req.params.status;
-    if (!status || !(await PetBusinessApplicationValidations.isValidApplicationStatus(status))) {
+    if (!status || !PetBusinessApplicationValidations.isValidApplicationStatus(status)) {
       return res.status(400).json({ message: "Invalid status { 'PENDING', 'APPROVED', 'REJECTED' }" });
     }
     const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationByStatus(
@@ -154,10 +154,7 @@ exports.getPetBusinessApplicationByStatus = async (req, res, next) => {
 exports.getPetBusinessApplicationByPBId = async (req, res, next) => {
   try {
     const petBusinessId = req.params.id;
-    if (!petBusinessId) {
-      return res.status(400).json({ message: "Pet Business ID cannot be empty" });
-    }
-    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+    if (!(await BaseValidations.isValidNumber(id))) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
     const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationByPBId(
@@ -172,15 +169,65 @@ exports.getPetBusinessApplicationByPBId = async (req, res, next) => {
 exports.getPetBusinessApplicationStatusByPBId = async (req, res, next) => {
   try {
     const petBusinessId = req.params.id;
-    if (!petBusinessId) {
-      return res.status(400).json({ message: "Pet Business ID cannot be empty" });
-    }
-    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+    if (!(await BaseValidations.isValidNumber(id))) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
     const petBusinessApplicationStatus =
       await PetBusinessApplicationService.getPetBusinessApplicationStatusByPBId(Number(petBusinessId));
     res.status(200).json({ status: 200, message: petBusinessApplicationStatus });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.approvePetBusinessApplication = async (req, res, next) => {
+  try {
+    const petBusinessApplicationId = req.params.id;
+    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+      return res.status(400).json({ message: "Invalid ID Format" });
+    }
+    const petBusinessApplication = await PetBusinessApplicationService.approvePetBusinessApplication(
+      Number(petBusinessApplicationId)
+    );
+    res.status(200).json(petBusinessApplication); // Can either return full obj or just a message, but former is chosen
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.rejectPetBusinessApplication = async (req, res, next) => {
+  try {
+    const petBusinessApplicationId = req.params.id;
+    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+      return res.status(400).json({ message: "Invalid ID Format" });
+    }
+
+    // Error with request payload, bad format (400)
+    if (errorMessage) {
+      return res.status(400).json({ errorMessage });
+    }
+
+    const petBusinessApplication = await PetBusinessApplicationService.rejectPetBusinessApplication(
+      Number(petBusinessApplicationId)
+    );
+    res.status(200).json(petBusinessApplication); // Can either return full obj or just a message, but former is chosen
+  } catch (error) {
+    next(error);
+  }
+};
+
+// This function is just for testing purposes
+exports.deletePetBusinessApplicationByPBId = async (req, res, next) => {
+  try {
+    const petBusinessId = req.params.id;
+    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+      return res.status(400).json({ message: "Invalid ID Format" });
+    }
+    await PetBusinessApplicationService.deletePetBusinessApplicationByPBId(
+      Number(petBusinessId),
+      req.body.remark
+    );
+    res.status(200).json({ message: "Deletion successful" });
   } catch (error) {
     next(error);
   }

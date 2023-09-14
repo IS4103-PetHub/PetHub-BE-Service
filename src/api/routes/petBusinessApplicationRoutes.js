@@ -17,9 +17,9 @@ router.get(
   "/status/pet-business-id/:id",
   petBusinessApplicationController.getPetBusinessApplicationStatusByPBId
 );
-
-// // Remember to do the email for PH-56 for the below
-// router.get("/reject/:id", petBusinessApplicationController.rejectApplication);
-// router.get("/approve/:id", petBusinessApplicationController.approveApplication);
+router.delete("/pet-business-id/:id", petBusinessApplicationController.deletePetBusinessApplicationByPBId); // for testing purposes
+// Remember to do the email for PH-56 for the below
+router.post("/approve/:id", petBusinessApplicationController.approvePetBusinessApplication);
+router.post("/reject/:id", petBusinessApplicationController.rejectPetBusinessApplication);
 
 module.exports = router;
