@@ -86,6 +86,7 @@ exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedD
         businessAddresses: {
           connect: addressIds.map((id) => ({ addressId: id })),
         },
+        lastUpdated: new Date(),
       },
 
       include: {
@@ -109,6 +110,7 @@ exports.getAllPetBusinessApplications = async () => {
     return await prisma.petBusinessApplication.findMany({
       include: {
         businessAddresses: true,
+        approver: true,
       },
     });
   } catch (error) {
@@ -127,6 +129,7 @@ exports.getPetBusinessApplicationById = async (petBusinessApplicationId) => {
       where: { petBusinessApplicationId },
       include: {
         businessAddresses: true,
+        approver: true,
       },
     });
     if (!petBusinessApplication) {
@@ -149,6 +152,7 @@ exports.getPetBusinessApplicationByStatus = async (applicationStatus) => {
       where: { applicationStatus: applicationStatus },
       include: {
         businessAddresses: true,
+        approver: true,
       },
     });
     return petBusinessApplication;
@@ -168,6 +172,7 @@ exports.getPetBusinessApplicationByPBId = async (id) => {
       where: { petBusinessId: id },
       include: {
         businessAddresses: true,
+        approver: true,
       },
     });
     if (!petBusinessApplication) {
@@ -208,7 +213,7 @@ exports.getPetBusinessApplicationStatusByPBId = async (id) => {
   }
 };
 
-exports.approvePetBusinessApplication = async (id) => {
+exports.approvePetBusinessApplication = async (id, approverId) => {
   try {
     // just a quick check to terminate early + return custom message if invalid + check that the tied PB's AccountStatus is PENDING only + get email details later
     const associatedPetBusinessApp = await prisma.petBusinessApplication.findUnique({
@@ -224,6 +229,7 @@ exports.approvePetBusinessApplication = async (id) => {
     if (!associatedPetBusinessApp) {
       throw new CustomError("Pet Business Application not found", 404);
     }
+    console.log("HELLSSSSSSSSSSSSSSSSSSSSO", associatedPetBusinessApp.petBusiness.user.accountStatus);
     if (associatedPetBusinessApp.petBusiness.user.accountStatus !== "PENDING") {
       throw new CustomError("Pet Business does not have have accountStatus PENDING", 400);
     }
@@ -231,9 +237,10 @@ exports.approvePetBusinessApplication = async (id) => {
     // Attempt update - PB APP - BusinessApplicationStatus: PENDING/REJECTED -> APPROVED
     const updatedApplication = await prisma.petBusinessApplication.update({
       where: { petBusinessApplicationId: id },
-      data: { applicationStatus: "APPROVED" },
+      data: { applicationStatus: "APPROVED", approverId: approverId },
       include: {
         businessAddresses: true,
+        approver: true,
       },
     });
 
@@ -263,7 +270,7 @@ exports.approvePetBusinessApplication = async (id) => {
     });
 
     // Notify PB by email
-    const name = associatedPetBusinessApp.companyName;
+    const name = associatedPetBusinessApp.petBusiness.companyName;
     const link = "http://localhost:3002";
     const body = emailTemplate.petBusinessApplicationApprovalEmail(name, link);
 
@@ -293,6 +300,7 @@ exports.rejectPetBusinessApplication = async (id, remark) => {
     const associatedPetBusinessApp = await prisma.petBusinessApplication.findUnique({
       where: { petBusinessApplicationId: id },
       include: {
+        businessAddresses: true,
         petBusiness: {
           include: {
             user: true,

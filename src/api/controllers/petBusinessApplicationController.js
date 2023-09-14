@@ -29,7 +29,7 @@ exports.register = async (req, res, next) => {
       case !(await BaseValidations.isValidNumber(data.petBusinessId)):
         errorMessage = "Invalid ID format";
         break;
-      case !(await PetBusinessApplicationValidations.isValidBusinessType(data.businessType)):
+      case !PetBusinessApplicationValidations.isValidBusinessType(data.businessType):
         errorMessage = "Invalid BusinessType";
         break;
       case !(await UserValidations.isValidEmail(data.businessEmail)):
@@ -183,11 +183,16 @@ exports.getPetBusinessApplicationStatusByPBId = async (req, res, next) => {
 exports.approvePetBusinessApplication = async (req, res, next) => {
   try {
     const petBusinessApplicationId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(petBusinessApplicationId))) {
+    const approverId = req.body.approverId;
+    if (
+      !(await BaseValidations.isValidNumber(petBusinessApplicationId)) ||
+      !(await BaseValidations.isValidNumber(approverId))
+    ) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
     const petBusinessApplication = await PetBusinessApplicationService.approvePetBusinessApplication(
-      Number(petBusinessApplicationId)
+      Number(petBusinessApplicationId),
+      approverId
     );
     res.status(200).json(petBusinessApplication); // Can either return full obj or just a message, but former is chosen
   } catch (error) {

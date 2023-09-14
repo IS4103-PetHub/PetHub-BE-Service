@@ -17,9 +17,8 @@ router.get(
   "/status/pet-business-id/:id",
   petBusinessApplicationController.getPetBusinessApplicationStatusByPBId
 );
-router.delete("/pet-business-id/:id", petBusinessApplicationController.deletePetBusinessApplicationByPBId); // for testing purposes
-// Remember to do the email for PH-56 for the below
 router.post("/approve/:id", petBusinessApplicationController.approvePetBusinessApplication);
 router.post("/reject/:id", petBusinessApplicationController.rejectPetBusinessApplication);
+// router.delete("/pet-business-id/:id", petBusinessApplicationController.deletePetBusinessApplicationByPBId); // for testing purposes
 
 module.exports = router;
