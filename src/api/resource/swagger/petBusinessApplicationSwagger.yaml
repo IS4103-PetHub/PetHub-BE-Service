@@ -1,0 +1,415 @@
+swagger: "2.0"
+definitions:
+  PetBusinessApplicationRequest:
+    type: object
+    required:
+      - businessEmail
+      - businessDescription
+      - websiteURL
+      - petBusinessId
+      - businessType
+    properties:
+      businessEmail:
+        type: string
+        description: The business email address that is displayed to the customer.
+      businessDescription:
+        type: string
+        description: The business description of the Pet Business.
+      websiteURL:
+        type: string
+        description: The website URL of the Pet Business.
+      petBusinessId:
+        type: integer
+        description: The unique identifier of the Pet Business associated with this application.
+      businessType:
+        type: string
+        description: The business type of the Pet Business.
+      businessAddresses:
+        type: array
+        items:
+          $ref: "#/definitions/BusinessAddress"
+
+  PetBusinessApplicationResponse:
+    type: object
+    properties:
+      petBusinessApplicationId:
+        type: integer
+        description: The unique identifier of the Pet Business Application.
+      businessType:
+        type: string
+        description: The business type of the Pet Business.
+      businessEmail:
+        type: string
+        description: The business email address that is displayed to the customer.
+      businessDescription:
+        type: string
+        description: The business description of the Pet Business.
+      websiteURL:
+        type: string
+        description: The website URL of the Pet Business.
+      attachments:
+        type: array
+        items:
+          type: string
+        description: List of attachment URLs/identifiers.
+      applicationStatus:
+        type: string
+        enum: [PENDING, APPROVED, REJECTED]
+        description: The status of the application.
+      adminRemarks:
+        type: array
+        items:
+          type: string
+        description: Remarks given by the admin.
+      dateCreated:
+        type: string
+        format: date-time
+        description: The date the application was created.
+      lastUpdated:
+        type: string
+        format: date-time
+        description: The last date the application was updated.
+      petBusinessId:
+        type: integer
+        description: The unique identifier of the Pet Business associated with this application.
+      approverId:
+        type: integer
+        description: The ID of the approver.
+      businessAddresses:
+        type: array
+        items:
+          $ref: "#/definitions/BusinessAddress"
+      approver:
+        $ref: "#/definitions/Approver"
+
+  businessAddresses:
+    type: array
+    description: A list of businesses addresses for this application.
+    items:
+      type: object
+      required:
+        - addressName
+        - line1
+        - postalCode
+      properties:
+        addressName:
+          type: string
+          description: The identifier for this address. This is not a unique property.
+        line1:
+          type: string
+          description: Line 1 of the address.
+        line2:
+          type: string
+          description: The optional line 2 of the address.
+        postalCode:
+          type: string
+          description: The postal code of the address.
+
+  Approver:
+    type: object
+    required:
+      - firstName
+      - lastName
+      - adminRole
+      - userId
+    properties:
+      firstName:
+        type: string
+        description: First name of the approver.
+      lastName:
+        type: string
+        description: Last name of the approver.
+      adminRole:
+        type: string
+        description: Role of the approver in the system.
+      userId:
+        type: integer
+        description: The unique identifier of the approver.
+
+paths:
+  /api/pbapplication/health-check:
+    get:
+      summary: Test endpoint to check if the Pet Business Application API is working
+      responses:
+        200:
+          description: API is working
+      tags:
+        - Health
+  /api/pbapplication/register:
+    post:
+      summary: Register a new pet business application
+      description: Create a new pet business application with the specified details.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters: []
+      requestBody:
+        description: Pet business application details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/PetBusinessApplicationRequest"
+            example:
+              businessEmail: "pet@petgroom.com"
+              businessDescription: "We offer grooming stuff."
+              websiteURL: "https://www.petgroom.com"
+              petBusinessId: 1
+              businessType: "SERVICE"
+              businessAddresses:
+                - addressName: "Main Office"
+                  line1: "123 Paws Street"
+                  line2: "Suite 100"
+                  postalCode: "12345D"
+                - addressName: "Side Office"
+                  line1: "321 Paws Street"
+                  postalCode: "12345F"
+      tags:
+        - PetBusinessApplication
+      responses:
+        201:
+          description: Pet business Application created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationResponse"
+
+  /api/pbapplication/update/{id}:
+    put:
+      summary: Update an existing pet business application
+      description: Update the details of an existing pet business application. Only applications with REJECTED status can be updated.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business Application ID.
+          schema:
+            type: integer
+      requestBody:
+        description: Pet business application details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/PetBusinessApplicationRequest"
+            example:
+              businessEmail: "pet@petgroom.com"
+              businessDescription: "We offer grooming stuff."
+              websiteURL: "https://www.petgroom.com"
+              petBusinessId: 1
+              businessType: "SERVICE"
+              businessAddresses:
+                - addressName: "Main Office"
+                  line1: "123 Paws Street"
+                  line2: "Suite 100"
+                  postalCode: "12345D"
+                - addressName: "Side Office"
+                  line1: "321 Paws Street"
+                  postalCode: "12345F"
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Pet business application updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationStatusResponse"
+
+  /api/pbapplication/:
+    get:
+      summary: Retrieve all pet business applications
+      description: Fetch all the pet business applications available in the system.
+      produces:
+        - application/json
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: A list of pet business applications.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/PetBusinessApplicationRequest"
+
+  /api/pbapplication/application-id/{id}:
+    get:
+      summary: Retrieve pet business application by its application ID
+      description: Fetch a specific pet business application by its unique application ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business Application ID.
+          schema:
+            type: integer
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Pet business application details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationRequest"
+        400:
+          description: Invalid ID format provided.
+        404:
+          description: Pet Business Application not found based on the provided ID.
+
+  /api/pbapplication/filter-status/{status}:
+    get:
+      summary: Filter pet business applications by status
+      description: Fetch pet business applications based on their application status.
+      parameters:
+        - in: path
+          name: status
+          required: true
+          description: Application status - PENDING, APPROVED, or REJECTED.
+          schema:
+            type: string
+            enum: [PENDING, APPROVED, REJECTED]
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: List of pet business applications filtered by status.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/PetBusinessApplicationRequest"
+        400:
+          description: Invalid status provided.
+
+  /api/pbapplication/pet-business-id/{id}:
+    get:
+      summary: Retrieve pet business application by pet business ID
+      description: Fetch a specific pet business application by its unique pet business ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business ID.
+          schema:
+            type: integer
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Pet business application details based on pet business ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationRequest"
+        400:
+          description: Invalid ID format provided.
+        404:
+          description: Pet Business Application not found based on the provided ID.
+
+  /api/pbapplication/status/pet-business-id/{id}:
+    get:
+      summary: Retrieve pet business application status by pet business ID
+      description: Fetch the application status of a specific pet business using its unique pet business ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business ID.
+          schema:
+            type: integer
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Pet business application status based on pet business ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                    enum: [PENDING, APPROVED, REJECTED]
+        400:
+          description: Invalid ID format provided.
+        404:
+          description: Pet Business Application not found based on the provided ID.
+
+  /api/pbapplication/approve/{id}:
+    post:
+      summary: Approve a pet business application
+      description: Approves a specific pet business application based on its unique ID and updates related data.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business Application ID.
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approverId:
+                  type: integer
+                  description: ID of the approver.
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Pet business application approval details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationRequest"
+        400:
+          description: Invalid ID format provided or pet business does not have accountStatus as PENDING.
+        404:
+          description: Pet Business Application not found based on the provided ID.
+
+  /api/pbapplication/reject/{id}:
+    post:
+      summary: Reject a pet business application
+      description: Rejects a specific pet business application by its unique ID and sends a notification email.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business Application ID.
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                remark:
+                  type: string
+                  description: Remarks for rejection.
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Pet business application rejection details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationRequest"
+        400:
+          description: Invalid ID format provided.
+        404:
+          description: Pet Business Application not found based on the provided ID.
