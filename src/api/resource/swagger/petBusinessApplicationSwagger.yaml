@@ -365,6 +365,69 @@ paths:
         404:
           description: Pet Business Application not found based on the provided ID.
 
+  /api/pb-applications/pet-business/{id}:
+    get:
+      summary: Retrieve a specific pet business application by the pet business ID tied to it
+      description: Fetch details of a pet business application using the ID of the pet business tied to it.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Pet Business ID.
+          schema:
+            type: integer
+      tags:
+        - PetBusinessApplication
+      responses:
+        200:
+          description: Details of the specified pet business.
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PetBusinessApplicationRequest"
+              example:
+                petBusinessApplicationId: 13
+                businessType: SERVICE
+                businessEmail: example@gmail.com
+                businessDescription: ello there
+                websiteURL: https://www.google.com
+                attachments: []
+                applicationStatus: APPROVED
+                adminRemarks:
+                  - Test remark 1
+                  - Test remark 1
+                  - Test remark 1
+                  - Test remark 1
+                  - Test remark 2
+                dateCreated: "2023-09-14T08:12:43.130Z"
+                lastUpdated: "2023-09-14T08:28:24.971Z"
+                petBusinessId: 21
+                approverId: 1
+                businessAddresses:
+                  - addressId: 97
+                    addressName: address3
+                    line1: line1
+                    line2: line2
+                    postalCode: 12983714
+                    petBusinessId: 21
+                    petBusinessApplicationId: 13
+                  - addressId: 98
+                    addressName: address4
+                    line1: line1
+                    line2:
+                    postalCode: 12983714
+                    petBusinessId: 21
+                    petBusinessApplicationId: 13
+                approver:
+                  firstName: Jake
+                  lastName: TheDog
+                  adminRole: ADMINISTRATOR
+                  userId: 1
+        400:
+          description: Invalid ID format provided.
+        404:
+          description: Pet Business not found based on the provided ID.
+
   /api/pb-applications/status/{id}:
     get:
       summary: Retrieve pet business application status by pet business ID
