@@ -14,7 +14,18 @@ class UserGroupService {
                         include: { permission: true }
                     },
                     userGroupMemberships: {
-                        include: { user: true }
+                        include: { 
+                            user: {
+                                include: { 
+                                    internalUser: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                 }
             });

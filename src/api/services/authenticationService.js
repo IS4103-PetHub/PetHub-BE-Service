@@ -31,7 +31,7 @@ class AuthenticationService {
 
             const token = UserHelper.generateUniqueToken();
             const baseurl = (accountType == "INTERNAL_USER") ? "http://localhost:3001" : "http://localhost:3002";
-            const link = `${baseurl}/resetpassword?token=${token}`;
+            const link = `${baseurl}/reset-password?token=${token}`;
             const body = emailTemplate.forgetPasswordEmail(link);
             await this.createResetPasswordRecord(token, email);
             await EmailService.sendEmail(email, 'PetHub Forget Password', body);
