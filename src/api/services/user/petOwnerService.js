@@ -85,20 +85,34 @@ class PetOwnerService extends BaseUserService {
 
     async updateUser(userId, data) {
         try {
-            const user = await prisma.petOwner.update({
-                where: { userId },
-                data: {
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    contactNumber: data.contactNumber,
-                    dateOfBirth: data.dateOfBirth,
-                },
-                include: {
-                    user: true
+            const updatedUser = await prisma.$transaction(async (prismaClient) => {
+                if (data.email) {
+                    await prismaClient.user.update({
+                        where: { userId },
+                        data: {
+                            email: data.email,
+                            lastUpdated: new Date(),
+                        }
+                    })
                 }
-            });
-            if (!user) throw new CustomError('User not found', 404);
-            return this.removePassword(user);
+
+                const user = await prismaClient.petOwner.update({
+                    where: { userId },
+                    data: {
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        contactNumber: data.contactNumber,
+                        dateOfBirth: data.dateOfBirth,
+                    },
+                    include: {
+                        user: true
+                    }
+                });
+                return user
+            })
+
+
+            return this.removePassword(updatedUser);
         } catch (error) {
             console.error("Error during user update:", error);
             throw new UserError(error);
