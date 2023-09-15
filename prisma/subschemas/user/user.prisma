@@ -1,6 +1,7 @@
-import {AccountType, AdminRole, AccountStatus, BusinessType} from "../enums/accountEnums"
+import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus} from "../enums/accountEnums"
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
+import { PetBusiness } from "..\..\schema"
 // Entities
 model User {
     userId        Int           @id @default(autoincrement())
@@ -24,6 +25,7 @@ model InternalUser {
     firstName String
     lastName  String
     adminRole AdminRole
+    approvedPetBusinessApplications PetBusinessApplication[]
 
     user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
     userId Int  @id @unique
@@ -42,11 +44,16 @@ model PetOwner {
 model PetBusiness {
     companyName         String
     uen                 String
-    businessType        BusinessType?
-    businessDescription String?
     contactNumber       String
+    // This section is for the optional fields that are empty during PB signup, but populated during PB app approval //
+    businessType        BusinessType?
+    businessEmail       String?
+    businessDescription String?
     websiteURL          String?
-    serviceListings ServiceListing[]
+    businessAddresses   Address[]
+    // ------------------------------------------------ Section End ------------------------------------------------ //
+    serviceListings     ServiceListing[]
+    petBusinessApplication PetBusinessApplication?
     // logo                String // TODO: figure out best way to save logos
 
     user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -57,4 +64,37 @@ model ResetPassword {
   token String @unique
   expiryDate DateTime
   email String 
+}
+
+model Address {
+    addressId               Int                     @id @default(autoincrement())
+    addressName             String
+    line1                   String
+    line2                   String?
+    postalCode              String
+    // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
+    petBusinessId           Int?
+    PetBusiness             PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
+    petBusinessApplicationId Int?
+    PetBusinessApplication  PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+}
+
+model PetBusinessApplication {
+    petBusinessApplicationId    Int                         @id @default(autoincrement())
+    businessType                BusinessType
+    businessEmail               String
+    businessDescription         String
+    businessAddresses           Address[]
+    websiteURL                  String?
+    attachments                 String[] // Assuming that these would be URLs pointing to the S3 bucket                 
+    applicationStatus           BusinessApplicationStatus   @default(PENDING)
+    adminRemarks                String[]
+    dateCreated                 DateTime                    @default(now())
+    lastUpdated                 DateTime?
+
+    petBusinessId               Int @unique
+    petBusiness                 PetBusiness                 @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade)
+    
+    approverId                  Int?
+    approver                    InternalUser?               @relation(fields: [approverId], references: [userId])
 }
