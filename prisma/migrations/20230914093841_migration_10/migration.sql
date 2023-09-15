@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "ServiceListing" ALTER COLUMN "basePrice" SET DEFAULT 0,
-ALTER COLUMN "basePrice" SET DATA TYPE DOUBLE PRECISION;
