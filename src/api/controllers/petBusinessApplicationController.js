@@ -36,7 +36,7 @@ exports.register = async (req, res, next) => {
 
     // Error with request payload, bad format (400)
     if (errorMessage) {
-      return res.status(400).json({ errorMessage });
+      return res.status(400).json({ message: errorMessage });
     }
 
     const petBusinessApplication = await PetBusinessApplicationService.register(data);
@@ -74,7 +74,7 @@ exports.updatePetBusinessApplication = async (req, res, next) => {
       case !(await UserValidations.isValidEmail(data.businessEmail)):
         errorMessage = "Invalid email address";
         break;
-      case !(await UserValidations.isValidURL(data.websiteURL)):
+      case !(data.websiteURL === "" || (await UserValidations.isValidURL(data.websiteURL))):
         errorMessage = "Invalid website URL";
         break;
       default:
@@ -82,7 +82,7 @@ exports.updatePetBusinessApplication = async (req, res, next) => {
     }
     // Error with request payload, bad format (400)
     if (errorMessage) {
-      return res.status(400).json({ errorMessage });
+      return res.status(400).json({ message: errorMessage });
     }
     const petBusinessApplication = await PetBusinessApplicationService.updatePetBusinessApplication(
       Number(petBusinessApplicationId),
