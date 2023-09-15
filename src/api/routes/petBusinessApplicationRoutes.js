@@ -10,6 +10,7 @@ router.post("/", petBusinessApplicationController.register);
 router.put("/:id", petBusinessApplicationController.updatePetBusinessApplication);
 router.get("/", petBusinessApplicationController.getAllPetBusinessApplications); // accepts a query param for "status"
 router.get("/:id", petBusinessApplicationController.getPetBusinessApplicationById);
+router.get("/pet-business/:id", petBusinessApplicationController.getPetBusinessApplicationByPBId);
 router.get("/status/:id", petBusinessApplicationController.getPetBusinessApplicationStatusByPBId);
 router.post("/approve/:id", petBusinessApplicationController.approvePetBusinessApplication);
 router.post("/reject/:id", petBusinessApplicationController.rejectPetBusinessApplication);

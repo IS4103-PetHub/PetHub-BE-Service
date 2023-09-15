@@ -27,7 +27,7 @@ exports.register = async (req, res, next) => {
       case !(await UserValidations.isValidEmail(data.businessEmail)):
         errorMessage = "Invalid email address";
         break;
-      case !(await UserValidations.isValidURL(data.websiteURL)):
+      case !(data.websiteURL === "" || (await UserValidations.isValidURL(data.websiteURL))):
         errorMessage = "Invalid website URL";
         break;
       default:
@@ -123,6 +123,21 @@ exports.getPetBusinessApplicationById = async (req, res, next) => {
 
     const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationById(
       Number(petBusinessApplicationId)
+    );
+    res.status(200).json(petBusinessApplication);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getPetBusinessApplicationByPBId = async (req, res, next) => {
+  try {
+    const petBusinessId = req.params.id;
+    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+      return res.status(400).json({ message: "Invalid ID Format" });
+    }
+    const petBusinessApplication = await PetBusinessApplicationService.getPetBusinessApplicationByPBId(
+      Number(petBusinessId)
     );
     res.status(200).json(petBusinessApplication);
   } catch (error) {

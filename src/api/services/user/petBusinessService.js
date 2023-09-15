@@ -14,6 +14,11 @@ const petBusinessSelectFields = {
   businessEmail: true,
   businessDescription: true,
   businessAddresses: true,
+  petBusinessApplication: {
+    select: {
+      petBusinessApplicationId: true,
+    },
+  },
   contactNumber: true,
   websiteURL: true,
   userId: true,
