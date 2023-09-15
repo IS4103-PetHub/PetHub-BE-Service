@@ -30,7 +30,8 @@ exports.loginUser = async (req, res, next) => {
     if (!service) return;
 
     const { email, password } = req.body;
-    const user = await service.login(email, password);
+    const userType = req.params.userType;
+    const user = await service.login(email, password, userType);
     res.json(user);
   } catch (error) {
     next(error);
@@ -114,9 +115,13 @@ exports.updateUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
 
+    
     const updateData = req.body;
-    await service.updateUser(Number(userId), updateData);
-    res.status(200).json(updateData);
+    if (updateData.email && !(await UserValidations.isValidEmail(updateData.email))) {
+      return res.status(400).json({ message: "Invalid Email Format"})
+    }
+    const updatedUser = await service.updateUser(Number(userId), updateData);
+    res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
   }
@@ -177,98 +182,11 @@ exports.forgetPassword = async (req, res, next) => {
 exports.changePassword = async (req, res, next) => {
   try {
     const { email, password, newPassword } = req.body;
-    if (!await UserValidations.isValidPassword(newPassword) || !await UserValidations.isValidPassword(newPassword)) {
-      return res.status(400).json({ message: 'Invalid password format' });
+
+    if (newPassword == password) {
+      return res.status(400).json( {message: 'New password must be different from the old password'})
     }
 
-    if (!await UserValidations.isValidEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email address' });
-    }
-
-    await baseUserServiceInstance.login(email, password)
-    await baseUserServiceInstance.resetPassword(email, newPassword)
-    res.status(200).json({ message: "Change Password successfullyy" });
-  } catch (error) {
-    next(error)
-  }
-}
-
-exports.activateUser = async (req, res, next) => {
-  try {
-    const userId = req.params.id;
-    if (!await BaseValidations.isValidNumber(userId)) {
-      return res.status(400).json({ message: 'Invalid ID Format' });
-    }
-
-    const activateUserPayload = req.body;
-    if (!activateUserPayload || !await UserValidations.isValidPassword(activateUserPayload.password)) {
-      return res.status(400).json({ message: 'Invalid password format' });
-    }
-
-    await baseUserServiceInstance.activateUser(Number(userId), activateUserPayload.password);
-    res.status(200).json({ message: 'User activated successfully' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.deactivateUser = async (req, res, next) => {
-  try {
-    const userId = req.params.id;
-    if (!await BaseValidations.isValidNumber(userId)) {
-      return res.status(400).json({ message: 'Invalid ID Format' });
-    }
-
-    const deactivateUserPayload = req.body;
-
-    if (!deactivateUserPayload || !await UserValidations.isValidPassword(deactivateUserPayload.password)) {
-      return res.status(400).json({ message: 'Invalid password format' });
-    }
-
-    await baseUserServiceInstance.deactivateUser(Number(userId), deactivateUserPayload.password);
-    res.status(200).json({ message: 'User deactivated successfully' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/*
-***************************************************************************
- * COMMON USER FUNCTIONS
-**************************************************************************
-*/
-exports.resetPasswordFromEmail = async (req, res, next) => {
-  try {
-    const token = req.params.token;
-    const { newPassword } = req.body;
-    if (!await UserValidations.isValidPassword(newPassword)) {
-      throw new CustomError('Invalid password format', 400);
-    }
-
-    await AuthenticationService.handleResetPassword(token, newPassword);
-    res.status(200).json({ message: "Password Reset successfully" });
-  } catch (error) {
-    next(error);
-  }
-}
-
-exports.forgetPassword = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    if (!await UserValidations.isValidEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email address' });
-    }
-
-    await AuthenticationService.handleForgetPassword(email);
-    res.status(200).json({ message: "Password Reset Email sent successfully" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.changePassword = async (req, res, next) => {
-  try {
-    const { email, password, newPassword } = req.body;
     if (!await UserValidations.isValidPassword(newPassword) || !await UserValidations.isValidPassword(newPassword)) {
       return res.status(400).json({ message: 'Invalid password format' });
     }

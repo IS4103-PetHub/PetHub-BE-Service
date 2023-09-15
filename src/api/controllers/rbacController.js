@@ -50,7 +50,11 @@ exports.updateUserGroup = async (req, res, next) => {
         }
 
         const updateData = req.body;
-        if (!validations.isValidUserGroupPayload(updateData)) {
+        if (!updateData.permissionIds && !updateData.name && !updateData.description) {
+            return res.status(400).json({ message: 'Invalid input: name, description or permissionId Required'})
+        }
+        
+        if (updateData.permissionIds && !validations.isValidUserGroupPayload(updateData)) {
             return res.status(400).json({ message: 'Invalid input: Name must not be empty and all permission IDs should be numeric.' });
         }
 

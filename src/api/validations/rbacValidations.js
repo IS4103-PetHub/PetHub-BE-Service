@@ -9,9 +9,15 @@ exports.isValidUserGroupPayload = (payload) => {
         return false;
     }
 
-    const hasValidName = typeof payload.name === 'string' && payload.name.trim() !== '';
-    const hasValidPermissionIds = Array.isArray(payload.permissionIds) &&
-        payload.permissionIds.every(id => isValidNumericID(id));
+    let hasValidName = true
+    if(payload.name) {
+        hasValidName = typeof payload.name === 'string' && payload.name.trim() !== '';
+    }
+    let hasValidPermissionIds = true
+    if(payload.permissionIds) {
+        hasValidPermissionIds = Array.isArray(payload.permissionIds) && payload.permissionIds.every(id => isValidNumericID(id));
+    }
+
     // Return true only if both name and permissionIds are valid
     return hasValidName && hasValidPermissionIds;
 }

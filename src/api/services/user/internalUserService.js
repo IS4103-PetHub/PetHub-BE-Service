@@ -82,18 +82,36 @@ class InternalUserService extends BaseUserService {
 
     async updateUser(userId, data) {
         try {
-            const user = await prisma.internalUser.update({
-                where: { userId },
-                data: {
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    adminRole: data.adminRole,
-                },
-            });
 
-            if (!user) throw new CustomError('User not found', 404);
+            const updatedUser = await prisma.$transaction(async (prismaClient) => {
+                
+                if (data.email) {
+                    await prismaClient.user.update({
+                        where: { userId },
+                        data: {
+                            email: data.email,
+                            lastUpdated: new Date(),
+                        }
+                    })
+                }
 
-            return this.removePassword(user);
+                const user = await prismaClient.internalUser.update({
+                    where: { userId },
+                    data: {
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        adminRole: data.adminRole,
+                    },
+                    include: {
+                        user: true
+                    }
+                });
+                
+                return user
+            })
+
+            delete updatedUser.user.password;
+            return this.removePassword(updatedUser);
         } catch (error) {
             console.error("Error during user update:", error);
             throw new UserError(error);

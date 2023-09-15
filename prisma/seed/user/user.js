@@ -8,7 +8,7 @@ const petBusinesses = [
     email: "john.doe123231@example.com",
     password: "password1234",
     companyName: "John's Company",
-    uen: "13213821312",
+    uen: "12345678A",
     contactNumber: "93727651",
   },
   {
@@ -16,7 +16,7 @@ const petBusinesses = [
     email: "jane.smith@example.com",
     password: "pass12345", 
     companyName: "Smith's Pet Shop",
-    uen: "987654321",
+    uen: "12345678B",
     contactNumber: "5551234",
   },
   {
@@ -24,7 +24,7 @@ const petBusinesses = [
     email: "mike.petbiz@example.com",
     password: "secure1234", 
     companyName: "Mike's Pet Business",
-    uen: "1122334455",
+    uen: "12345678C",
     contactNumber: "12345678",
   },
   {
@@ -32,7 +32,7 @@ const petBusinesses = [
     email: "susan.animalstore@example.com",
     password: "mypets123", 
     companyName: "Susan's Animal Store",
-    uen: "987654321",
+    uen: "12345678D",
     contactNumber: "98765432",
   },
   {
@@ -40,7 +40,7 @@ const petBusinesses = [
     email: "petstore123@example.com",
     password: "pets12345", 
     companyName: "PetStore123",
-    uen: "9988776655",
+    uen: "12345678E",
     contactNumber: "99999999",
   },
 ];

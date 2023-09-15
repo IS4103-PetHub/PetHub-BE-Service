@@ -4,6 +4,7 @@ const prisma = require('../../../../prisma/prisma');
 const UserError = require('../../errors/userError')
 const CustomError = require('../../errors/customError')
 const { AccountStatus } = require('@prisma/client');
+const usersHelper = require('../../helpers/usersHelper')
 // Shared selection fields
 const userSelectFields = {
   userId: true,
@@ -97,12 +98,16 @@ class BaseUserService {
   }
 
   // Verify user
-  async login(email, password) {
+  async login(email, password, userType) {
     try {
       // TODO: Generate token or create session here
       // const token = jwt.sign({ userId: user.id }, 'your_secret_key');
       // return { user, token }; 
-      return this.verifyUserByEmail(email, password);
+      const user = await this.verifyUserByEmail(email, password);
+      if (user.accountType != usersHelper.mapUserType(userType)) {
+        throw new CustomError('Invalid Login Credentials', 403)
+      }
+      return user;
     } catch (error) {
       if (error instanceof CustomError || error instanceof UserError) {
         throw error;
@@ -127,7 +132,6 @@ class BaseUserService {
         },
       })
       if (!updatedUser) throw new CustomError('User not found', 404);
-      console.log(`Password successfuly reset`)
     } catch (error) {
       if (error instanceof CustomError) throw error;
       console.error("Error resetting password:", error);
