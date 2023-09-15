@@ -115,7 +115,11 @@ exports.updateUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
 
+    
     const updateData = req.body;
+    if (updateData.email && !(await UserValidations.isValidEmail(updateData.email))) {
+      return res.status(400).json({ message: "Invalid Email Format"})
+    }
     const updatedUser = await service.updateUser(Number(userId), updateData);
     res.status(200).json(updatedUser);
   } catch (error) {

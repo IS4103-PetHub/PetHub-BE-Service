@@ -191,10 +191,13 @@ definitions:
         enum:
           - MANAGER
           - ADMINISTRATOR
+      email:
+        type: string
     example:
       firstName: "John1"
       lastName: "Doe1"
       adminRole: "ADMINISTRATOR"
+      email: "admin@example.com"
 
   PutPetOwner:
     type: object
@@ -208,11 +211,14 @@ definitions:
       dateOfBirth:
         type: string
         format: date-time
+      email:
+        type: string
     example:
       firstName: "John1"
       lastName: "Doe1"
       contactNumber: "12345678"
       dateOfBirth: "1990-01-15T00:00:00Z"
+      email: "petowner@example.com"
 
   PutPetBusiness:
     type: object
@@ -233,6 +239,8 @@ definitions:
         type: string
       websiteURL:
         type: string
+      email:
+        type: string
     example:
       companyName: "abcd company"
       uen: "12345678X"
@@ -240,6 +248,7 @@ definitions:
       businessDescription: "Updated pet service company"
       contactNumber: "98765432"
       websiteURL: "www.updatedabcd.com"
+      email: "petbusiness@example.com"
 
   post-forget-password:
     type: object
