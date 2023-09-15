@@ -123,7 +123,7 @@ class PetBusinessService extends BaseUserService {
                 });
                 return user
             })
-
+            delete updatedUser.user.password;
             return this.removePassword(updatedUser);
         } catch (error) {
             console.error("Error during user update:", error);
