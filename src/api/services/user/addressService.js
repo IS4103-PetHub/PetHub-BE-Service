@@ -93,6 +93,11 @@ const updateAddressDetailsForAddressWithAddressId = async (address) => {
   }
 };
 
+/* 
+  This function is being used internally by petBusinessApplicationService
+  If desired, create a new function called unlinkAddressFromPetBusiness if the intention is only to unlink from PBs while keeping the address OR
+  modify this function to do a check
+*/
 exports.deleteAddress = async (addressId) => {
   try {
     await prisma.address.delete({

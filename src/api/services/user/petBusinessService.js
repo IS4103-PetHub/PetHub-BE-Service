@@ -101,44 +101,6 @@ class PetBusinessService extends BaseUserService {
     }
   }
 
-  async updateUser(userId, data) {
-    try {
-      /*
-        For all the address objects in businessAddresses:
-          1. If it has an ID, check PB account if there is an address with that ID linked to it, these references will be kept, just the fields updated if neccessary.
-          2. For all other addresses linked to the PB account, remove them.
-          3. For the addresses provided with no IDs, these are new addresses. Create them.
-      */
-      const { newAddressIds, disconnectAddresses } =
-        await AddressService.getUpdateAddressDetailsFromAddressArray(userId, data.businessAddresses);
-
-      const user = await prisma.petBusiness.update({
-        where: { userId },
-        data: {
-          companyName: data.companyName,
-          uen: data.uen,
-          businessType: data.businessType,
-          businessEmail: data.businessEmail,
-          businessDescription: data.businessDescription,
-          businessAddresses: {
-            disconnect: disconnectAddresses, // Disconnect all address that was not provided with an ID
-            connect: newAddressIds.map((id) => ({ addressId: id })), // Link all new addresses (provided with no ID)
-          },
-          contactNumber: data.contactNumber,
-          websiteURL: data.websiteURL,
-        },
-        include: {
-          businessAddresses: true,
-        },
-      });
-      if (!user) throw new CustomError("User not found", 404);
-      return this.removePassword(user);
-    } catch (error) {
-      console.error("Error during user update:", error);
-      throw new UserError(error);
-    }
-  }
-
   async deleteUser(userId) {
     try {
       return await prisma.petBusiness.delete({
@@ -152,6 +114,15 @@ class PetBusinessService extends BaseUserService {
 
   async updateUser(userId, data) {
     try {
+      /*
+        For all the address objects in businessAddresses:
+          1. If it has an ID, check PB account if there is an address with that ID linked to it, these references will be kept, just the fields updated if neccessary.
+          2. For all other addresses linked to the PB account, remove them.
+          3. For the addresses provided with no IDs, these are new addresses. Create them.
+      */
+      const { newAddressIds, disconnectAddresses } =
+        await AddressService.getUpdateAddressDetailsFromAddressArray(userId, data.businessAddresses);
+
       const updatedUser = await prisma.$transaction(async (prismaClient) => {
         if (data.email) {
           await prismaClient.user.update({
@@ -169,12 +140,18 @@ class PetBusinessService extends BaseUserService {
             companyName: data.companyName,
             uen: data.uen,
             businessType: data.businessType,
+            businessEmail: data.businessEmail,
             businessDescription: data.businessDescription,
+            businessAddresses: {
+              disconnect: disconnectAddresses, // Disconnect all address that was not provided with an ID
+              connect: newAddressIds.map((id) => ({ addressId: id })), // Link all new addresses (provided with no ID)
+            },
             contactNumber: data.contactNumber,
             websiteURL: data.websiteURL,
           },
           include: {
             user: true,
+            businessAddresses: true,
           },
         });
         return user;
