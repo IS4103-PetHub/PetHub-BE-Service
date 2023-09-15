@@ -14,7 +14,18 @@ class UserGroupService {
                         include: { permission: true }
                     },
                     userGroupMemberships: {
-                        include: { user: true }
+                        include: { 
+                            user: {
+                                include: { 
+                                    internalUser: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                 }
             });
@@ -52,8 +63,9 @@ class UserGroupService {
         try {
             const existingPermissions = await rbacService.getUserGroupPermissions(groupId);
             const existingPermissionIdsSet = new Set(existingPermissions.map(entry => entry.permissionId));
-            const newPermissionIdsSet = new Set(data.permissionIds);
-            const permissionIdsToRemove = [...existingPermissionIdsSet].filter(permissionId => !newPermissionIdsSet.has(permissionId));
+            const newPermissionIdsSet = (data.permissionIds) ? new Set(data.permissionIds) : [];
+            // Dont remove permission if data.permissionids is empty
+            const permissionIdsToRemove = (data.permissionIds) ? [...existingPermissionIdsSet].filter(permissionId => !newPermissionIdsSet.has(permissionId)) : [];
 
             const updatedUserGroup = await prisma.$transaction(async (prismaClient) => {
                 // Update User Group Details
@@ -65,34 +77,37 @@ class UserGroupService {
                     },
                 });
 
-                // Delete existing permissionIDs that are not part of the payload
-                for (const permissionId of permissionIdsToRemove) {
-                    try {
-                        await prismaClient.userGroupPermission.delete({
-                            where: {
-                                groupId_permissionId: {
-                                    groupId: groupId,
-                                    permissionId: permissionId
-                                }
-                            }
-                        });
-                    } catch (error) {
-                        throw new CustomError(`Failed to detach permissions for permission ID: ${permissionId}.`, 400);
-                    }
-                }
-
-                // Add additional permissionIDs that are not part of the existing permissions
-                for (const permissionId of data.permissionIds) {
-                    if (!existingPermissionIdsSet.has(permissionId)) {
+                // Only run change when permissionids is given
+                if (data.permissionIds) {
+                    // Delete existing permissionIDs that are not part of the payload
+                    for (const permissionId of permissionIdsToRemove) {
                         try {
-                            await prismaClient.userGroupPermission.create({
-                                data: {
-                                    groupId: groupId,
-                                    permissionId: permissionId,
-                                },
+                            await prismaClient.userGroupPermission.delete({
+                                where: {
+                                    groupId_permissionId: {
+                                        groupId: groupId,
+                                        permissionId: permissionId
+                                    }
+                                }
                             });
                         } catch (error) {
-                            throw new CustomError(`Failed to attach new permissions for permission ID: ${permissionId}.`, 400);
+                            throw new CustomError(`Failed to detach permissions for permission ID: ${permissionId}.`, 400);
+                        }
+                    }
+    
+                    // Add additional permissionIDs that are not part of the existing permissions
+                    for (const permissionId of data.permissionIds) {
+                        if (!existingPermissionIdsSet.has(permissionId)) {
+                            try {
+                                await prismaClient.userGroupPermission.create({
+                                    data: {
+                                        groupId: groupId,
+                                        permissionId: permissionId,
+                                    },
+                                });
+                            } catch (error) {
+                                throw new CustomError(`Failed to attach new permissions for permission ID: ${permissionId}.`, 400);
+                            }
                         }
                     }
                 }

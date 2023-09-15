@@ -16,7 +16,7 @@ function registerRoutes(controller, userType) {
   router.post(`/forget-password`, controller.forgetPassword);
   router.post(`/reset-password/:token`, controller.resetPasswordFromEmail);
   router.post(`/change-password`, controller.changePassword)
-  router.post(`/${userType}/login`, controller.loginUser);
+  router.post(`/:userType/login`, controller.loginUser);
   router.patch(`/:id/activate-user`, controller.activateUser);
   router.patch(`/:id/deactivate-user`, controller.deactivateUser);
 }

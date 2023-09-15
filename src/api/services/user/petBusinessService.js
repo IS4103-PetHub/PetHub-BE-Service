@@ -149,6 +149,43 @@ class PetBusinessService extends BaseUserService {
       throw new UserError(error);
     }
   }
+
+  async updateUser(userId, data) {
+    try {
+      const updatedUser = await prisma.$transaction(async (prismaClient) => {
+        if (data.email) {
+          await prismaClient.user.update({
+            where: { userId },
+            data: {
+              email: data.email,
+              lastUpdated: new Date(),
+            },
+          });
+        }
+
+        const user = await prismaClient.petBusiness.update({
+          where: { userId },
+          data: {
+            companyName: data.companyName,
+            uen: data.uen,
+            businessType: data.businessType,
+            businessDescription: data.businessDescription,
+            contactNumber: data.contactNumber,
+            websiteURL: data.websiteURL,
+          },
+          include: {
+            user: true,
+          },
+        });
+        return user;
+      });
+      delete updatedUser.user.password;
+      return this.removePassword(updatedUser);
+    } catch (error) {
+      console.error("Error during user update:", error);
+      throw new UserError(error);
+    }
+  }
 }
 
 module.exports = new PetBusinessService();
