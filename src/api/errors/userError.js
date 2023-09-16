@@ -11,6 +11,9 @@ class UserError extends CustomError {
         } else if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
             message = 'This email is already registered.';
             statusCode = 400;
+        } else if (error.code === 'P2025') {
+            message = 'This email is already registered.'
+            statusCode = 400;
         }
 
         super(message, statusCode);

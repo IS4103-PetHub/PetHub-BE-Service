@@ -35,7 +35,7 @@ class InternalUserService extends BaseUserService {
                     email: data.email,
                     password: hashedPassword,
                     accountType: AccountType.INTERNAL_USER,
-                    accountStatus: AccountStatus.INACTIVE,
+                    accountStatus: AccountStatus.ACTIVE,
                     internalUser: {
                         create: {
                             firstName: data.firstName,

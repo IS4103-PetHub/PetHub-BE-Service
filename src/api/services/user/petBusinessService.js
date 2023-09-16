@@ -134,11 +134,11 @@ class PetBusinessService extends BaseUserService {
           });
         }
 
+        if (data.uen) throw new CustomError("Update of UEN is not allowed", 400)
         const user = await prismaClient.petBusiness.update({
           where: { userId },
           data: {
             companyName: data.companyName,
-            uen: data.uen,
             businessType: data.businessType,
             businessEmail: data.businessEmail,
             businessDescription: data.businessDescription,
@@ -159,6 +159,7 @@ class PetBusinessService extends BaseUserService {
       delete updatedUser.user.password;
       return this.removePassword(updatedUser);
     } catch (error) {
+      if (error instanceof CustomError) throw error;
       console.error("Error during user update:", error);
       throw new UserError(error);
     }
