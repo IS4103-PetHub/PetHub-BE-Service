@@ -120,7 +120,7 @@ class PetOwnerService extends BaseUserService {
 
     async deleteUser(userId) {
         try {
-            return await prisma.petOwner.delete({
+            return await prisma.user.delete({
                 where: { userId },
             });
         } catch (error) {
