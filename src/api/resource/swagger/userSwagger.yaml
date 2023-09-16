@@ -248,8 +248,6 @@ definitions:
     properties:
       companyName:
         type: string
-      uen:
-        type: string
       businessType:
         type: string
         enum:
@@ -273,7 +271,6 @@ definitions:
           $ref: "#/definitions/BusinessAddress"
     example:
       companyName: "abcd company"
-      uen: "12345678X"
       businessType: "SERVICE"
       businessDescription: "Updated pet service company"
       contactNumber: "98765432"
