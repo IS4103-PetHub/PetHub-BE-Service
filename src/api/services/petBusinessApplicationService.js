@@ -139,6 +139,7 @@ exports.getAllPetBusinessApplications = async () => {
     return await prisma.petBusinessApplication.findMany({
       include: {
         businessAddresses: true,
+        petBusiness: true,
         approver: true,
       },
     });
@@ -158,6 +159,7 @@ exports.getPetBusinessApplicationById = async (petBusinessApplicationId) => {
       where: { petBusinessApplicationId },
       include: {
         businessAddresses: true,
+        petBusiness: true,
         approver: true,
       },
     });
@@ -204,6 +206,7 @@ exports.getPetBusinessApplicationByStatus = async (applicationStatus) => {
       where: { applicationStatus: applicationStatus },
       include: {
         businessAddresses: true,
+        petBusiness: true,
         approver: true,
       },
     });
@@ -244,6 +247,7 @@ exports.approvePetBusinessApplication = async (id, approverId) => {
       data: { applicationStatus: "APPROVED", approverId: approverId },
       include: {
         businessAddresses: true,
+        petBusiness: true,
         approver: true,
       },
     });
