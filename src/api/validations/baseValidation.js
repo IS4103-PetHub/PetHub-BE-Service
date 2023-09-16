@@ -9,9 +9,10 @@ exports.isValidNumber = async (num) => {
 };
 
 // Check if an array contains all positive IDs
+// Takes in an array of string ids
 exports.isValidNumericIDs = async (ids) => {
   for (const element of ids) {
-    if (!(typeof element === "number") || element < 0) {
+    if (!(await this.isValidNumber(element))) {
       return false;
     }
   }

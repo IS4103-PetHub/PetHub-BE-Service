@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Sep 15 2023 21:06:23 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Sat Sep 16 2023 18:50:04 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -45,6 +45,8 @@ model ServiceListing {
   title            String
   description      String
   basePrice        Float     @default(0)
+  attachmentKeys   String[]
+  attachmentURLs   String[]
   dateCreated      DateTime  @default(now())
   lastUpdated      DateTime?
 

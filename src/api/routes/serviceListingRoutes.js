@@ -1,15 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const serviceListingController = require("../controllers/serviceListingController");
+const multer = require("multer")
 
 // service listing endpoint health check
 router.get("/health-check", async (req, res, next) => {
   res.send({ message: "Ok service lising api is working 🚀" });
 });
 
+const storage = multer.memoryStorage(); 
+const upload = multer({ storage: storage });
+
 // CREATE AND UPDATE
-router.post("", serviceListingController.createServiceListing);
-router.patch("/:id", serviceListingController.updateServiceListing);
+// As file upload is required, these 2 APIs use form-data instead of JSON
+router.post("", upload.array('file'), serviceListingController.createServiceListing);
+router.patch("/:id", upload.array('file'), serviceListingController.updateServiceListing);
 
 // RETRIEVE ALL, BY ID, BY CATEGORY, BY TAG, BY PB ID
 router.get("", serviceListingController.getAllServiceListing);

@@ -171,24 +171,47 @@ paths:
       summary: Create a new service listing
       description: Create a new service listing with the specified details.
       consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters: []
-      requestBody:
-        description: Service listing details.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/definitions/ServiceListingRequest'
-            example:
-              title: "Dog Grooming!"
-              description: "I love to groom"
-              petBusinessId: "3"
-              category: "PET_GROOMING"
-              basePrice: "40"
-              tagIds: [4, 8]
+        - multipart/form-data
+      parameters:
+        - name: title
+          in: formData
+          description: Title of the service listing.
+          required: true
+          type: string
+        - name: description
+          in: formData
+          description: Description of the service listing.
+          required: true
+          type: string
+        - name: petBusinessId
+          in: formData
+          description: ID of the pet business.
+          required: true
+          type: integer
+        - name: category
+          in: formData
+          description: Category of the service listing.
+          required: true
+          type: string
+        - name: basePrice
+          in: formData
+          description: Base price of the service listing.
+          required: true
+          type: number
+        - name: tagIds
+          in: formData
+          description: An array of tag IDs.
+          required: false
+          type: array
+          items:
+            type: integer
+        - name: file
+          description: A list of files
+          type: array
+          items:
+            type: string
+            format: binary
+          required: true
       responses:
         201:
           description: Service listing created successfully
@@ -196,8 +219,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/definitions/ServiceListingResponse'
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
       tags:
         - Service Listing
+
+    # post:
+    #   summary: Create a new service listing
+    #   description: Create a new service listing with the specified details.
+    #   consumes:
+    #     - application/json
+    #   produces:
+    #     - application/json
+    #   parameters: []
+    #   requestBody:
+    #     description: Service listing details.
+    #     required: true
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: '#/definitions/ServiceListingRequest'
+    #         example:
+    #           title: "Dog Grooming!"
+    #           description: "I love to groom"
+    #           petBusinessId: "3"
+    #           category: "PET_GROOMING"
+    #           basePrice: "40"
+    #           tagIds: [4, 8]
+    #   responses:
+    #     201:
+    #       description: Service listing created successfully
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/definitions/ServiceListingResponse'
+    #   tags:
+    #     - Service Listing
 
   /api/service-listings/{id}:
     get:

@@ -4,10 +4,23 @@ const ServiceListingValidations = require("../validations/servicelistingValidati
 const constants = require("../../constants/common");
 const limitations = constants.limitations;
 const errorMessages = constants.errorMessages;
+const { uploadImgFiles, getObjectSignedUrl } = require("../services/s3Service.js");
 
 exports.createServiceListing = async (req, res, next) => {
   try {
     const data = req.body;
+    if (
+      !data.title ||
+      !data.petBusinessId ||
+      !data.basePrice ||
+      !data.category ||
+      !data.description
+    ) {
+      return res.status(400).json({
+        message: "Incomplete form data. Please fill in all required fields.",
+      });
+    }
+
     if (
       !(await BaseValidations.isValidLength(
         data.title,
@@ -35,6 +48,10 @@ exports.createServiceListing = async (req, res, next) => {
           .status(400)
           .json({ message: "Please ensure that every tag ID is valid" });
       }
+    }
+    if (req.files) {
+      data.attachmentKeys = await uploadImgFiles(req.files);
+      data.attachmentURLs = await getObjectSignedUrl(data.attachmentKeys);
     }
     const serviceListing = await ServiceListingService.createServiceListing(
       data
@@ -78,6 +95,12 @@ exports.updateServiceListing = async (req, res, next) => {
           .status(400)
           .json({ message: "Please ensure that every tag ID is valid" });
       }
+    }
+    if (req.files) {
+      // delete existing files and update with new files
+      await ServiceListingService.deleteFilesOfAServiceListing(Number(serviceListingId));
+      updateData.attachmentKeys = await uploadImgFiles(req.files);
+      updateData.attachmentURLs = await getObjectSignedUrl(updateData.attachmentKeys);
     }
     updatedListing = await ServiceListingService.updateServiceListing(
       Number(serviceListingId),

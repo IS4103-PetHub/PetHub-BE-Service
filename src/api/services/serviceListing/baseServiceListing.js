@@ -1,6 +1,7 @@
 const prisma = require("../../../../prisma/prisma");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
+const { deleteFiles } = require("../s3Service");
 
 exports.createServiceListing = async (data) => {
   try {
@@ -8,7 +9,7 @@ exports.createServiceListing = async (data) => {
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     let tagIdsArray = [];
     if (data.tagIds) {
-      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: parseInt(id) }));
     }
     const serviceListing = await prisma.serviceListing.create({
       data: {
@@ -16,6 +17,8 @@ exports.createServiceListing = async (data) => {
         description: data.description,
         basePrice: Number(data.basePrice),
         category: data.category,
+        attachmentURLs: data.attachmentURLs,
+        attachmentKeys: data.attachmentKeys,
         tags: {
           connect: tagIdsArray,
         },
@@ -42,7 +45,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     let tagIdsArray = [];
     if (data.tagIds) {
-      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: parseInt(id) }));
     }
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
@@ -51,6 +54,8 @@ exports.updateServiceListing = async (serviceListingId, data) => {
         description: data.description,
         basePrice: Number(data.basePrice),
         category: data.category,
+        attachmentURLs: data.attachmentURLs,
+        attachmentKeys: data.attachmentKeys,
         tags: {
           // disconnect, then connect with new tags
           set: [],
@@ -160,11 +165,31 @@ exports.deleteServiceListing = async (serviceListingId) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
   // Current logic: Disasicaite a particular service listing from existing connections (tag, PB) and delete 
   try {
+    this.deleteFilesOfAServiceListing(serviceListingId)
     await prisma.serviceListing.delete({
       where: { serviceListingId },
     });
   } catch (error) {
     console.error("Error deleting service listing:", error);
+    throw new ServiceListingError(error);
+  }
+};
+
+exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
+  try {
+    // delete images from S3
+    const serviceListing = await prisma.serviceListing.findUnique({
+      where: { serviceListingId },
+    });
+    if (!serviceListing) {
+      throw new CustomError("Service Listing not found", 404);
+    }
+    deleteFiles(serviceListing.attachmentKeys);
+
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error
+    }
     throw new ServiceListingError(error);
   }
 };
