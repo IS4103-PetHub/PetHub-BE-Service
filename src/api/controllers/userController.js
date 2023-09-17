@@ -94,7 +94,7 @@ exports.getUserById = async (req, res, next) => {
     if (!service) return;
 
     const userId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(userId))) {
+    if (!(await BaseValidations.isValidInteger(userId))) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
 
@@ -111,7 +111,7 @@ exports.updateUser = async (req, res, next) => {
     if (!service) return;
 
     const userId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(userId))) {
+    if (!(await BaseValidations.isValidInteger(userId))) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
 
@@ -133,7 +133,7 @@ exports.deleteUser = async (req, res, next) => {
     if (!service) return;
 
     const userId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(userId))) {
+    if (!(await BaseValidations.isValidInteger(userId))) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
 
@@ -206,7 +206,7 @@ exports.changePassword = async (req, res, next) => {
 exports.activateUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    if (!await BaseValidations.isValidNumber(userId)) {
+    if (!await BaseValidations.isValidInteger(userId)) {
       return res.status(400).json({ message: 'Invalid ID Format' });
     }
 
@@ -225,7 +225,7 @@ exports.activateUser = async (req, res, next) => {
 exports.deactivateUser = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    if (!await BaseValidations.isValidNumber(userId)) {
+    if (!await BaseValidations.isValidInteger(userId)) {
       return res.status(400).json({ message: 'Invalid ID Format' });
     }
 

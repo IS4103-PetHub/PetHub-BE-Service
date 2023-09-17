@@ -1,14 +1,17 @@
 const prisma = require("../../../../prisma/prisma");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
+const S3Service = require("../s3Service");
 const { deleteFiles } = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
+const s3Service = new S3Service();
+
 
 exports.createServiceListing = async (data) => {
   try {
     // Ensure that pet business exists
     const petBusiness = await prisma.user.findUnique({
-      where: { userId: parseInt(data.petBusinessId) },
+      where: { userId: data.petBusinessId },
     });
     if (!petBusiness) {
       throw new CustomError(
@@ -17,21 +20,20 @@ exports.createServiceListing = async (data) => {
       );
     }
 
-    let tagIdsArray = [],
-      addressIdsArray = [];
+    let tagIdsArray = [], addressIdsArray = [];
     // format as "[{ tagId: 8 }, { tagId: 9 }, { tagId: 10 }]"
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     if (data.tagIds) {
-      tagIdsArray = data.tagIds.map((id) => ({ tagId: parseInt(id) }));
+      tagIdsArray =  data.tagIds.map((id) => ({ tagId: id }));
     }
     if (data.addressIds) {
       // validate that data.addressIds is a subset of petBusiness's addresses
       const validAddresses = await getAllAddressesForPetBusiness(
-        Number(data.petBusinessId)
+        data.petBusinessId
       );
       const validAddressIds = validAddresses.map((a) => a.addressId);
       if (
-        !data.addressIds.every((id) => validAddressIds.includes(parseInt(id)))
+        !data.addressIds.every((id) => validAddressIds.includes(id))
       ) {
         throw new CustomError(
           "Addresses tagged to service listing should be a subset of parent pet business's address list!",
@@ -39,7 +41,7 @@ exports.createServiceListing = async (data) => {
         );
       }
       addressIdsArray = data.addressIds.map((id) => ({
-        addressId: parseInt(id),
+        addressId: id,
       }));
     }
 
@@ -47,7 +49,7 @@ exports.createServiceListing = async (data) => {
       data: {
         title: data.title,
         description: data.description,
-        basePrice: Number(data.basePrice),
+        basePrice: data.basePrice,
         category: data.category,
         attachmentURLs: data.attachmentURLs,
         attachmentKeys: data.attachmentKeys,
@@ -59,7 +61,7 @@ exports.createServiceListing = async (data) => {
         },
         petBusiness: {
           connect: {
-            userId: Number(data.petBusinessId),
+            userId: data.petBusinessId,
           },
         },
       },
@@ -91,7 +93,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
     let tagIdsArray = [],
       addressIdsArray = [];
     if (data.tagIds) {
-      tagIdsArray = data.tagIds.map((id) => ({ tagId: parseInt(id) }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
     }
     if (data.addressIds) {
       // validate that data.addressIds is a subset of petBusiness's addresses
@@ -99,24 +101,20 @@ exports.updateServiceListing = async (serviceListingId, data) => {
         serviceListing.petBusinessId
       );
       const validAddressIds = validAddresses.map((a) => a.addressId);
-      if (
-        !data.addressIds.every((id) => validAddressIds.includes(parseInt(id)))
-      ) {
+      if (!data.addressIds.every((id) => validAddressIds.includes(id))) {
         throw new CustomError(
           "Addresses tagged to service listing should be a subset of parent pet business's address list!",
           400
         );
       }
-      addressIdsArray = data.addressIds.map((id) => ({
-        addressId: parseInt(id),
-      }));
+      addressIdsArray = data.addressIds.map((id) => ({ addressId: id }));
     }
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
       data: {
         title: data.title,
         description: data.description,
-        basePrice: Number(data.basePrice),
+        basePrice: data.basePrice,
         category: data.category,
         attachmentURLs: data.attachmentURLs,
         attachmentKeys: data.attachmentKeys,
@@ -139,6 +137,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
     return updatedListing;
   } catch (error) {
     console.error("Error during service listing creation:", error);
+    if (error instanceof CustomError) throw error;
     throw new ServiceListingError(error);
   }
 };
@@ -256,7 +255,7 @@ exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
     if (!serviceListing) {
       throw new CustomError("Service Listing not found", 404);
     }
-    deleteFiles(serviceListing.attachmentKeys);
+    await s3Service.deleteFiles(serviceListing.attachmentKeys);
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;
