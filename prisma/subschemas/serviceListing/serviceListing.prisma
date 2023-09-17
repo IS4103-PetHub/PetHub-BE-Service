@@ -1,11 +1,14 @@
 import {Category} from "../enums/businessLogicEnums"
 import {PetBusiness} from "../user/user"
+import { Address } from "..\..\schema"
 
 model ServiceListing {
   serviceListingId Int @id @default(autoincrement())
   title String
   description String
   basePrice Float @default(0)
+  attachmentKeys String[]
+  attachmentURLs String[]
   dateCreated DateTime @default(now())
   lastUpdated   DateTime?
 
@@ -13,6 +16,7 @@ model ServiceListing {
   
   // tags that a service listing has (implicit many-to-many relationship)
   tags Tag[] 
+  addresses Address[]
   petBusiness PetBusiness @relation(fields:[petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   petBusinessId Int
 }

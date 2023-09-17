@@ -22,6 +22,8 @@ CREATE TABLE "ServiceListing" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "basePrice" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "attachmentKeys" TEXT[],
+    "attachmentURLs" TEXT[],
     "dateCreated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lastUpdated" TIMESTAMP(3),
     "category" "Category" NOT NULL,
@@ -167,6 +169,12 @@ CREATE TABLE "_ServiceListingToTag" (
     "B" INTEGER NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "_AddressToServiceListing" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
 
@@ -199,6 +207,12 @@ CREATE UNIQUE INDEX "_ServiceListingToTag_AB_unique" ON "_ServiceListingToTag"("
 
 -- CreateIndex
 CREATE INDEX "_ServiceListingToTag_B_index" ON "_ServiceListingToTag"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_AddressToServiceListing_AB_unique" ON "_AddressToServiceListing"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_AddressToServiceListing_B_index" ON "_AddressToServiceListing"("B");
 
 -- AddForeignKey
 ALTER TABLE "ServiceListing" ADD CONSTRAINT "ServiceListing_petBusinessId_fkey" FOREIGN KEY ("petBusinessId") REFERENCES "PetBusiness"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -241,3 +255,9 @@ ALTER TABLE "_ServiceListingToTag" ADD CONSTRAINT "_ServiceListingToTag_A_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "_ServiceListingToTag" ADD CONSTRAINT "_ServiceListingToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "Tag"("tagId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_AddressToServiceListing" ADD CONSTRAINT "_AddressToServiceListing_A_fkey" FOREIGN KEY ("A") REFERENCES "Address"("addressId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_AddressToServiceListing" ADD CONSTRAINT "_AddressToServiceListing_B_fkey" FOREIGN KEY ("B") REFERENCES "ServiceListing"("serviceListingId") ON DELETE CASCADE ON UPDATE CASCADE;

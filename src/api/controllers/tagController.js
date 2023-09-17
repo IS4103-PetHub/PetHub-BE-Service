@@ -25,7 +25,7 @@ exports.updateTag = async (req, res, next) => {
   try {
     const updateData = req.body;
     const tagId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(tagId))) {
+    if (!(await BaseValidations.isValidInteger(tagId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
     if (
@@ -58,7 +58,7 @@ exports.getAllTags = async (req, res, next) => {
 exports.getTagById = async (req, res, next) => {
   try {
     const tagId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(tagId))) {
+    if (!(await BaseValidations.isValidInteger(tagId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
@@ -72,7 +72,7 @@ exports.getTagById = async (req, res, next) => {
 exports.deleteTag = async (req, res, next) => {
   try {
     const tagId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(tagId))) {
+    if (!(await BaseValidations.isValidInteger(tagId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
     await TagService.deleteTag(Number(tagId));

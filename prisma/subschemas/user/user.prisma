@@ -77,6 +77,8 @@ model Address {
     PetBusiness             PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
     petBusinessApplicationId Int?
     PetBusinessApplication  PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+
+    serviceListings ServiceListing[]
 }
 
 model PetBusinessApplication {

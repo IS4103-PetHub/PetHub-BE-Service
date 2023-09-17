@@ -40,6 +40,11 @@ This aligns your Prisma schema with your database schema.
 #### Manually Seed DB
 ```prisma db seed```
 
+#### Prisma Web Client (Studio)
+```npx prisma studio```
+Prisma studio should be up on http://localhost:5555
+
+
 ## More information in our documentation:
 - Prisma: https://pris.ly/d/getting-started
 - Prisma Import: https://marketplace.visualstudio.com/items?itemName=ajmnz.prisma-import

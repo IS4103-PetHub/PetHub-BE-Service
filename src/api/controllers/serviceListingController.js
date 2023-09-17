@@ -4,10 +4,24 @@ const ServiceListingValidations = require("../validations/servicelistingValidati
 const constants = require("../../constants/common");
 const limitations = constants.limitations;
 const errorMessages = constants.errorMessages;
+const S3Service = require("../services/s3Service.js");
+const s3Service = new S3Service();
 
 exports.createServiceListing = async (req, res, next) => {
   try {
     const data = req.body;
+    if (
+      !data.title ||
+      !data.petBusinessId ||
+      !data.basePrice ||
+      !data.category ||
+      !data.description
+    ) {
+      return res.status(400).json({
+        message: "Incomplete form data. Please fill in all required fields.",
+      });
+    }
+
     if (
       !(await BaseValidations.isValidLength(
         data.title,
@@ -18,24 +32,48 @@ exports.createServiceListing = async (req, res, next) => {
         message: errorMessages.INVALID_SERVICE_TITLE,
       });
     }
-    if (!(await BaseValidations.isValidNumber(data.petBusinessId))) {
+
+    if (!(await BaseValidations.isValidInteger(data.petBusinessId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
-    if (!(await BaseValidations.isValidNumber(data.basePrice))) {
+    data.petBusinessId = parseInt(data.petBusinessId, 10);
+
+    if (!(await BaseValidations.isValidFloat(data.basePrice))) {
       return res
         .status(400)
         .json({ message: errorMessages.INVALID_BASE_PRICE });
     }
+    data.basePrice = parseFloat(data.basePrice);
+
     if (!(await ServiceListingValidations.isValidCategory(data.category))) {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
+
     if (data.tagIds) {
       if (!(await BaseValidations.isValidNumericIDs(data.tagIds))) {
         return res
           .status(400)
           .json({ message: "Please ensure that every tag ID is valid" });
       }
+      data.tagIds = data.tagIds.map((id) => parseInt(id, 10));
     }
+
+    if (data.addressIds) {
+      if (!(await BaseValidations.isValidNumericIDs(data.addressIds))) {
+        return res
+          .status(400)
+          .json({ message: "Please ensure that every address ID is valid" });
+      }
+      data.addressIds = data.addressIds.map((id) => parseInt(id, 10));
+    }
+
+    if (req.files) {
+      data.attachmentKeys = await s3Service.uploadImgFiles(req.files);
+      data.attachmentURLs = await s3Service.getObjectSignedUrl(
+        data.attachmentKeys
+      );
+    }
+
     const serviceListing = await ServiceListingService.createServiceListing(
       data
     );
@@ -48,8 +86,14 @@ exports.createServiceListing = async (req, res, next) => {
 exports.updateServiceListing = async (req, res, next) => {
   try {
     const updateData = req.body;
-    const serviceListingId = req.params.id;
+    let serviceListingId = req.params.id;
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
+    serviceListingId = parseInt(serviceListingId, 10);
+
     if (
+      updateData.title &&
       !(await BaseValidations.isValidLength(
         updateData.title,
         limitations.SERVICE_LISTING_TITLE_LENGTH
@@ -59,28 +103,54 @@ exports.updateServiceListing = async (req, res, next) => {
         message: errorMessages.INVALID_SERVICE_TITLE,
       });
     }
-    if (!(await BaseValidations.isValidNumber(serviceListingId))) {
-      return res.status(400).json({ message: errorMessages.INVALID_ID });
-    }
-    if (!(await BaseValidations.isValidNumber(updateData.basePrice))) {
+
+    if (
+      updateData.basePrice &&
+      !(await BaseValidations.isValidFloat(updateData.basePrice))
+    ) {
       return res
         .status(400)
         .json({ message: errorMessages.INVALID_BASE_PRICE });
     }
+    updateData.basePrice = parseFloat(updateData.basePrice);
+
     if (
+      updateData.category &&
       !(await ServiceListingValidations.isValidCategory(updateData.category))
     ) {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
+
     if (updateData.tagIds) {
       if (!(await BaseValidations.isValidNumericIDs(updateData.tagIds))) {
         return res
           .status(400)
           .json({ message: "Please ensure that every tag ID is valid" });
       }
+      updateData.tagIds = updateData.tagIds.map((id) => parseInt(id, 10));
+    }
+
+    if (updateData.addressIds) {
+      if (!(await BaseValidations.isValidNumericIDs(updateData.addressIds))) {
+        return res
+          .status(400)
+          .json({ message: "Please ensure that every address ID is valid" });
+      }
+      updateData.addressIds = updateData.addressIds.map((id) => parseInt(id, 10));
+    }
+
+    if (req.files) {
+      // delete existing files and update with new files
+      await ServiceListingService.deleteFilesOfAServiceListing(
+        serviceListingId
+      );
+      updateData.attachmentKeys = await s3Service.uploadImgFiles(req.files);
+      updateData.attachmentURLs = await s3Service.getObjectSignedUrl(
+        updateData.attachmentKeys
+      );
     }
     updatedListing = await ServiceListingService.updateServiceListing(
-      Number(serviceListingId),
+      serviceListingId,
       updateData
     );
 
@@ -102,7 +172,7 @@ exports.getAllServiceListing = async (req, res, next) => {
 exports.getServiceListingById = async (req, res, next) => {
   try {
     const serviceListingId = req.params.id;
-    if (!(await BaseValidations.isValidNumber(serviceListingId))) {
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
@@ -139,7 +209,7 @@ exports.getServiceListingByTag = async (req, res, next) => {
     if (!tagId) {
       return res.status(400).json({ message: "Tag ID cannot be empty" });
     }
-    if (!(await BaseValidations.isValidNumber(tagId))) {
+    if (!(await BaseValidations.isValidInteger(tagId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
@@ -160,7 +230,7 @@ exports.getServiceListingByPBId = async (req, res, next) => {
         .status(400)
         .json({ message: "Pet Business ID cannot be empty" });
     }
-    if (!(await BaseValidations.isValidNumber(petBusinessId))) {
+    if (!(await BaseValidations.isValidInteger(petBusinessId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
@@ -181,7 +251,7 @@ exports.deleteServiceListing = async (req, res, next) => {
         .status(400)
         .json({ message: "Service Listing ID cannot be empty" });
     }
-    if (!(await BaseValidations.isValidNumber(serviceListingId))) {
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
