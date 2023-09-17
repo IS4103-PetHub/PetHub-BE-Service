@@ -4,7 +4,10 @@ const ServiceListingValidations = require("../validations/servicelistingValidati
 const constants = require("../../constants/common");
 const limitations = constants.limitations;
 const errorMessages = constants.errorMessages;
-const { uploadImgFiles, getObjectSignedUrl } = require("../services/s3Service.js");
+const {
+  uploadImgFiles,
+  getObjectSignedUrl,
+} = require("../services/s3Service.js");
 
 exports.createServiceListing = async (req, res, next) => {
   try {
@@ -49,6 +52,13 @@ exports.createServiceListing = async (req, res, next) => {
           .json({ message: "Please ensure that every tag ID is valid" });
       }
     }
+    if (data.addressIds) {
+      if (!(await BaseValidations.isValidNumericIDs(data.addressIds))) {
+        return res
+          .status(400)
+          .json({ message: "Please ensure that every address ID is valid" });
+      }
+    }
     if (req.files) {
       data.attachmentKeys = await uploadImgFiles(req.files);
       data.attachmentURLs = await getObjectSignedUrl(data.attachmentKeys);
@@ -66,7 +76,11 @@ exports.updateServiceListing = async (req, res, next) => {
   try {
     const updateData = req.body;
     const serviceListingId = req.params.id;
+    if (!(await BaseValidations.isValidNumber(serviceListingId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
     if (
+      updateData.title &&
       !(await BaseValidations.isValidLength(
         updateData.title,
         limitations.SERVICE_LISTING_TITLE_LENGTH
@@ -76,31 +90,38 @@ exports.updateServiceListing = async (req, res, next) => {
         message: errorMessages.INVALID_SERVICE_TITLE,
       });
     }
-    if (!(await BaseValidations.isValidNumber(serviceListingId))) {
-      return res.status(400).json({ message: errorMessages.INVALID_ID });
-    }
-    if (!(await BaseValidations.isValidNumber(updateData.basePrice))) {
+    if (
+      updateData.basePrice &&
+      !(await BaseValidations.isValidNumber(updateData.basePrice))
+    ) {
       return res
         .status(400)
         .json({ message: errorMessages.INVALID_BASE_PRICE });
     }
     if (
+      updateData.category &&
       !(await ServiceListingValidations.isValidCategory(updateData.category))
     ) {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
-    if (updateData.tagIds) {
-      if (!(await BaseValidations.isValidNumericIDs(updateData.tagIds))) {
-        return res
-          .status(400)
-          .json({ message: "Please ensure that every tag ID is valid" });
-      }
+    if (
+      updateData.tagIds &&
+      !(await BaseValidations.isValidNumericIDs(updateData.tagIds))
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please ensure that every tag ID is valid" });
     }
+
     if (req.files) {
       // delete existing files and update with new files
-      await ServiceListingService.deleteFilesOfAServiceListing(Number(serviceListingId));
+      await ServiceListingService.deleteFilesOfAServiceListing(
+        Number(serviceListingId)
+      );
       updateData.attachmentKeys = await uploadImgFiles(req.files);
-      updateData.attachmentURLs = await getObjectSignedUrl(updateData.attachmentKeys);
+      updateData.attachmentURLs = await getObjectSignedUrl(
+        updateData.attachmentKeys
+      );
     }
     updatedListing = await ServiceListingService.updateServiceListing(
       Number(serviceListingId),

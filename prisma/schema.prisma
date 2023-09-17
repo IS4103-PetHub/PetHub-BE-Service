@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Sep 17 2023 13:12:44 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Sep 17 2023 14:04:23 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -61,6 +61,7 @@ model ServiceListing {
 
   // tags that a service listing has (implicit many-to-many relationship)
   tags          Tag[]
+  addresses     Address[]
   petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   petBusinessId Int
 }
@@ -192,6 +193,8 @@ model Address {
   PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
   petBusinessApplicationId Int?
   PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+
+  serviceListings ServiceListing[]
 }
 
 model PetBusinessApplication {

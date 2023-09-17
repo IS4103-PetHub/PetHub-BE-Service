@@ -28,7 +28,7 @@ const serviceListings = [
     description: "Top-quality pet grooming services for your furry friend",
     petBusinessId: 1,
     category: "PET_GROOMING",
-    basePrice: 40,
+    basePrice: 40.0,
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
   },
   {
@@ -37,7 +37,7 @@ const serviceListings = [
     description: "Expert dog training to teach your pet new tricks",
     petBusinessId: 1,
     category: "PET_RETAIL",
-    basePrice: 60,
+    basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
   },
   {
@@ -56,7 +56,7 @@ const serviceListings = [
       "Ensure your pet's well-being with our thorough health checkup",
     petBusinessId: 1,
     category: "VETERINARY",
-    basePrice: 75,
+    basePrice: 75.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
   },
   {
@@ -65,7 +65,7 @@ const serviceListings = [
     description: "Trustworthy pet sitting services for your beloved pets",
     petBusinessId: 4,
     category: "VETERINARY",
-    basePrice: 50,
+    basePrice: 50.50,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
   },
 ];
