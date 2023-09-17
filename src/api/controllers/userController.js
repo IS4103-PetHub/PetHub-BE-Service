@@ -195,7 +195,7 @@ exports.changePassword = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid email address' });
     }
 
-    await baseUserServiceInstance.login(email, password)
+    await baseUserServiceInstance.verifyUserByEmail(email, password)
     await baseUserServiceInstance.resetPassword(email, newPassword)
     res.status(200).json({ message: "Change Password successfullyy" });
   } catch (error) {

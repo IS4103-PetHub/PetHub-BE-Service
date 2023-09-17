@@ -3,8 +3,12 @@ exports.isValidNumber = async (number) => {
 };
 
 exports.isValidUEN = async (uen) => {
-    return /^.{8,9}[A-Z]$/.test(uen)
-}
+  return /^.{8,9}[A-Z]$/.test(uen);
+};
+
+exports.isValidURL = async (url) => {
+  return /^(http|https):\/\/[^ "]+$/.test(url);
+};
 
 exports.isValidEmail = async (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,16 +29,19 @@ exports.isValidPassword = async (password) => {
 };
 
 exports.isValidNumericID = async (id) => {
-    // Check if the string can be parsed into a positive integer
-    const parsedId = parseInt(id, 10);
-    return !isNaN(parsedId) && parsedId > 0 && parsedId.toString() === id;
+  // Check if the string can be parsed into a positive integer
+  const parsedId = parseInt(id, 10);
+  return !isNaN(parsedId) && parsedId > 0 && parsedId.toString() === id;
 };
 
 exports.isValidAccountType = async (accountType) => {
-    const AccountTypesSet = new Set(["PET_OWNER", "PET_BUSINESS", "INTERNAL_USER"]);
-    if (typeof accountType !== 'string') {
-        return false;
-    }
-    return AccountTypesSet.has(accountType);
-}
-
+  const AccountTypesSet = new Set([
+    "PET_OWNER",
+    "PET_BUSINESS",
+    "INTERNAL_USER",
+  ]);
+  if (typeof accountType !== "string") {
+    return false;
+  }
+  return AccountTypesSet.has(accountType);
+};

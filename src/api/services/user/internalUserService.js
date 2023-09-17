@@ -35,7 +35,7 @@ class InternalUserService extends BaseUserService {
                     email: data.email,
                     password: hashedPassword,
                     accountType: AccountType.INTERNAL_USER,
-                    accountStatus: AccountStatus.INACTIVE,
+                    accountStatus: AccountStatus.ACTIVE,
                     internalUser: {
                         create: {
                             firstName: data.firstName,
@@ -120,7 +120,7 @@ class InternalUserService extends BaseUserService {
 
     async deleteUser(userId) {
         try {
-            return await prisma.internalUser.delete({
+            return await prisma.user.delete({
                 where: { userId },
             });
         } catch (error) {
