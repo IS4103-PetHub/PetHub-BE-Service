@@ -76,7 +76,7 @@ class S3Service {
         };
 
         const command = new GetObjectCommand(params);
-        const url = await getSignedUrl(this.s3Service, command);
+        const url = await getSignedUrl(this.s3Service, command, { expiresIn: 604800 });
         signedUrls.push(url);
       }
       return signedUrls;
