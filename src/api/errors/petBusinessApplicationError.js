@@ -15,7 +15,7 @@ class PetBusinessApplicationError extends CustomError {
       statusCode = 400;
     }
     if (error.code === "P2003" || error.code === "P2025") {
-      message = "No PetBusiness record was found.";
+      message = "Invalid ID provided for foreign key association.";
       statusCode = 400;
     }
     super(message, statusCode);

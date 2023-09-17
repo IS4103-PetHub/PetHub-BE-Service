@@ -18,7 +18,7 @@ exports.register = async (req, res, next) => {
       case !(await PetBusinessApplicationValidations.validAddressFieldsPresent(data.businessAddresses)):
         errorMessage = "Invalid address format";
         break;
-      case !(await BaseValidations.isValidInteger(data.petBusinessId)):
+      case !(await BaseValidations.isValidNumericID(data.petBusinessId)):
         errorMessage = "Invalid ID format";
         break;
       case !PetBusinessApplicationValidations.isValidBusinessType(data.businessType):
@@ -65,7 +65,7 @@ exports.updatePetBusinessApplication = async (req, res, next) => {
       case !(await PetBusinessApplicationValidations.validAddressFieldsPresent(data.businessAddresses)):
         errorMessage = "Invalid address format";
         break;
-      case !(await BaseValidations.isValidInteger(data.petBusinessId)):
+      case !(await BaseValidations.isValidNumericID(data.petBusinessId)):
         errorMessage = "Invalid ID format";
         break;
       case !(await PetBusinessApplicationValidations.isValidBusinessType(data.businessType)):
@@ -97,8 +97,6 @@ exports.updatePetBusinessApplication = async (req, res, next) => {
 exports.getAllPetBusinessApplications = async (req, res, next) => {
   try {
     const { status } = req.query;
-    console.log("STATUS2", status);
-
     let petBusinessApplications = [];
     if (status) {
       if (!PetBusinessApplicationValidations.isValidApplicationStatus(status)) {
@@ -145,27 +143,13 @@ exports.getPetBusinessApplicationByPBId = async (req, res, next) => {
   }
 };
 
-exports.getPetBusinessApplicationStatusByPBId = async (req, res, next) => {
-  try {
-    const petBusinessId = req.params.id;
-    if (!(await BaseValidations.isValidInteger(petBusinessId))) {
-      return res.status(400).json({ message: "Invalid ID Format" });
-    }
-    const petBusinessApplicationStatus =
-      await PetBusinessApplicationService.getPetBusinessApplicationStatusByPBId(Number(petBusinessId));
-    res.status(200).json({ status: 200, message: petBusinessApplicationStatus });
-  } catch (error) {
-    next(error);
-  }
-};
-
 exports.approvePetBusinessApplication = async (req, res, next) => {
   try {
     const petBusinessApplicationId = req.params.id;
     const approverId = req.body.approverId;
     if (
       !(await BaseValidations.isValidInteger(petBusinessApplicationId)) ||
-      !(await BaseValidations.isValidInteger(approverId))
+      !(await BaseValidations.isValidNumericID(approverId))
     ) {
       return res.status(400).json({ message: "Invalid ID Format" });
     }
