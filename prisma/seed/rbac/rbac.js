@@ -4,8 +4,8 @@ const { AccountStatus, AccountType } = require('@prisma/client');
 
 const permissions = [
     // USERS
-    { code: "WRITE_USERS", name: "Write Users", description: "Permission to write user data" },
-    { code: "READ_USERS", name: "Read Users", description: "Permission to read user data" },
+    { code: "WRITE_INTERNAL_USERS", name: "Write Internal Users", description: "Permission to write internal users" },
+    { code: "READ_INTERNAL_USERS", name: "Read Internal Users", description: "Permission to read internal users" },
 
     // PET OWNERS
     { code: "WRITE_PET_OWNERS", name: "Write Pet Owners", description: "Permission to write pet owners" },
