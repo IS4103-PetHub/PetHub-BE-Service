@@ -24,8 +24,8 @@ const permissions = [
     { code: "READ_TAGS", name: "Read Tags", description: "Permission to read Tags" },
 
     // Pet Business Applications
-    { code: "WRITE_PET_BUSINESS_APPLICATION", name: "Write Pet Business Application", description: "Permission to write Pet Business Application" },
-    { code: "READ_PET_BUSINESS_APPLICATION", name: "Read Pet Business Application", description: "Permission to read Pet Business Application" },
+    { code: "WRITE_PET_BUSINESS_APPLICATIONS", name: "Write Pet Business Applications", description: "Permission to write Pet Business Applications" },
+    { code: "READ_PET_BUSINESS_APPLICATIONS", name: "Read Pet Business Applications", description: "Permission to read Pet Business Applications" },
 
 ];
 
