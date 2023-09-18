@@ -18,6 +18,15 @@ const permissions = [
     // RBAC
     { code: "WRITE_RBAC", name: "Write RBAC", description: "Permission to write Role-Based Access Controls" },
     { code: "READ_RBAC", name: "Read RBAC", description: "Permission to read Role-Based Access Controls" },
+
+    // Tags
+    { code: "WRITE_TAGS", name: "Write Tags", description: "Permission to write Tags" },
+    { code: "READ_TAGS", name: "Read Tags", description: "Permission to read Tags" },
+
+    // Pet Business Applications
+    { code: "WRITE_PET_BUSINESS_APPLICATION", name: "Write Pet Business Application", description: "Permission to write Pet Business Application" },
+    { code: "READ_PET_BUSINESS_APPLICATION", name: "Read Pet Business Application", description: "Permission to read Pet Business Application" },
+
 ];
 
 // Root Administrator User Data
