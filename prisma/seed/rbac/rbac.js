@@ -9,7 +9,7 @@ const permissions = [
 
     // PET OWNERS
     { code: "WRITE_PET_OWNERS", name: "Write Pet Owners", description: "Permission to write pet owners" },
-    { code: "READ_OWNERS", name: "Read Pet Owners", description: "Permission to read pet owners" },
+    { code: "READ_PET_OWNERS", name: "Read Pet Owners", description: "Permission to read pet owners" },
 
     // PET BUSINESS
     { code: "WRITE_PET_BUSINESSES", name: "Write Pet Businesses", description: "Permission to write pet businesses" },
