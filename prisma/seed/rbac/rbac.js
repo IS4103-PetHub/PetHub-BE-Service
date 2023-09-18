@@ -4,8 +4,8 @@ const { AccountStatus, AccountType } = require('@prisma/client');
 
 const permissions = [
     // USERS
-    { code: "WRITE_USERS", name: "Write Users", description: "Permission to write user data" },
-    { code: "READ_USERS", name: "Read Users", description: "Permission to read user data" },
+    { code: "WRITE_INTERNAL_USERS", name: "Write Internal Users", description: "Permission to write internal users" },
+    { code: "READ_INTERNAL_USERS", name: "Read Internal Users", description: "Permission to read internal users" },
 
     // PET OWNERS
     { code: "WRITE_PET_OWNERS", name: "Write Pet Owners", description: "Permission to write pet owners" },
@@ -18,6 +18,15 @@ const permissions = [
     // RBAC
     { code: "WRITE_RBAC", name: "Write RBAC", description: "Permission to write Role-Based Access Controls" },
     { code: "READ_RBAC", name: "Read RBAC", description: "Permission to read Role-Based Access Controls" },
+
+    // Tags
+    { code: "WRITE_TAGS", name: "Write Tags", description: "Permission to write Tags" },
+    { code: "READ_TAGS", name: "Read Tags", description: "Permission to read Tags" },
+
+    // Pet Business Applications
+    { code: "WRITE_PET_BUSINESS_APPLICATIONS", name: "Write Pet Business Applications", description: "Permission to write Pet Business Applications" },
+    { code: "READ_PET_BUSINESS_APPLICATIONS", name: "Read Pet Business Applications", description: "Permission to read Pet Business Applications" },
+
 ];
 
 // Root Administrator User Data
