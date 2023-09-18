@@ -57,6 +57,7 @@ exports.register = async (data) => {
             userId: Number(data.petBusinessId),
           },
         },
+        lastUpdated: new Date(),
       },
       include: {
         businessAddresses: true,
