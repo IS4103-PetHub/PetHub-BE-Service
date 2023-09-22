@@ -72,12 +72,9 @@ exports.register = async (data) => {
 
     return petBusinessApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error during pet business application creation:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -126,12 +123,9 @@ exports.updatePetBusinessApplication = async (petBusinessApplicationId, updatedD
 
     return updatedPetBusinessApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error during pet business application update:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -145,12 +139,9 @@ exports.getAllPetBusinessApplications = async () => {
       },
     });
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error fetching all pet business applications:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -169,12 +160,9 @@ exports.getPetBusinessApplicationById = async (petBusinessApplicationId) => {
     }
     return petBusinessApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error fetching pet business application by ID:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -192,12 +180,9 @@ exports.getPetBusinessApplicationByPBId = async (id) => {
     }
     return petBusinessApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error fetching Business Application:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -213,12 +198,9 @@ exports.getPetBusinessApplicationByStatus = async (applicationStatus) => {
     });
     return petBusinessApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error fetching pet business applications by application status:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -294,12 +276,9 @@ exports.approvePetBusinessApplication = async (id, approverId) => {
 
     return updatedApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error during pet business application approval:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -348,12 +327,9 @@ exports.rejectPetBusinessApplication = async (id, remark) => {
 
     return updatedApplication;
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error during pet business application rejection:", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
 
@@ -382,11 +358,8 @@ exports.deletePetBusinessApplicationByPBId = async (id) => {
       where: { petBusinessId },
     });
   } catch (error) {
+    if (error instanceof CustomError) throw error;
     console.error("Error deleting Pet Business Application", error);
-    if (error instanceof CustomError) {
-      throw error;
-    } else {
-      throw new PetBusinessApplicationError(error);
-    }
+    throw new PetBusinessApplicationError(error);
   }
 };
