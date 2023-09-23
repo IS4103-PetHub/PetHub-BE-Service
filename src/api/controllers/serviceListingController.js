@@ -243,6 +243,20 @@ exports.getServiceListingByPBId = async (req, res, next) => {
   }
 };
 
+exports.getFilteredServiceListings = async (req, res, next) => {
+  try {
+    const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
+    const tags = req.query.tag ? Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag] : [];
+
+    const serviceListings = await ServiceListingService.filterServiceListing(
+      categories, tags
+    );
+    res.status(200).json(serviceListings);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteServiceListing = async (req, res, next) => {
   try {
     const serviceListingId = req.params.id;
