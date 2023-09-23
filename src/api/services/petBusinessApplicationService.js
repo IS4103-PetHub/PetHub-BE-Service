@@ -248,7 +248,7 @@ class PetBusinessApplicationService {
         throw new CustomError("Pet Business does not have have accountStatus PENDING", 400);
       }
 
-      await prisma.$transaction(async (prismaClient) => {
+      const updatedApplication = prisma.$transaction(async (prismaClient) => {
         // Attempt update - PB APP - BusinessApplicationStatus: PENDING/REJECTED -> APPROVED
         const updatedApplication = await prismaClient.petBusinessApplication.update({
           where: { petBusinessApplicationId: id },
@@ -286,6 +286,8 @@ class PetBusinessApplicationService {
             },
           },
         });
+
+        return updatedApplication;
       }); // end of transaction
 
       // Notify PB by email
