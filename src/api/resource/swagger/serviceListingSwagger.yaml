@@ -109,6 +109,17 @@ definitions:
         lastUpdated: null
         category: "PET_GROOMING"
         petBusinessId: 1
+        tags:
+        - tagId: 4
+          name: "Free"
+          dateCreated: "2023-09-01T08:29:02.262Z"
+          lastUpdated: null
+        - tagId: 7
+          name: "Not Free"
+          dateCreated: "2023-09-02T01:33:10.287Z"
+          lastUpdated: null
+        petBusiness:
+        - companyName: "My Company"
       - serviceListingId: 2
         title: "Dog Training Session"
         description: "Expert dog training to teach your pet new tricks"
@@ -117,6 +128,13 @@ definitions:
         lastUpdated: null
         category: "PET_RETAIL"
         petBusinessId: 1
+        tags:
+        - tagId: 4
+          name: "Free"
+          dateCreated: "2023-09-01T08:29:02.262Z"
+          lastUpdated: null
+        petBusiness:
+        - companyName: "My Company"
 
   ServiceListingUpdateRequest:
     type: object
@@ -366,15 +384,26 @@ paths:
       tags:
         - Service Listing
 
-  /api/service-listings/pet-businesses/{id}:
+  /api/service-listings/filter:
     get:
-      summary: Get service listings by pet business ID
+      summary: Get service listings by filter
       parameters:
-        - in: path
-          name: id
-          description: The ID of the pet business to filter service listings.
-          required: true
-          type: integer
+        - in: query
+          name: category
+          description: Filter by category
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: tag
+          description: Filter by tag
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         200:
           description: An array of service listings
@@ -386,5 +415,3 @@ paths:
                   $ref: '#/definitions/ServiceListingResponse'
       tags:
         - Service Listing
-
-
