@@ -105,6 +105,32 @@ definitions:
 
 paths:
   /api/calendar-groups/:
+    get:
+      summary: Get all calendar groups object.
+      description: Get all calendar groups object
+      parameters:
+        - name: includeTimeSlot
+          in: query
+          description: Set as true if include timeslot objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: includeBooking
+          in: query
+          description: Set as true if include booking objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+      responses:
+        200:
+          description: List of available calendar groups.
+        400:
+          description: Invalid input parameters.
+        500:
+          description: Internal server error.
+      tags:
+        - CalendarGroup
+
     post:
       summary: Create a new calendar group for pet businesses to accept bookings
       description: Create a new calendar group for pet businesses to accept bookings
@@ -188,6 +214,38 @@ paths:
       responses:
         200:
           description: Calendar group updated successfully
+      tags:
+        - CalendarGroup
+
+    get:
+      summary: Get calendar group object by ID.
+      description: Get calendar group object by ID
+      parameters:
+        - name: calendarGroupId
+          in: path
+          description: ID of the calendar to update.
+          required: true
+          type: integer
+          default: 1 # Example default value
+        - name: includeTimeSlot
+          in: query
+          description: Set as true if include timeslot objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: includeBooking
+          in: query
+          description: Set as true if include booking objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+      responses:
+        200:
+          description: List of available calendar groups.
+        400:
+          description: Invalid input parameters.
+        500:
+          description: Internal server error.
       tags:
         - CalendarGroup
 

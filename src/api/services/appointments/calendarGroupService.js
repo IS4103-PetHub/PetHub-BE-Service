@@ -6,6 +6,7 @@ const EmailService = require('../emailService')
 const PetOwnerService = require('../user/petOwnerService')
 const { differenceInDays, addDays, format, parseISO } = require('date-fns');
 const emailTemplate = require('../../resource/emailTemplate');
+const { getAllCalendarGroups } = require('../../controllers/calendarGroupController');
 class CalendarGroupService {
 
     async getAvailability(calendarGroupId, startTime, endTime, bookingDuration) {
@@ -64,6 +65,23 @@ class CalendarGroupService {
         return availableSlots;
     }
 
+    async getAllCalendarGroups(includeTimeSlot = false, includeBooking = false) {
+        try {
+            const calendarGroups = await prisma.calendarGroup.findMany({
+                include: {
+                    timeslots: includeTimeSlot ? {
+                        include: { Booking: includeBooking }
+                    } : false,
+                    scheduleSettings: true
+                }
+            });
+
+            return calendarGroups;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new CalendarGroupError(error);
+        }
+    }
 
     async getCalendarGroupById(calendarGroupId, includeTimeSlot = false, includeBooking = false) {
         try {

@@ -5,6 +5,43 @@ const calendarGroupService = require('../services/appointments/calendarGroupServ
 const constants = require("../../constants/common");
 const errorMessages = constants.errorMessages;
 
+
+exports.getAllCalendarGroups = async (req, res, next) => {
+    try {
+        const includeTimeSlot = req.query.includeTimeSlot === 'true';
+        const includeBooking = req.query.includeBooking === 'true';
+
+        const calendarGroups = await calendarGroupService
+            .getAllCalendarGroups(includeTimeSlot, includeBooking);
+
+        res.status(200).json(calendarGroups);
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+exports.getCalendarGroupById = async (req, res, next) => {
+    try {
+
+        const calendarGroupId = req.params.calendarGroupId; // must be valid number
+        if (!(await baseValidations.isValidInteger(calendarGroupId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const includeTimeSlot = req.query.includeTimeSlot === 'true';
+        const includeBooking = req.query.includeBooking === 'true';
+
+        const calendarGroups = await calendarGroupService
+            .getCalendarGroupById(Number(calendarGroupId), includeTimeSlot, includeBooking);
+
+        res.status(200).json(calendarGroups);
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 exports.createCalendarGroup = async (req, res, next) => {
     try {
         const calendarGroupPayload = req.body
