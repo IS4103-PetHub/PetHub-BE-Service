@@ -40,6 +40,32 @@ definitions:
 
 paths:
   /api/bookings:
+    get:
+      summary: Get bookings within a time range
+      description: Retrieve all bookings within a specified time period.
+      parameters:
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
+
     post:
       summary: Create a new booking
       description: Create a new booking for a specific calendar group and service listing within a specified time period.
@@ -97,5 +123,98 @@ paths:
           description: Invalid request parameters
         406:
           description: Unable to update booking, no available timeslots
+      tags:
+        - Booking
+
+  /api/bookings/calendar-groups/{calendarGroupId}:
+    get:
+      summary: Get bookings by calendar group
+      description: Retrieve all bookings for a specific calendar group within a specified time period.
+      parameters:
+        - name: calendarGroupId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
+
+  /api/bookings/service-listings/{serviceListingId}:
+    get:
+      summary: Get bookings by service listing
+      description: Retrieve all bookings for a specific service listing within a specified time period.
+      parameters:
+        - name: serviceListingId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
+
+  /api/bookings/users/{userId}:
+    get:
+      summary: Get bookings by user
+      description: Retrieve all bookings for a specific user within a specified time period.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
       tags:
         - Booking

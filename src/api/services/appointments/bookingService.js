@@ -49,6 +49,82 @@ class BookingService {
         }
     }
 
+    async getBookings(startTime, endTime) {
+        try {
+            const bookings = await prisma.booking.findMany({
+                where: {
+                    AND: [
+                        { startTime: { gte: startTime } },
+                        { endTime: { lte: endTime } }
+                    ]
+                },
+            });
+
+            return bookings;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new BookingError(error);
+        }
+    }
+
+    async getBookingsByCalendarGroup(calendarGroupId, startTime, endTime) {
+        try {
+            const bookings = await prisma.booking.findMany({
+                where: {
+                    AND: [
+                        { timeSlot: { calendarGroupId: calendarGroupId } },
+                        { startTime: { gte: startTime } },
+                        { endTime: { lte: endTime } }
+                    ]
+                },
+                include: { timeSlot: true }
+            });
+
+            return bookings;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new BookingError(error);
+        }
+    }
+
+    async getBookingsByServiceListing(serviceListingId, startTime, endTime) {
+        try {
+            const bookings = await prisma.booking.findMany({
+                where: {
+                    AND: [
+                        { serviceListingId: serviceListingId },
+                        { startTime: { gte: startTime } },
+                        { endTime: { lte: endTime } }
+                    ]
+                }
+            });
+
+            return bookings;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new BookingError(error);
+        }
+    }
+
+    async getBookingsByUser(userId, startTime, endTime) {
+        try {
+            const bookings = await prisma.booking.findMany({
+                where: {
+                    AND: [
+                        { petOwnerId: userId },
+                        { startTime: { gte: startTime } },
+                        { endTime: { lte: endTime } }
+                    ]
+                }
+            });
+
+            return bookings;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new BookingError(error);
+        }
+    }
+
     async updateBooking(bookingId, newStartTime, newEndTime) {
         try {
             const existingBooking = await this.getBookingById(bookingId)
