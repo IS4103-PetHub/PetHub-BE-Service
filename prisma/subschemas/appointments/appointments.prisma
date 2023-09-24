@@ -1,0 +1,70 @@
+import { DayOfWeek, RecurrencePattern } from "../enums/appointmentsEnum"
+import { PetBusiness } from "../user/user"
+import { ServiceListing } from "../serviceListing/serviceListing"
+import { ServiceListing } from "../../schema"
+
+model CalendarGroup {
+    calendarGroupId  Int                @id @default(autoincrement())
+    name             String
+    description      String?
+    timeslots        TimeSlot[]
+    scheduleSettings ScheduleSettings[]
+
+    petBusinessId  Int // CalendarGroup ISA Weak Entity of PetBusiness 
+    petBusiness    PetBusiness      @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
+    ServiceListing ServiceListing[]
+
+    @@unique([petBusinessId, name])
+}
+
+model ScheduleSettings {
+    scheduleSettingId Int               @id @default(autoincrement())
+    days              DayOfWeek[]
+    pattern           RecurrencePattern
+    vacancies         Int
+    startDate         String // Only require Date portion
+    endDate           String // Only require Date portion
+    timePeriods       TimePeriod[]
+
+    calendarGroupId Int // ScheduleSettings ISA Weak Entity of CalendarGroup 
+    CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
+}
+
+model TimePeriod {
+    timePeriodId Int    @id @default(autoincrement())
+    startTime    String
+    endTime      String
+
+    scheduleSettingId Int // TimePeriods ISA Weak Entity of ScheduleSettings 
+    ScheduleSettings  ScheduleSettings @relation(fields: [scheduleSettingId], references: [scheduleSettingId], onDelete: Cascade)
+}
+
+model TimeSlot {
+    timeSlotId Int      @id @default(autoincrement())
+    startTime  DateTime
+    endTime    DateTime
+    vacancies  Int
+
+    calendarGroupId Int
+    CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId])
+
+    Booking Booking[]
+}
+
+model Booking {
+    bookingId     Int       @id @default(autoincrement())
+    invoiceId     Int?
+    transactionId Int?
+    petOwnerId    Int
+    dateCreated   DateTime  @default(now())
+    lastUpdated   DateTime?
+
+    startTime DateTime
+    endTime   DateTime
+
+    serviceListingId Int
+    serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId], onDelete: Cascade)
+
+    timeSlotId Int?
+    timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
+}

@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const baseValidation = require("./baseValidation")
 
 // Validation for the timePeriod object
 const timePeriodValidation = () => {
@@ -53,7 +54,7 @@ const recurrenceValidation = () => {
                 threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
                 const maxDate = threeMonthsFromNow.toISOString().split('T')[0];
 
-                if (new Date(value) <= new Date(startDate)) {
+                if (new Date(value) < new Date(startDate)) {
                     return helpers.message('endDate must be after startDate');
                 }
                 if (new Date(value) > new Date(maxDate)) {
@@ -69,6 +70,18 @@ const recurrenceValidation = () => {
             .items(timePeriodValidation())
             .min(1)
             .message('At least one timePeriod is required.')
+            .custom((value, helpers) => {
+                for (let i = 0; i < value.length; i++) {
+                    for (let j = i + 1; j < value.length; j++) {
+                        const a = value[i];
+                        const b = value[j];
+                        if (a.startTime < b.endTime && a.endTime > b.startTime) {
+                            return helpers.message('Time periods must not overlap.');
+                        }
+                    }
+                }
+                return value;  // validation passed
+            })
             .required()
     });
 };
@@ -76,7 +89,7 @@ const recurrenceValidation = () => {
 
 // Validation for the timeslot object
 // days is required only when the recurrence pattern is 'WEEKLY'.
-const timeslotValidation = () => {
+const scheduleSettingsValidation = () => {
     return Joi.object({
         days: Joi.array()
             .items(Joi.string().valid('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'))
@@ -105,26 +118,26 @@ exports.isValidCreateCalendarGroupPayload = (payload) => {
     const schema = Joi.object({
         name: Joi.string()
             .trim()
-            .pattern(/^[a-zA-Z\s.,]+$/, 'name pattern')
+            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'name pattern')
             .pattern(/[a-zA-Z]+/, 'alphabet presence')
             .messages({
                 'string.empty': 'Name must not be empty.',
-                'string.pattern.name': 'Name must have a valid format (only alphabets, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
+                'string.pattern.name': 'Name must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
             })
             .required(),
         description: Joi.string()
             .trim()
-            .pattern(/^[a-zA-Z\s.,]+$/, 'description pattern')
+            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'description pattern')
             .pattern(/[a-zA-Z]+/, 'alphabet presence')
             .messages({
                 'string.empty': 'Description must not be empty.',
-                'string.pattern.name': 'Description must have a valid format (only alphabets, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
+                'string.pattern.name': 'Description must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
             })
             .optional(),
-        timeslots: Joi.array()
-            .items(timeslotValidation())
+        scheduleSettings: Joi.array()
+            .items(scheduleSettingsValidation())
             .min(1)
-            .message('At least one timeslot is required.')
+            .message('At least one scheduleSetting is required.')
             .required()
     });
 
@@ -137,3 +150,77 @@ exports.isValidCreateCalendarGroupPayload = (payload) => {
     return { isValid: true };
 };
 
+exports.isValidUpdateCalendarGroupPayload = (payload) => {
+    const schema = Joi.object({
+        name: Joi.string()
+            .trim()
+            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'name pattern')
+            .pattern(/[a-zA-Z]+/, 'alphabet presence')
+            .messages({
+                'string.empty': 'Name must not be empty.',
+                'string.pattern.name': 'Name must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
+            })
+            .optional(),
+        description: Joi.string()
+            .trim()
+            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'description pattern')
+            .pattern(/[a-zA-Z]+/, 'alphabet presence')
+            .messages({
+                'string.empty': 'Description must not be empty.',
+                'string.pattern.name': 'Description must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
+            })
+            .optional(),
+        scheduleSettings: Joi.array()
+            .items(scheduleSettingsValidation())
+            .min(1)
+            .message('At least one scheduleSetting is required.')
+            .optional()
+    });
+
+    const { error } = schema.validate(payload, { convert: false });
+    if (error) {
+        console.log(error);
+        return { isValid: false, message: error.details[0].message };
+    }
+
+    return { isValid: true };
+};
+
+const durationValidation = (startTime, endTime) => {
+    return Joi.string()
+        .custom((value, helpers) => {
+            const duration = Number(value);
+            if (isNaN(duration) || !Number.isInteger(duration)) {
+                return helpers.message('Duration must be a valid integer.');
+            }
+
+            maxDuration = ((new Date(endTime) - new Date(startTime)) / 60000)
+            if (duration < 1 || duration > maxDuration) {
+                return helpers.message(`Duration must be between 1 and the difference of startTime and endTime in minutes: ${maxDuration} mins`);
+            }
+            return value;
+        }, 'Duration Validation');
+};
+
+exports.isValidAvailabilityPayload = (payload) => {
+    const schema = Joi.object({
+        startTime: baseValidation.dateTimeValidation('startTime').required(),
+        endTime: baseValidation.dateTimeValidation('endTime').required()
+            .custom((value, helpers) => {
+                const startTime = helpers.state.ancestors[0].startTime;
+                if (new Date(value) <= new Date(startTime)) {
+                    return helpers.message('endTime must be after startTime');
+                }
+                return value;
+            }),
+        duration: durationValidation(payload.startTime, payload.endTime).required()
+    });
+
+    const { error } = schema.validate(payload, { convert: false });
+    if (error) {
+        console.log(error);
+        return { isValid: false, message: error.details[0].message };
+    }
+
+    return { isValid: true };
+};

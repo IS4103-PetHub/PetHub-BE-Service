@@ -84,7 +84,7 @@ class InternalUserService extends BaseUserService {
         try {
 
             const updatedUser = await prisma.$transaction(async (prismaClient) => {
-                
+
                 if (data.email) {
                     await prismaClient.user.update({
                         where: { userId },
@@ -106,7 +106,7 @@ class InternalUserService extends BaseUserService {
                         user: true
                     }
                 });
-                
+
                 return user
             })
 

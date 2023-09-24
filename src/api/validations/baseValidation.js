@@ -1,3 +1,5 @@
+const Joi = require('joi');
+
 exports.isValidNumericID = async (id) => {
   return typeof id === "number" && id > 0;
 };
@@ -8,6 +10,10 @@ exports.isValidLength = async (data, length) => {
 
 exports.isValidInteger = async (num) => {
   // Check if the string is strictly an integer representation
+  if (Number.isInteger(num)) {
+    return num > 0
+  }
+
   if (num !== parseInt(num, 10).toString()) {
     return false;
   }
@@ -32,4 +38,24 @@ exports.isValidNumericIDs = async (ids) => {
     }
   }
   return true;
+};
+
+exports.dateTimeValidation = (label) => {
+  return Joi.string()
+    .custom((value, helpers) => {
+      if (isNaN(Date.parse(value))) {
+        return helpers.message(`${label} must be a valid date in the format: YYYY-MM-DDTHH:MM:SS.sssZ`);
+      }
+      return value;
+    }, 'Date Validation')
+};
+
+exports.integerValidation = (label) => {
+  return Joi.number()
+    .integer()
+    .min(1)
+    .messages({
+      'number.base': `${label} must be a number.`,
+      'number.min': `${label} must be a valid positive integer.`
+    });
 };

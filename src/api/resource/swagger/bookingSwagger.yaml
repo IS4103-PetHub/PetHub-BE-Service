@@ -1,0 +1,101 @@
+swagger: "2.0"
+definitions:
+  createBookingRequest:
+    type: object
+    required:
+      - calendarGroupId
+      - serviceListingId
+      - startTime
+      - endTime
+    properties:
+      calendarGroupId:
+        type: integer
+        description: The Id of the calendar group to book from.
+      serviceListingId:
+        type: integer
+        description: The associated service listing for the booking.
+      startTime:
+        type: string
+        format: date-time
+        description: Start time of the booking.
+      endTime:
+        type: string
+        format: date-time
+        description: End time of the booking.
+
+  updateBookingRequest:
+    type: object
+    required:
+      - startTime
+      - endTime
+    properties:
+      startTime:
+        type: string
+        format: date-time
+        description: Start time of the booking.
+      endTime:
+        type: string
+        format: date-time
+        description: End time of the booking.
+
+paths:
+  /api/bookings:
+    post:
+      summary: Create a new booking
+      description: Create a new booking for a specific calendar group and service listing within a specified time period.
+      consumes:
+        - application/json
+      requestBody:
+        description: Booking details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/createBookingRequest"
+            example:
+              calendarGroupId: 1
+              serviceListingId: 1
+              startTime: "2023-10-30T01:00:00.000Z"
+              endTime: "2023-10-30T01:30:00.000Z"
+      responses:
+        201:
+          description: Booking created successfully
+        400:
+          description: Invalid request parameters
+        406:
+          description: Unable to create new booking, no available timeslots
+      tags:
+        - Booking
+
+  /api/bookings/{bookingId}:
+    patch:
+      summary: Update existing booking's timing
+      description: Change the timing for an existing booking for a specified time period.
+      parameters:
+        - name: bookingId
+          in: path
+          description: ID of the booking to update.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      consumes:
+        - application/json
+      requestBody:
+        description: Update booking details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/updateBookingRequest"
+            example:
+              startTime: "2023-10-30T01:00:00.000Z"
+              endTime: "2023-10-30T01:30:00.000Z"
+      responses:
+        201:
+          description: Booking updated successfully
+        400:
+          description: Invalid request parameters
+        406:
+          description: Unable to update booking, no available timeslots
+      tags:
+        - Booking

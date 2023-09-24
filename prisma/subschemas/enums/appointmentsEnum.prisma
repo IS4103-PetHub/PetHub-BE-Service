@@ -1,0 +1,14 @@
+enum DayOfWeek {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+}
+
+enum RecurrencePattern {
+    DAILY
+    WEEKLY
+}
