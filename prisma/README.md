@@ -44,6 +44,10 @@ This aligns your Prisma schema with your database schema.
 ```npx prisma studio```
 Prisma studio should be up on http://localhost:5555
 
+#### Reset DB and Re-seed Data
+```prisma migrate reset```
+Note that all data will be wiped and new data will be seeded.
+
 
 ## More information in our documentation:
 - Prisma: https://pris.ly/d/getting-started

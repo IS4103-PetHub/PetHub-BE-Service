@@ -30,6 +30,7 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 40.0,
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
+    addressIds: [{addressId: 1}]
   },
   {
     id: 2,
@@ -39,6 +40,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
+    addressIds: [{addressId: 2}]
   },
   {
     id: 3,
@@ -48,6 +50,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
+    addressIds: []
   },
   {
     id: 4,
@@ -58,6 +61,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 75.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
+    addressIds: [{addressId: 1}, {addressId: 2 }]
   },
   {
     id: 5,
@@ -67,6 +71,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
+    addressIds: [{addressId: 6}]
   },
   {
     id: 6,
@@ -76,6 +81,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
+    addressIds: [{addressId: 7}, {addressId: 8}]
   },
   {
     id: 7,
@@ -85,6 +91,7 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 70.0,
     tagIds: [{ tagId: 3 }, { tagId: 5 }],
+    addressIds: [{addressId: 3}]
   },
   {
     id: 8,
@@ -94,24 +101,27 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 80.0,
     tagIds: [{ tagId: 1 }, { tagId: 4 }],
+    addressIds: []
   },
   {
     id: 9,
     title: "Emergency Pet Clinic",
     description: "24/7 emergency care for your pets",
-    petBusinessId: 6,
+    petBusinessId: 1,
     category: "VETERINARY",
     basePrice: 120.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
+    addressIds: []
   },
   {
     id: 10,
     title: "Dog Walking Service",
     description: "Regular dog walking to keep your pup happy and healthy",
-    petBusinessId: 7,
+    petBusinessId: 2,
     category: "PET_GROOMING",
     basePrice: 20.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
+    addressIds: [{addressId: 3}, {addressId: 4}]
   },
 ];
 
@@ -137,6 +147,9 @@ async function seedBusinessData(prisma) {
         category: data.category,
         tags: {
           connect: data.tagIds,
+        },
+        addresses: {
+          connect: data.addressIds,
         },
         petBusiness: {
           connect: {

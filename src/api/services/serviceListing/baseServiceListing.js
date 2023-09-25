@@ -147,6 +147,7 @@ exports.getAllServiceListings = async () => {
     return await prisma.serviceListing.findMany({
       include: {
         tags: true,
+        addresses: true,
         petBusiness: {
           select: {
             companyName: true,
@@ -167,6 +168,7 @@ exports.getServiceListingById = async (serviceListingId) => {
       include: {
         tags: true,
         addresses: true,
+        petBusiness: true,
       },
     });
     if (!serviceListing) {
@@ -261,6 +263,11 @@ exports.filterServiceListing = async (categories, tags) => {
       },
       include: {
         tags: true,
+        petBusiness: {
+          select: {
+            companyName: true,
+          },
+        },
       },
     });
     return serviceListings;
