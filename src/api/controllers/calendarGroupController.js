@@ -44,19 +44,21 @@ exports.getCalendarGroupById = async (req, res, next) => {
 
 exports.createCalendarGroup = async (req, res, next) => {
     try {
-        const calendarGroupPayload = req.body
 
         // TODO: use middleware to identify creator
-        const petBusinessId = 1
-        // TODO validate petBusinessID
+        const petBusinessId = req.query.petBusinessId
+        if (!await baseValidations.isValidInteger(petBusinessId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID}: petBusinessId` });
+        }
 
+        const calendarGroupPayload = req.body
         const validationResult = calendarGroupValidations.isValidCreateCalendarGroupPayload(calendarGroupPayload);
         if (!validationResult.isValid) {
             res.status(400).send({ message: validationResult.message });
             return;
         }
 
-        const newCalendarGroup = await calendarGroupService.createCalendarGroup(calendarGroupPayload, petBusinessId);
+        const newCalendarGroup = await calendarGroupService.createCalendarGroup(calendarGroupPayload, Number(petBusinessId));
 
         res.status(201).json(newCalendarGroup);
     } catch (error) {

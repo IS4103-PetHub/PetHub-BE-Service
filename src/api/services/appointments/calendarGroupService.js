@@ -7,6 +7,8 @@ const PetOwnerService = require('../user/petOwnerService')
 const { differenceInDays, addDays, format, parseISO } = require('date-fns');
 const emailTemplate = require('../../resource/emailTemplate');
 const { getAllCalendarGroups } = require('../../controllers/calendarGroupController');
+const PetBusinessService = require('../user/petBusinessService')
+
 class CalendarGroupService {
 
     async getAvailability(calendarGroupId, startTime, endTime, bookingDuration) {
@@ -107,6 +109,8 @@ class CalendarGroupService {
 
     async createCalendarGroup(calendarGroupData, petBusinessId) {
         try {
+            const petBusiness = await PetBusinessService.getUserById(petBusinessId) // Validate if it's pet business
+
             const scheduleSettingsData = await this.mapToScheduleSettings(calendarGroupData.scheduleSettings);
             const timeSlotsData = await this.mapToTimeSlots(calendarGroupData.scheduleSettings)
             console.log(timeSlotsData)

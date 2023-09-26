@@ -69,6 +69,13 @@ paths:
     post:
       summary: Create a new booking
       description: Create a new booking for a specific calendar group and service listing within a specified time period.
+      parameters:
+        - name: petOwnerId
+          in: query
+          description: ID of the Pet Owner creating the booking.
+          required: true
+          type: integer
+          default: 1 # Example default value
       consumes:
         - application/json
       requestBody:

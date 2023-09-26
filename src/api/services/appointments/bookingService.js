@@ -2,11 +2,12 @@ const CustomError = require("../../errors/customError");
 const BookingError = require("../../errors/bookingError");
 const CalendarGroupService = require('./calendarGroupService')
 const prisma = require('../../../../prisma/prisma');
-
+const PetOwnerService = require('../user/petOwnerService')
 class BookingService {
 
     async createBooking(petOwnerId, calendarGroupId, serviceListingId, startTime, endTime) {
         try {
+            const petOwner = await PetOwnerService.getUserById(petOwnerId) // Validate if it's pet owner
             const bookingDuration = Math.abs((new Date(endTime) - new Date(startTime)) / 60000);
             const availableSlots = await CalendarGroupService.getAvailability(Number(calendarGroupId), new Date(startTime), new Date(endTime), bookingDuration);
             if (availableSlots.length === 0) throw new CustomError("Unable to create new booking, no available timeslots", 406);

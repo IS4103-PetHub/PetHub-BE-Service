@@ -65,7 +65,7 @@ exports.getBookingsByUser = [baseValidations.validateDateQuery, async (req, res,
 exports.createBooking = async (req, res, next) => {
     try {
         // TODO: use middleware to identify creator
-        const petOwnerId = 10
+        const petOwnerId = req.query.petOwnerId
         const payload = req.body
         const { calendarGroupId, serviceListingId } = payload
 

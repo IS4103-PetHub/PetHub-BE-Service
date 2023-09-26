@@ -134,6 +134,13 @@ paths:
     post:
       summary: Create a new calendar group for pet businesses to accept bookings
       description: Create a new calendar group for pet businesses to accept bookings
+      parameters:
+        - name: petBusinessId
+          in: query
+          description: ID of the Pet Business creating the calendar group.
+          required: true
+          type: integer
+          default: 1 # Example default value
       consumes:
         - application/json
       requestBody:
