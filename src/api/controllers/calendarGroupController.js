@@ -66,6 +66,21 @@ exports.createCalendarGroup = async (req, res, next) => {
     }
 }
 
+exports.deleteCalendarGroup = async (req, res, next) => {
+    try {
+        const calendarGroupId = req.params.calendarGroupId;
+
+        if (!await baseValidations.isValidInteger(calendarGroupId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID}: calendarGroupId` });
+        }
+
+        await calendarGroupService.deleteCalendarGroup(Number(calendarGroupId));
+        res.status(200).json({ message: 'Calendar group deleted successfully.' });
+    } catch (error) {
+        // Passing errors to the next middleware for handling.
+        next(error);
+    }
+}
 
 exports.updateCalendarGroup = async (req, res, next) => {
     try {

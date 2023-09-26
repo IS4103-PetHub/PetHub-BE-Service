@@ -9,12 +9,13 @@ router.get('/health-check', async (req, res, next) => {
 
 
 function registerCalendarGroupRoutes(controller) {
-    router.post(`/`, controller.createCalendarGroup);
-    router.put(`/:calendarGroupId`, controller.updateCalendarGroup);
     router.get(`/`, controller.getAllCalendarGroups);
     router.get(`/:calendarGroupId`, controller.getCalendarGroupById);
+    router.post(`/`, controller.createCalendarGroup);
+    router.put(`/:calendarGroupId`, controller.updateCalendarGroup);
+    router.delete(`/:calendarGroupId`, controller.deleteCalendarGroup);
 
-
+    // Utility Routes
     router.get('/available-timeslots/:calendarID', controller.getAvailability);
 }
 

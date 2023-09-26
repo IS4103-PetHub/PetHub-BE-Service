@@ -138,6 +138,36 @@ class CalendarGroupService {
         }
     }
 
+    async deleteCalendarGroup(calendarGroupId) {
+        try {
+            // Fetch the calendar group with all related bookings.
+            const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true);
+            const Bookings = calendarGroup.timeslots.flatMap(timeslot => timeslot.Booking);
+
+            // Deleting the entire calendar group.
+            await prisma.calendarGroup.delete({
+                where: { calendarGroupId: calendarGroupId },
+            });
+
+            // Emailing all affected bookings.
+            for (const booking of Bookings) {
+                const petOwner = await PetOwnerService.getUserById(Number(booking.petOwnerId));
+                const emailTitle = "[Notification] Your Booking Has Been Canceled";
+
+                // TODO: email sending code here
+                console.log(`====================== AFFECTED BOOKING ============================`);
+                console.log(`email is sent to ${petOwner.lastName}, affected booking: `, booking);
+            }
+
+            return true; // Returning true to indicate successful deletion.
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new CalendarGroupError(error);
+        }
+    }
+
+
+
     async updateCalendarGroup(calendarGroupId, calendarGroupData) {
         try {
             const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true)
@@ -225,9 +255,6 @@ class CalendarGroupService {
         }
         return unsuccessfulMigration
     }
-
-
-
 
     formatDateKey(date) {
         return format(date, 'yyyy-MM-dd');

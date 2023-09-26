@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Mon Sep 25 2023 00:14:41 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Sep 27 2023 00:07:00 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -43,7 +43,7 @@ model TimeSlot {
   vacancies  Int
 
   calendarGroupId Int
-  CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId])
+  CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
 
   Booking Booking[]
 }

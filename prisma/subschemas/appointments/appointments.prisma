@@ -46,7 +46,7 @@ model TimeSlot {
     vacancies  Int
 
     calendarGroupId Int
-    CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId])
+    CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
 
     Booking Booking[]
 }

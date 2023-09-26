@@ -256,6 +256,27 @@ paths:
       tags:
         - CalendarGroup
 
+    delete:
+      summary: Delete a calendar group
+      description: Delete the specified calendar group and notify all affected bookings.
+      parameters:
+        - name: calendarGroupId
+          in: path
+          description: ID of the calendar to delete.
+          required: true
+          schema:
+            type: integer
+          example: 1 # Example default value
+      responses:
+        200:
+          description: Calendar group deleted successfully
+        400:
+          description: Invalid calendar group ID
+        500:
+          description: Server error while deleting calendar group
+      tags:
+        - CalendarGroup
+
   /api/calendar-groups/available-timeslots/{calendarID}:
     get:
       summary: Get available time slots for a given calendar ID.
