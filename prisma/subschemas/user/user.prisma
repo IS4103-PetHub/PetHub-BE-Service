@@ -43,24 +43,63 @@ model PetOwner {
 }
 
 model PetBusiness {
-    companyName            String
-    uen                    String
-    contactNumber          String
-    // This section is for the optional fields that are empty during PB signup, but populated during PB app approval //
-    businessType           BusinessType?
-    businessEmail          String?
-    businessDescription    String?
-    websiteURL             String?
-    businessAddresses      Address[]
-    // ------------------------------------------------ Section End ------------------------------------------------ //
-    serviceListings        ServiceListing[]
-    petBusinessApplication PetBusinessApplication?
-    // logo                String // TODO: figure out best way to save logos
+  companyName            String
+  uen                    String
+  contactNumber          String
+  // This section is for the optional fields that are empty during PB signup, but populated during PB app approval //
+  businessType           BusinessType?
+  businessEmail          String?
+  businessDescription    String?
+  websiteURL             String?
+  businessAddresses      Address[]
+  // ------------------------------------------------ Section End ------------------------------------------------ //
+  serviceListings        ServiceListing[]
+  petBusinessApplication PetBusinessApplication?
+  // logo                String // TODO: figure out best way to save logos
 
-    user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    userId        Int             @id @unique
-    CalendarGroup CalendarGroup[]
+  user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId        Int             @id @unique
+  CalendarGroup CalendarGroup[]
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 model ResetPassword {
     token      String   @unique
@@ -69,19 +108,20 @@ model ResetPassword {
 }
 
 model Address {
-    addressId                Int                     @id @default(autoincrement())
-    addressName              String
-    line1                    String
-    line2                    String?
-    postalCode               String
-    // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
-    petBusinessId            Int?
-    PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
-    petBusinessApplicationId Int?
-    PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+  addressId                Int                     @id @default(autoincrement())
+  addressName              String
+  line1                    String
+  line2                    String?
+  postalCode               String
+  // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
+  petBusinessId            Int?
+  PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
+  petBusinessApplicationId Int?
+  PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
 
-    serviceListings ServiceListing[]
+  serviceListings ServiceListing[]
 }
+
 
 model PetBusinessApplication {
     petBusinessApplicationId Int                       @id @default(autoincrement())

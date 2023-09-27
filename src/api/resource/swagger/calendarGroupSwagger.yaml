@@ -12,6 +12,9 @@ definitions:
       endTime:
         type: string
         description: "The end time for the time period. Format: HH:MM"
+      vacancies:
+        type: integer
+        description: number of availability per ScheduleSetting
 
   Recurrence:
     type: object
@@ -48,9 +51,6 @@ definitions:
         items:
           enum: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
         description: List of days applied for the ScheduleSetting definition. Optional if all recurrence pattern are DAILY
-      vacancies:
-        type: integer
-        description: number of availability per ScheduleSetting
       recurrence:
         type: "#/definitions/Recurrence"
         description: recurrence rules applied for the indicated days
@@ -155,7 +155,6 @@ paths:
               description: "Available slots for grooming services"
               scheduleSettings:
                 - days: [MONDAY, WEDNESDAY]
-                  vacancies: 1
                   recurrence:
                     pattern: "WEEKLY"
                     startDate: "2023-10-18"
@@ -163,14 +162,15 @@ paths:
                     timePeriods:
                       - startTime: "09:00"
                         endTime: "10:00"
-                - vacancies: 2
-                  recurrence:
+                        vacancies: 1
+                - recurrence:
                     pattern: "DAILY"
                     startDate: "2023-11-01"
                     endDate: "2023-11-01"
                     timePeriods:
                       - startTime: "12:00"
                         endTime: "13:00"
+                        vacancies: 2
       responses:
         201:
           description: Calendar group created successfully
@@ -202,22 +202,25 @@ paths:
               description: "Updated Available slots for grooming services"
               scheduleSettings:
                 - days: [MONDAY, WEDNESDAY]
-                  vacancies: 1
                   recurrence:
                     pattern: "WEEKLY"
-                    startDate: "2023-10-28"
+                    startDate: "2023-10-18"
                     endDate: "2023-11-01"
                     timePeriods:
                       - startTime: "09:00"
                         endTime: "10:00"
-                - vacancies: 2
-                  recurrence:
+                        vacancies: 1
+                - recurrence:
                     pattern: "DAILY"
                     startDate: "2023-11-01"
                     endDate: "2023-11-01"
                     timePeriods:
                       - startTime: "12:00"
                         endTime: "13:00"
+                        vacancies: 2
+                      - startTime: "13:00"
+                        endTime: "19:00"
+                        vacancies: 5
       responses:
         200:
           description: Calendar group updated successfully

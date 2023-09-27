@@ -18,7 +18,13 @@ const timePeriodValidation = () => {
                     return helpers.message('endTime must be after startTime');
                 }
                 return value;  // validation passed
+            }),
+        vacancies: Joi.number().integer().min(1)
+            .messages({
+                'number.base': 'Vacancies must be a number.',
+                'number.min': 'Vacancies must be at least 1.',
             })
+            .required(),
     });
 };
 
@@ -103,12 +109,6 @@ const scheduleSettingsValidation = () => {
                 'any.required': 'days is compulsory if pattern is not DAILY',
             })
         ,
-        vacancies: Joi.number().integer().min(1)
-            .messages({
-                'number.base': 'Vacancies must be a number.',
-                'number.min': 'Vacancies must be at least 1.',
-            })
-            .required(),
         recurrence: recurrenceValidation().required()
     });
 };

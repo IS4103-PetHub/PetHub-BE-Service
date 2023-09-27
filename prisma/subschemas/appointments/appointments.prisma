@@ -21,7 +21,6 @@ model ScheduleSettings {
     scheduleSettingId Int               @id @default(autoincrement())
     days              DayOfWeek[]
     pattern           RecurrencePattern
-    vacancies         Int
     startDate         String // Only require Date portion
     endDate           String // Only require Date portion
     timePeriods       TimePeriod[]
@@ -34,6 +33,7 @@ model TimePeriod {
     timePeriodId Int    @id @default(autoincrement())
     startTime    String
     endTime      String
+    vacancies    Int
 
     scheduleSettingId Int // TimePeriods ISA Weak Entity of ScheduleSettings 
     ScheduleSettings  ScheduleSettings @relation(fields: [scheduleSettingId], references: [scheduleSettingId], onDelete: Cascade)

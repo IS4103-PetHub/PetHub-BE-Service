@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Sep 27 2023 00:07:00 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Sep 27 2023 21:54:14 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -18,7 +18,6 @@ model ScheduleSettings {
   scheduleSettingId Int               @id @default(autoincrement())
   days              DayOfWeek[]
   pattern           RecurrencePattern
-  vacancies         Int
   startDate         String // Only require Date portion
   endDate           String // Only require Date portion
   timePeriods       TimePeriod[]
@@ -31,6 +30,7 @@ model TimePeriod {
   timePeriodId Int    @id @default(autoincrement())
   startTime    String
   endTime      String
+  vacancies    Int
 
   scheduleSettingId Int // TimePeriods ISA Weak Entity of ScheduleSettings 
   ScheduleSettings  ScheduleSettings @relation(fields: [scheduleSettingId], references: [scheduleSettingId], onDelete: Cascade)

@@ -272,9 +272,14 @@ class CalendarGroupService {
             while (differenceInDays(new Date(endDate), currentDate) >= 0) {
                 const dayName = format(currentDate, 'EEEE').toUpperCase();
                 if (days.includes(dayName)) {
+
+                    // CHECK DATE OVERLAP; DATEMAP IS USED TO CHECK DATE OVERLAP 
                     if (dateMap[this.formatDateKey(currentDate)]) {
                         throw new CustomError(`Overlap detected for date ${currentDate} in weekly settings`, 400);
                     }
+
+                    // CHECK TIMING OVERLAP; TIME PERIODS SHOULD NOT OVERLAP
+
                     dateMap[this.formatDateKey(currentDate)] = setting;
                 }
                 currentDate = addDays(currentDate, 1);
@@ -293,10 +298,14 @@ class CalendarGroupService {
 
             let currentDate = new Date(startDate);
             while (differenceInDays(new Date(endDate), currentDate) >= 0) {
+                // CHECK DATE OVERLAP; DATEMAP IS USED TO CHECK DATE OVERLAP 
                 if (dateMap[this.formatDateKey(currentDate)]) {
                     throw new CustomError(`Overlap detected for date ${currentDate} in daily settings`, 400);
                 }
+
+                // CHECK TIMING OVERLAP; TIME PERIODS SHOULD NOT OVERLAP; ALREADY DONE BY
                 dateMap[this.formatDateKey(currentDate)] = setting;
+
                 currentDate = addDays(currentDate, 1);
             }
         }
@@ -305,12 +314,13 @@ class CalendarGroupService {
     }
 
 
-    generateTimeSlotsForDate(dateString, timePeriods, vacancies) {
+    generateTimeSlotsForDate(dateString, timePeriods) {
         const slotsForDate = [];
 
         for (let period of timePeriods) {
             const startTime = parseISO(`${dateString}T${period.startTime}`);
             const endTime = parseISO(`${dateString}T${period.endTime}`);
+            const vacancies = period.vacancies
 
             // Create a TimeSlot object
             const timeSlot = {
@@ -361,6 +371,7 @@ class CalendarGroupService {
                     create: recurrence.timePeriods.map(period => ({
                         startTime: period.startTime,
                         endTime: period.endTime,
+                        vacancies: period.vacancies
                     }))
                 }
             };
