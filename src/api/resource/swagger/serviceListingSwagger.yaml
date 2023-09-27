@@ -415,3 +415,24 @@ paths:
                   $ref: '#/definitions/ServiceListingResponse'
       tags:
         - Service Listing
+  /api/service-listings/pet-businesses/{id}:
+    get:
+      summary: Get all service listings by pet business ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pet business.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing

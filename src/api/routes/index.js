@@ -10,6 +10,7 @@ router.get("/", async (req, res, next) => {
 const userRoutes = require("./userRoutes");
 const serviceListingRoutes = require("./serviceListingRoutes");
 const tagRoutes = require("./tagRoutes");
+const petRoutes = require("./petRoutes");
 const rbacRoutes = require("./rbacRoutes");
 const authRoutes = require("./auth");
 const petBusinessApplicationRoutes = require("./petBusinessApplicationRoutes");
@@ -18,6 +19,7 @@ const petBusinessApplicationRoutes = require("./petBusinessApplicationRoutes");
 router.use("/users", userRoutes);
 router.use("/service-listings", serviceListingRoutes);
 router.use("/tags", tagRoutes);
+router.use("/pets", petRoutes);
 router.use("/rbac", rbacRoutes);
 router.use("/", authRoutes);
 router.use("/pb-applications", petBusinessApplicationRoutes);

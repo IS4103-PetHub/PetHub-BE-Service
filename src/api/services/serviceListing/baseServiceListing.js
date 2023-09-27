@@ -1,10 +1,9 @@
 const prisma = require("../../../../prisma/prisma");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
-const S3Service = require("../s3Service");
-const { deleteFiles } = require("../s3Service");
+const s3ServiceInstance = require("../s3Service");
+// const { deleteFiles } = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
-const s3Service = new S3Service();
 
 
 exports.createServiceListing = async (data) => {
@@ -235,7 +234,7 @@ exports.getServiceListingByPBId = async (id) => {
     });
     return serviceListings;
   } catch (error) {
-    console.error("Error fetching all service listings:", error);
+    console.error("Error fetching service listings by pet business ID:", error);
     throw new ServiceListingError(error);
   }
 };
@@ -303,7 +302,7 @@ exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
     if (!serviceListing) {
       throw new CustomError("Service Listing not found", 404);
     }
-    await s3Service.deleteFiles(serviceListing.attachmentKeys);
+    await s3ServiceInstance.deleteFiles(serviceListing.attachmentKeys);
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;

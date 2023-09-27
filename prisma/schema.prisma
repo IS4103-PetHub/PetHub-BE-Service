@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Sep 17 2023 14:04:23 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Sep 27 2023 01:16:23 GMT+0800 (Singapore Standard Time)✨
 
 generator client {
   provider = "prisma-client-js"
@@ -37,6 +37,21 @@ enum BusinessApplicationStatus {
   PENDING
   REJECTED // This means require changes, but is named `REJECTED` in all of our external documentation
   APPROVED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum PetType {
+  DOG
+  CAT
+  BIRD
+  TERRAPIN
+  RABBIT
+  RODENT
+  OTHERS
 }
 
 enum Category {
@@ -155,6 +170,8 @@ model PetOwner {
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
+
+  pets Pet[]
 }
 
 model PetBusiness {
@@ -215,4 +232,21 @@ model PetBusinessApplication {
 
   approverId Int?
   approver   InternalUser? @relation(fields: [approverId], references: [userId])
+}
+
+model Pet {
+  petId           Int       @id @default(autoincrement())
+  petName         String
+  petType         PetType
+  gender          Gender
+  dateOfBirth     DateTime?
+  petWeight       Float?
+  microchipNumber String?
+  attachmentKeys  String[]
+  attachmentURLs  String[]
+  dateCreated     DateTime  @default(now())
+  lastUpdated     DateTime?
+
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }

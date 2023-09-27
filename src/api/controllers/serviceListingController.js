@@ -4,8 +4,7 @@ const ServiceListingValidations = require("../validations/servicelistingValidati
 const constants = require("../../constants/common");
 const limitations = constants.limitations;
 const errorMessages = constants.errorMessages;
-const S3Service = require("../services/s3Service.js");
-const s3Service = new S3Service();
+const s3ServiceInstance = require("../services/s3Service.js");
 
 exports.createServiceListing = async (req, res, next) => {
   try {
@@ -68,8 +67,8 @@ exports.createServiceListing = async (req, res, next) => {
     }
 
     if (req.files) {
-      data.attachmentKeys = await s3Service.uploadImgFiles(req.files);
-      data.attachmentURLs = await s3Service.getObjectSignedUrl(
+      data.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files);
+      data.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
         data.attachmentKeys
       );
     }
@@ -144,8 +143,8 @@ exports.updateServiceListing = async (req, res, next) => {
       await ServiceListingService.deleteFilesOfAServiceListing(
         serviceListingId
       );
-      updateData.attachmentKeys = await s3Service.uploadImgFiles(req.files);
-      updateData.attachmentURLs = await s3Service.getObjectSignedUrl(
+      updateData.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files);
+      updateData.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
         updateData.attachmentKeys
       );
     }

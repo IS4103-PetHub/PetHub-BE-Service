@@ -2,6 +2,8 @@ import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplication
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
 import { PetBusiness } from "..\..\schema"
+import { Gender, PetType } from "..\enums\accountEnums"
+import { PetOwner } from "..\..\schema"
 // Entities
 model User {
     userId        Int           @id @default(autoincrement())
@@ -39,6 +41,8 @@ model PetOwner {
 
     user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
     userId Int  @id @unique
+
+    pets Pet[]
 }
 
 model PetBusiness {
@@ -99,4 +103,21 @@ model PetBusinessApplication {
     
     approverId                  Int?
     approver                    InternalUser?               @relation(fields: [approverId], references: [userId])
+}
+
+model Pet {
+  petId          Int       @id @default(autoincrement())
+  petName        String
+  petType        PetType  
+  gender         Gender   
+  dateOfBirth    DateTime?
+  petWeight      Float?
+  microchipNumber String?
+  attachmentKeys String[]
+  attachmentURLs String[]
+  dateCreated    DateTime  @default(now())
+  lastUpdated    DateTime?
+
+  petOwnerId     Int
+  petOwner       PetOwner  @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }

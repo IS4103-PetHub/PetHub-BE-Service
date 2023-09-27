@@ -45,6 +45,27 @@ class S3Service {
     }
   }
 
+  async uploadPdfFiles(files) {
+    try {
+      const params = files.map((file) => {
+        return {
+          Bucket: this.bucketName,
+          Key: `uploads/service-listing/img/${uuidv4()}-${file.originalname}`,
+          Body: file.buffer,
+          ContentType: "application/pdf",
+        };
+      });
+      const keys = params.map((param) => param.Key);
+      await Promise.all(
+        params.map((param) => this.s3Service.send(new PutObjectCommand(param)))
+      );
+      return keys;
+    } catch (error) {
+      console.error("Error uploading PDF files from s3 bucket:", error);
+      throw error;
+    }
+  }
+
   async deleteFiles(keys) {
     try {
       const deleteParams = keys.map((key) => {
@@ -87,4 +108,5 @@ class S3Service {
   }
 }
 
-module.exports = S3Service;
+const s3ServiceInstance = new S3Service()
+module.exports = s3ServiceInstance;
