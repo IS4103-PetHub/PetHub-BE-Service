@@ -1,11 +1,3 @@
-const {
-  AccountStatus,
-  AccountType,
-  BusinessType,
-  BusinessApplicationStatus,
-  PetType,
-  Gender,
-} = require("@prisma/client");
 const CalendarGroupService = require("../../../src/api/services/appointments/calendarGroupService");
 const BookingService = require("../../../src/api/services/appointments/bookingService");
 
