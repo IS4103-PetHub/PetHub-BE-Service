@@ -38,7 +38,11 @@ const getSuitableSpecialDate = (dayOfWeek, weeksAhead) => {
   return formatDate(date);
 };
 
-/* These are seeds CG payloads for PBs with ID: 1 biz1@example.com with password password1234 */
+// Generate booking time string based on a date string and SGT time [dateString format: YYYY-MM-DD, timeString format: HH:MM]
+const generateBookingTime = (dateString, timeString) => {
+  const sgtDate = new Date(`${dateString}T${timeString}:00+08:00`);
+  return sgtDate.toISOString();
+};
 
 const calendarGroupPayloads = [
   {
@@ -310,11 +314,36 @@ const calendarGroupPayloads = [
   },
 ];
 
+const bookingPayloads = [
+  {
+    bookingIndex: 1,
+    calendarGroupId: 1,
+    serviceListingId: 8,
+    startTime: generateBookingTime(getSuitableSpecialDate(3, 0), "09:00"), // Normal grooming waterslide experience, next wednesday, 9-10am
+    endTime: generateBookingTime(getSuitableSpecialDate(3, 0), "10:00"),
+  },
+  {
+    bookingIndex: 2,
+    calendarGroupId: 1,
+    serviceListingId: 8,
+    startTime: generateBookingTime(getSuitableSpecialDate(3, 0), "10:00"), // Normal grooming waterslide experience, next wednesday, 10-11am
+    endTime: generateBookingTime(getSuitableSpecialDate(3, 0), "11:00"),
+  },
+  {
+    bookingIndex: 3,
+    calendarGroupId: 3,
+    serviceListingId: 10,
+    startTime: generateBookingTime(getSuitableSpecialDate(1, 0), "12:00"), // John's new vet experiment, next monday, 12-12.30pm
+    endTime: generateBookingTime(getSuitableSpecialDate(1, 0), "12:30"),
+  },
+];
+
+/* For PB with ID: 1, email: biz1@example.com, password: password1234 */
 async function seedCalendarGroup() {
-  /* 
-    Save the original console.log and override it to do nothing, 
+  /*
+    Save the original console.log and override it to do nothing,
     this is because we want to avoid bombing the terminal from the console.log in the createCG service function in the event of an error
-    */
+  */
   const originalLog = console.log;
   console.log = () => {};
 
@@ -332,4 +361,29 @@ async function seedCalendarGroup() {
   console.log = originalLog; // Restore console.log after the loop
 }
 
-module.exports = { seedCalendarGroup };
+/* For PO with ID: 12, email: petowner5@example.com, password: ilovepets */
+async function seedBookings() {
+  const originalLog = console.log;
+  console.log = () => {};
+
+  for (const payload of bookingPayloads) {
+    try {
+      await BookingService.createBooking(
+        12,
+        payload.calendarGroupId,
+        payload.serviceListingId,
+        payload.startTime,
+        payload.endTime
+      );
+    } catch (error) {
+      console.log = originalLog;
+      console.log(
+        `Error seeding booking for booking index: ${payload.bookingIndex}. It is possible that this booking already exists.`
+      );
+      console.log = () => {};
+    }
+  }
+  console.log = originalLog;
+}
+
+module.exports = { seedCalendarGroup, seedBookings };
