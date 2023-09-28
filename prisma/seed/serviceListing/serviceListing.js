@@ -30,7 +30,8 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 40.0,
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
-    addressIds: [{addressId: 1}]
+    addressIds: [{addressId: 1}],
+    duration: 60
   },
   {
     id: 2,
@@ -40,7 +41,8 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
-    addressIds: [{addressId: 2}]
+    addressIds: [{addressId: 2}],
+    duration: 60
   },
   {
     id: 3,
@@ -50,6 +52,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
+    duration: 60,
     addressIds: []
   },
   {
@@ -61,6 +64,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 75.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
+    duration: 60,
     addressIds: [{addressId: 1}, {addressId: 2 }]
   },
   {
@@ -71,6 +75,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
+    duration: 60,
     addressIds: [{addressId: 6}]
   },
   {
@@ -81,7 +86,8 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
-    addressIds: [{addressId: 7}, {addressId: 8}]
+    addressIds: [{addressId: 7}, {addressId: 8}],
+    duration: 60,
   },
   {
     id: 7,
@@ -91,7 +97,8 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 70.0,
     tagIds: [{ tagId: 3 }, { tagId: 5 }],
-    addressIds: [{addressId: 3}]
+    addressIds: [{addressId: 3}],
+    duration: 60,
   },
   {
     id: 8,
@@ -101,7 +108,8 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 80.0,
     tagIds: [{ tagId: 1 }, { tagId: 4 }],
-    addressIds: []
+    addressIds: [],
+    duration: 60,
   },
   {
     id: 9,
@@ -111,7 +119,8 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 120.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
-    addressIds: []
+    addressIds: [],
+    duration: 60,
   },
   {
     id: 10,
@@ -121,7 +130,8 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 20.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
-    addressIds: [{addressId: 3}, {addressId: 4}]
+    addressIds: [{addressId: 3}, {addressId: 4}],
+    duration: 60,
   },
 ];
 
@@ -145,6 +155,7 @@ async function seedBusinessData(prisma) {
         description: data.description,
         basePrice: data.basePrice,
         category: data.category,
+        duration: data.duration,
         tags: {
           connect: data.tagIds,
         },

@@ -232,6 +232,23 @@ const nonActivePetBusinesses = [
   },
 ];
 
+
+
+// PET BUSINESS SEED DATA (NON ACTIVE)
+const activePetOwner = [
+  {
+    id: 10,
+    email: "petowner123@example.com",
+    password: "123456",
+    firstName: "Pet",
+    lastName: "Owner",
+    contactNumber: "12345678",
+    dateOfBirth: "2000-10-30T01:30:00.000Z",
+    accountType: AccountType.PET_OWNER,
+    accountStatus: AccountStatus.ACTIVE
+  }
+];
+
 async function seedUser(prisma) {
   for (const a of addresses) {
     await prisma.address.upsert({
@@ -300,6 +317,29 @@ async function seedUser(prisma) {
         accountStatus: [6, 7].includes(pb.id) ? AccountStatus.PENDING : AccountStatus.INACTIVE, // PBs 6 and 7 are pending, 8 is inactive (new user)
         petBusiness: {
           create: petBusinessData,
+        },
+      },
+    });
+  }
+
+  for (const po of activePetOwner) {
+    const petOwnerData = {
+      firstName: po.firstName,
+      lastName: po.lastName,
+      contactNumber: po.contactNumber,
+      dateOfBirth: po.dateOfBirth
+    };
+
+    await prisma.user.upsert({
+      where: { userId: po.id },
+      update: {},
+      create: {
+        email: po.email,
+        password: await bcrypt.hash(po.password, 10),
+        accountType: po.accountType,
+        accountStatus: po.accountStatus,
+        petOwner: {
+          create: petOwnerData,
         },
       },
     });

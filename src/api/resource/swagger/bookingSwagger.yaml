@@ -1,0 +1,227 @@
+swagger: "2.0"
+definitions:
+  createBookingRequest:
+    type: object
+    required:
+      - calendarGroupId
+      - serviceListingId
+      - startTime
+      - endTime
+    properties:
+      calendarGroupId:
+        type: integer
+        description: The Id of the calendar group to book from.
+      serviceListingId:
+        type: integer
+        description: The associated service listing for the booking.
+      startTime:
+        type: string
+        format: date-time
+        description: Start time of the booking.
+      endTime:
+        type: string
+        format: date-time
+        description: End time of the booking.
+
+  updateBookingRequest:
+    type: object
+    required:
+      - startTime
+      - endTime
+    properties:
+      startTime:
+        type: string
+        format: date-time
+        description: Start time of the booking.
+      endTime:
+        type: string
+        format: date-time
+        description: End time of the booking.
+
+paths:
+  /api/bookings:
+    get:
+      summary: Get bookings within a time range
+      description: Retrieve all bookings within a specified time period.
+      parameters:
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
+
+    post:
+      summary: Create a new booking
+      description: Create a new booking for a specific calendar group and service listing within a specified time period.
+      parameters:
+        - name: petOwnerId
+          in: query
+          description: ID of the Pet Owner creating the booking.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      consumes:
+        - application/json
+      requestBody:
+        description: Booking details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/createBookingRequest"
+            example:
+              calendarGroupId: 1
+              serviceListingId: 1
+              startTime: "2023-10-30T01:00:00.000Z"
+              endTime: "2023-10-30T01:30:00.000Z"
+      responses:
+        201:
+          description: Booking created successfully
+        400:
+          description: Invalid request parameters
+        406:
+          description: Unable to create new booking, no available timeslots
+      tags:
+        - Booking
+
+  /api/bookings/{bookingId}:
+    patch:
+      summary: Update existing booking's timing
+      description: Change the timing for an existing booking for a specified time period.
+      parameters:
+        - name: bookingId
+          in: path
+          description: ID of the booking to update.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      consumes:
+        - application/json
+      requestBody:
+        description: Update booking details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/updateBookingRequest"
+            example:
+              startTime: "2023-10-30T01:00:00.000Z"
+              endTime: "2023-10-30T01:30:00.000Z"
+      responses:
+        201:
+          description: Booking updated successfully
+        400:
+          description: Invalid request parameters
+        406:
+          description: Unable to update booking, no available timeslots
+      tags:
+        - Booking
+
+  /api/bookings/calendar-groups/{calendarGroupId}:
+    get:
+      summary: Get bookings by calendar group
+      description: Retrieve all bookings for a specific calendar group within a specified time period.
+      parameters:
+        - name: calendarGroupId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
+
+  /api/bookings/service-listings/{serviceListingId}:
+    get:
+      summary: Get bookings by service listing
+      description: Retrieve all bookings for a specific service listing within a specified time period.
+      parameters:
+        - name: serviceListingId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
+
+  /api/bookings/users/{userId}:
+    get:
+      summary: Get bookings by user
+      description: Retrieve all bookings for a specific user within a specified time period.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
