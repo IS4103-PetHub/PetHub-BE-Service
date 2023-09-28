@@ -34,6 +34,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "multer-s3": "^3.0.1",
+    "next-auth": "^4.23.1",
     "nodemailer": "^6.9.4",
     "prisma-multischema": "^1.1.3",
     "studio": "^0.13.5",

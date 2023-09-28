@@ -27,6 +27,9 @@ const permissions = [
     { code: "WRITE_PET_BUSINESS_APPLICATIONS", name: "Write Pet Business Applications", description: "Permission to write Pet Business Applications" },
     { code: "READ_PET_BUSINESS_APPLICATIONS", name: "Read Pet Business Applications", description: "Permission to read Pet Business Applications" },
 
+    // Service Listings
+    { code: "WRITE_SERVICE_LISTINGS", name: "Write Service Listings", description: "Permission to write Service Listings" },
+    { code: "READ_SERVICE_LISTINGS", name: "Read Service Listings", description: "Permission to read Service Listings" },
 ];
 
 // Root Administrator User Data

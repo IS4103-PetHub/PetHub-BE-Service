@@ -107,7 +107,7 @@ const petBusinesses = [
     password: "pass12345",
     companyName: "Smith's Pet Shop",
     uen: "12345678B",
-    contactNumber: "5551234",
+    contactNumber: "88712892",
     businessAddresses: [{ addressId: 3 }, { addressId: 4 }],
     businessDescription: "We groom cats",
     businessEmail: "biz2@example.com",
@@ -127,7 +127,7 @@ const petBusinesses = [
     password: "secure1234",
     companyName: "Mike's Pet Business",
     uen: "12345678C",
-    contactNumber: "12345678",
+    contactNumber: "97128913",
     businessAddresses: [{ addressId: 5 }],
     businessDescription: "We groom hamsters",
     businessEmail: "biz3@example.com",
@@ -168,7 +168,7 @@ const petBusinesses = [
     password: "pets12345",
     companyName: "PetStore123",
     uen: "12345678E",
-    contactNumber: "99999999",
+    contactNumber: "91789278",
     businessAddresses: [{ addressId: 7 }, { addressId: 8 }],
     businessDescription: "We groom birds",
     websiteURL: "https://www.google.com",
@@ -193,7 +193,7 @@ const nonActivePetBusinesses = [
     password: "password123",
     companyName: "Groomer1",
     uen: "12345678E",
-    contactNumber: "99999999",
+    contactNumber: "91627863",
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz6@example.com",
@@ -209,7 +209,7 @@ const nonActivePetBusinesses = [
     password: "password123",
     companyName: "Groomer2",
     uen: "12345678E",
-    contactNumber: "99999999",
+    contactNumber: "87168812",
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz7@example.com",
@@ -228,7 +228,7 @@ const nonActivePetBusinesses = [
     password: "password123",
     companyName: "Groomer3",
     uen: "12345678E",
-    contactNumber: "99999999",
+    contactNumber: "83192732",
   },
 ];
 

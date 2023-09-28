@@ -30,6 +30,7 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 40.0,
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
+    addressIds: [{addressId: 1}],
     duration: 60
   },
   {
@@ -40,6 +41,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
+    addressIds: [{addressId: 2}],
     duration: 60
   },
   {
@@ -50,7 +52,8 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
-    duration: 60
+    duration: 60,
+    addressIds: []
   },
   {
     id: 4,
@@ -61,7 +64,8 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 75.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
-    duration: 60
+    duration: 60,
+    addressIds: [{addressId: 1}, {addressId: 2 }]
   },
   {
     id: 5,
@@ -69,9 +73,65 @@ const serviceListings = [
     description: "Trustworthy pet sitting services for your beloved pets",
     petBusinessId: 4,
     category: "VETERINARY",
-    basePrice: 50.50,
+    basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
-    duration: 60
+    duration: 60,
+    addressIds: [{addressId: 6}]
+  },
+  {
+    id: 6,
+    title: "Cat Adoption Event",
+    description: "Find your purr-fect feline friend at our cat adoption event",
+    petBusinessId: 5,
+    category: "PET_RETAIL",
+    basePrice: 0,
+    tagIds: [{ tagId: 2 }, { tagId: 4 }],
+    addressIds: [{addressId: 7}, {addressId: 8}],
+    duration: 60,
+  },
+  {
+    id: 7,
+    title: "Pet Obedience Training",
+    description: "Teach your pets obedience and good behavior",
+    petBusinessId: 2,
+    category: "PET_GROOMING",
+    basePrice: 70.0,
+    tagIds: [{ tagId: 3 }, { tagId: 5 }],
+    addressIds: [{addressId: 3}],
+    duration: 60,
+  },
+  {
+    id: 8,
+    title: "Pet Spa Day",
+    description: "Treat your pets to a relaxing spa day",
+    petBusinessId: 3,
+    category: "PET_GROOMING",
+    basePrice: 80.0,
+    tagIds: [{ tagId: 1 }, { tagId: 4 }],
+    addressIds: [],
+    duration: 60,
+  },
+  {
+    id: 9,
+    title: "Emergency Pet Clinic",
+    description: "24/7 emergency care for your pets",
+    petBusinessId: 1,
+    category: "VETERINARY",
+    basePrice: 120.0,
+    tagIds: [{ tagId: 4 }, { tagId: 5 }],
+    addressIds: [],
+    duration: 60,
+  },
+  {
+    id: 10,
+    title: "Dog Walking Service",
+    description: "Regular dog walking to keep your pup happy and healthy",
+    petBusinessId: 2,
+    category: "PET_GROOMING",
+    basePrice: 20.0,
+    tagIds: [{ tagId: 2 }, { tagId: 3 }],
+    addressIds: [{addressId: 3}, {addressId: 4}],
+    duration: 60,
   },
 ];
 
@@ -97,6 +157,9 @@ async function seedBusinessData(prisma) {
         category: data.category,
         tags: {
           connect: data.tagIds,
+        },
+        addresses: {
+          connect: data.addressIds,
         },
         petBusiness: {
           connect: {

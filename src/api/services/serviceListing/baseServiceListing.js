@@ -171,7 +171,17 @@ exports.updateServiceListing = async (serviceListingId, data) => {
 
 exports.getAllServiceListings = async () => {
   try {
-    return await prisma.serviceListing.findMany();
+    return await prisma.serviceListing.findMany({
+      include: {
+        tags: true,
+        addresses: true,
+        petBusiness: {
+          select: {
+            companyName: true,
+          },
+        },
+      },
+    });
   } catch (error) {
     console.error("Error fetching all service listings:", error);
     throw new ServiceListingError(error);
@@ -185,6 +195,7 @@ exports.getServiceListingById = async (serviceListingId) => {
       include: {
         tags: true,
         addresses: true,
+        petBusiness: true,
         CalendarGroup: true
       },
     });
@@ -250,7 +261,43 @@ exports.getServiceListingByPBId = async (id) => {
       include: {
         tags: true,
         addresses: true,
-        CalendarGroup: true
+      },
+    });
+    return serviceListings;
+  } catch (error) {
+    console.error("Error fetching all service listings:", error);
+    throw new ServiceListingError(error);
+  }
+};
+
+exports.filterServiceListing = async (categories, tags) => {
+  try {
+    const serviceListings = await prisma.serviceListing.findMany({
+      where: {
+        OR: [
+          {
+            tags: {
+              some: {
+                name: {
+                  in: tags,
+                },
+              },
+            },
+          },
+          {
+            category: {
+              in: categories,
+            },
+          },
+        ],
+      },
+      include: {
+        tags: true,
+        petBusiness: {
+          select: {
+            companyName: true,
+          },
+        },
       },
     });
     return serviceListings;
