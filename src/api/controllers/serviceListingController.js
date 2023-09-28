@@ -14,7 +14,9 @@ exports.createServiceListing = async (req, res, next) => {
       !data.petBusinessId ||
       !data.basePrice ||
       !data.category ||
-      !data.description
+      !data.description ||
+      !data.calendarGroupId ||
+      !data.duration
     ) {
       return res.status(400).json({
         message: "Incomplete form data. Please fill in all required fields.",
@@ -32,10 +34,15 @@ exports.createServiceListing = async (req, res, next) => {
       });
     }
 
-    if (!(await BaseValidations.isValidInteger(data.petBusinessId))) {
+    if (!(await BaseValidations.isValidInteger(data.petBusinessId) ||
+      !(await BaseValidations.isValidInteger(data.calendarGroupId)) ||
+      !(await BaseValidations.isValidInteger(data.duration)))
+    ) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
     data.petBusinessId = parseInt(data.petBusinessId, 10);
+    data.calendarGroupId = parseInt(data.calendarGroupId, 10);
+    data.duration = parseInt(data.duration, 10);
 
     if (!(await BaseValidations.isValidFloat(data.basePrice))) {
       return res
@@ -86,10 +93,14 @@ exports.updateServiceListing = async (req, res, next) => {
   try {
     const updateData = req.body;
     let serviceListingId = req.params.id;
-    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
+    if (!(await BaseValidations.isValidInteger(serviceListingId))||
+    !(await BaseValidations.isValidInteger(updateData.calendarGroupId)) ||
+    !(await BaseValidations.isValidInteger(updateData.duration))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
     serviceListingId = parseInt(serviceListingId, 10);
+    updateData.calendarGroupId = parseInt(updateData.calendarGroupId, 10);
+    updateData.duration = parseInt(updateData.duration, 10);
 
     if (
       updateData.title &&

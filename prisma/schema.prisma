@@ -1,4 +1,70 @@
-//🧩Don't Edit this file.✨Generated in Wed Sep 27 2023 01:16:23 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Thu Sep 28 2023 22:57:53 GMT+0800 (Singapore Standard Time)✨
+
+model CalendarGroup {
+  calendarGroupId  Int                @id @default(autoincrement())
+  name             String
+  description      String?
+  timeslots        TimeSlot[]
+  scheduleSettings ScheduleSettings[]
+
+  petBusinessId  Int // CalendarGroup ISA Weak Entity of PetBusiness 
+  petBusiness    PetBusiness      @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
+  ServiceListing ServiceListing[]
+
+  @@unique([petBusinessId, name])
+}
+
+model ScheduleSettings {
+  scheduleSettingId Int               @id @default(autoincrement())
+  days              DayOfWeek[]
+  pattern           RecurrencePattern
+  startDate         String // Only require Date portion
+  endDate           String // Only require Date portion
+  timePeriods       TimePeriod[]
+
+  calendarGroupId Int // ScheduleSettings ISA Weak Entity of CalendarGroup 
+  CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
+}
+
+model TimePeriod {
+  timePeriodId Int    @id @default(autoincrement())
+  startTime    String
+  endTime      String
+  vacancies    Int
+
+  scheduleSettingId Int // TimePeriods ISA Weak Entity of ScheduleSettings 
+  ScheduleSettings  ScheduleSettings @relation(fields: [scheduleSettingId], references: [scheduleSettingId], onDelete: Cascade)
+}
+
+model TimeSlot {
+  timeSlotId Int      @id @default(autoincrement())
+  startTime  DateTime
+  endTime    DateTime
+  vacancies  Int
+
+  calendarGroupId Int
+  CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
+
+  Booking Booking[]
+}
+
+model Booking {
+  bookingId     Int       @id @default(autoincrement())
+  invoiceId     Int?
+  transactionId Int?
+  petOwnerId    Int
+  dateCreated   DateTime  @default(now())
+  lastUpdated   DateTime?
+
+  startTime DateTime
+  endTime   DateTime
+
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId], onDelete: Cascade)
+
+  timeSlotId Int?
+  timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
+}
 
 generator client {
   provider = "prisma-client-js"
@@ -54,6 +120,21 @@ enum PetType {
   OTHERS
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum RecurrencePattern {
+  DAILY
+  WEEKLY
+}
+
 enum Category {
   PET_GROOMING
   DINING
@@ -71,6 +152,7 @@ model ServiceListing {
   attachmentURLs   String[]
   dateCreated      DateTime  @default(now())
   lastUpdated      DateTime?
+  duration         Int?
 
   category Category
 
@@ -79,6 +161,10 @@ model ServiceListing {
   addresses     Address[]
   petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   petBusinessId Int
+
+  calendarGroupId Int?
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  Booking         Booking[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -189,8 +275,9 @@ model PetBusiness {
   petBusinessApplication PetBusinessApplication?
   // logo                String // TODO: figure out best way to save logos
 
-  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  userId Int  @id @unique
+  user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId        Int             @id @unique
+  CalendarGroup CalendarGroup[]
 }
 
 model ResetPassword {
@@ -214,6 +301,23 @@ model Address {
   serviceListings ServiceListing[]
 }
 
+model Pet {
+  petId           Int       @id @default(autoincrement())
+  petName         String
+  petType         PetType
+  gender          Gender
+  dateOfBirth     DateTime?
+  petWeight       Float?
+  microchipNumber String?
+  attachmentKeys  String[]
+  attachmentURLs  String[]
+  dateCreated     DateTime  @default(now())
+  lastUpdated     DateTime?
+
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
+
 model PetBusinessApplication {
   petBusinessApplicationId Int                       @id @default(autoincrement())
   businessType             BusinessType
@@ -232,21 +336,4 @@ model PetBusinessApplication {
 
   approverId Int?
   approver   InternalUser? @relation(fields: [approverId], references: [userId])
-}
-
-model Pet {
-  petId           Int       @id @default(autoincrement())
-  petName         String
-  petType         PetType
-  gender          Gender
-  dateOfBirth     DateTime?
-  petWeight       Float?
-  microchipNumber String?
-  attachmentKeys  String[]
-  attachmentURLs  String[]
-  dateCreated     DateTime  @default(now())
-  lastUpdated     DateTime?
-
-  petOwnerId Int
-  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }

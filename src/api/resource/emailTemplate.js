@@ -48,3 +48,20 @@ exports.petBusinessApplicationRejectionEmail = (name, link, remark) => {
       Pethub
       `;
 };
+
+
+
+exports.rescheduleOrRefundBookingEmail = (name, link) => {
+  return `
+      Dear ${name},
+      
+      Your appointment has been affected by changes in schedule
+        
+      Please reschedule your booking or request for refund: ${link}.
+  
+      Thank you for using PetHub!
+        
+      Regards,
+      Pethub
+      `;
+};

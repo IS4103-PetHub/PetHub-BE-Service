@@ -316,7 +316,6 @@ const petOwners = [
   },
 ];
 
-
 const pets = [
   {
     petId: 1,
@@ -439,6 +438,9 @@ const pets = [
     petOwnerId: 17,
   },
 ];
+
+
+
 
 async function seedUser(prisma) {
   for (const a of addresses) {
