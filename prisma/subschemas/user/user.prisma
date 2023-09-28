@@ -1,6 +1,9 @@
 import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus} from "../enums/accountEnums"
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
+import { PetBusiness } from "..\..\schema"
+import { Gender, PetType } from "..\enums\accountEnums"
+import { PetOwner } from "..\..\schema"
 import {CalendarGroup} from "../appointments/appointments"
 
 // Entities
@@ -40,6 +43,8 @@ model PetOwner {
 
     user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
     userId Int  @id @unique
+
+    pets Pet[]
 }
 
 model PetBusiness {
@@ -62,45 +67,6 @@ model PetBusiness {
   CalendarGroup CalendarGroup[]
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 model ResetPassword {
     token      String   @unique
     expiryDate DateTime
@@ -122,6 +88,22 @@ model Address {
   serviceListings ServiceListing[]
 }
 
+model Pet {
+  petId          Int       @id @default(autoincrement())
+  petName        String
+  petType        PetType  
+  gender         Gender   
+  dateOfBirth    DateTime?
+  petWeight      Float?
+  microchipNumber String?
+  attachmentKeys String[]
+  attachmentURLs String[]
+  dateCreated    DateTime  @default(now())
+  lastUpdated    DateTime?
+
+  petOwnerId     Int
+  petOwner       PetOwner  @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
 
 model PetBusinessApplication {
     petBusinessApplicationId Int                       @id @default(autoincrement())

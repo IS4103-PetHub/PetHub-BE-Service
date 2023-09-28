@@ -24,12 +24,12 @@ class S3Service {
     });
   }
 
-  async uploadImgFiles(files) {
+  async uploadImgFiles(files, folder) {
     try {
       const params = files.map((file) => {
         return {
           Bucket: this.bucketName,
-          Key: `uploads/service-listing/img/${uuidv4()}-${file.originalname}`,
+          Key: `uploads/${folder}/img/${uuidv4()}-${file.originalname}`,
           Body: file.buffer,
           ContentType: "image/jpg",
         };
@@ -41,6 +41,27 @@ class S3Service {
       return keys;
     } catch (error) {
       console.error("Error uploading files from s3 bucket:", error);
+      throw error;
+    }
+  }
+
+  async uploadPdfFiles(files, folder) {
+    try {
+      const params = files.map((file) => {
+        return {
+          Bucket: this.bucketName,
+          Key: `uploads/${folder}/pdf/${uuidv4()}-${file.originalname}`,
+          Body: file.buffer,
+          ContentType: "application/pdf",
+        };
+      });
+      const keys = params.map((param) => param.Key);
+      await Promise.all(
+        params.map((param) => this.s3Service.send(new PutObjectCommand(param)))
+      );
+      return keys;
+    } catch (error) {
+      console.error("Error uploading PDF files from s3 bucket:", error);
       throw error;
     }
   }
@@ -87,4 +108,5 @@ class S3Service {
   }
 }
 
-module.exports = S3Service;
+const s3ServiceInstance = new S3Service()
+module.exports = s3ServiceInstance;

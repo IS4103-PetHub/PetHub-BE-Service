@@ -1,0 +1,280 @@
+swagger: '2.0'
+definitions:
+  # cannot create with files using swagger, as swagger does not allow uploading of multiple files
+  # https://github.com/OAI/OpenAPI-Specification/issues/254
+  PetRequest:
+    type: object
+    properties:
+      petName:
+        type: string
+        description: The unique name of the pet.
+      petType:
+        type: string
+        description: The type of the pet (e.g., BIRD).
+      petOwnerId:
+        type: string
+        description: The ID of the pet owner.
+      gender:
+        type: string
+        description: The gender of the pet (e.g., MALE).
+      dateOfBirth:
+        type: string
+        format: date-time
+        description: The date of birth of the pet (e.g., "1990-09-26").
+      microchipNumber:
+        type: string
+        description: The microchip number of the pet.
+      weight:
+        type: number
+        description: The weight of the pet.
+    example:
+      petName: "Sam"
+      petType: "BIRD"
+      petOwnerId: "10"
+      gender: "MALE"
+      dateOfBirth: "1990-09-26"
+      microchipNumber: "132123"
+      weight: 60.9
+
+  PetResponse:
+    type: object
+    properties:
+      petId:
+        type: integer
+        description: The unique identifier of the pet.
+      petName:
+        type: string
+        description: The unique name of the pet.
+      petType:
+        type: string
+        description: The type of pet (e.g., DOG, CAT).
+      gender:
+        type: string
+        description: The gender of the pet.
+      dateOfBirth:
+        type: string
+        format: date-time
+        description: The date of birth of the pet.
+      petWeight:
+        type: number
+        description: The weight of the pet.
+      microchipNumber:
+        type: string
+        description: The microchip number of the pet.
+      attachmentKeys:
+        type: array
+        items:
+          type: string
+        description: An array of attachment keys.
+      attachmentURLs:
+        type: array
+        items:
+          type: string
+        description: An array of attachment URLs.
+      dateCreated:
+        type: string
+        format: date-time
+        description: The date and time when the pet was created.
+      lastUpdated:
+        type: string
+        format: date-time
+        description: The date and time of the last update (can be null).
+      petOwnerId:
+        type: integer
+        description: The unique identifier of the pet owner.
+    example:
+      petId: 42
+      petName: "Sam"
+      petType: "BIRD"
+      gender: "MALE"
+      dateOfBirth: "1990-09-26T00:00:00.000Z"
+      petWeight: 60.9
+      microchipNumber: "132123"
+      attachmentKeys: []
+      attachmentURLs: []
+      dateCreated: "2023-09-26T17:24:22.639Z"
+      lastUpdated: null
+      petOwnerId: 9
+
+  GetAllPetResponse:
+    type: array
+    items:
+      $ref: '#/definitions/PetResponse'
+    example:
+      - petId: 1
+        petName: "Fido"
+        petType: "DOG"
+        gender: "MALE"
+        dateOfBirth: "2018-05-10T00:00:00.000Z"
+        petWeight: 15.5
+        microchipNumber: "ABC123"
+        attachmentKeys: []
+        attachmentURLs: []
+        dateCreated: "2023-09-26T17:24:22.639Z"
+        lastUpdated: null
+        petOwnerId: 9
+      - petId: 2
+        petName: "Whiskers"
+        petType: "CAT"
+        gender: "FEMALE"
+        dateOfBirth: "2019-02-28T00:00:00.000Z"
+        petWeight: 7.2
+        microchipNumber: "XYZ789"
+        attachmentKeys: []
+        attachmentURLs: []
+        dateCreated: "2023-09-26T17:24:22.645Z"
+        lastUpdated: null
+        petOwnerId: 9
+
+  # cannot update with files using swagger, as swagger does not allow uploading of multiple files
+  # https://github.com/OAI/OpenAPI-Specification/issues/254
+  PetUpdateRequest:
+    type: object
+    properties:
+      petName:
+        type: string
+        description: The updated name of the pet.
+      petType:
+        type: string
+        description: The updated type of the pet (e.g., DOG, CAT).
+      gender:
+        type: string
+        description: The updated gender of the pet.
+      dateOfBirth:
+        type: string
+        format: date-time
+        description: The updated date of birth of the pet.
+      microchipNumber:
+        type: string
+        description: The updated microchip number of the pet.
+      weight:
+        type: number
+        description: The updated weight of the pet.
+    example:
+      petName: "Sam Loop"
+      petType: "CAT"
+      gender: "FEMALE"
+      dateOfBirth: "2001-10-31"
+      microchipNumber: "132121231"
+      weight: 312.26
+
+paths:
+  /api/pets/health-check:
+    get:
+        summary: Test endpoint to check if the Pet API is working
+        responses:
+          200:
+            description: API is working
+        tags:
+          - Health
+
+  /api/pets:
+    post:
+      summary: Create a new pet
+      requestBody:
+        description: Pet name.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/PetRequest'
+      responses:
+        201:
+          description: Pet created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/PetResponse'
+      tags:
+        - Pets
+    get:
+      summary: Retrieve all pets
+      responses:
+        200:
+          description: Details of all pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/GetAllPetResponse'
+      tags:
+        - Pets
+
+  /api/pets/{id}:
+    get:
+      summary: Retrieve a pet by ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the pet to retrieve.
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Pet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/PetResponse'
+      tags:
+        - Pets
+    patch:
+      summary: Update a pet by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      requestBody:
+        description: Pet update details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/PetUpdateRequest'
+      responses:
+        200:
+          description: Updated pet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/PetResponse'
+      tags:
+        - Pets
+    delete:
+      summary: Delete a pet by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Pet deleted successfully
+      tags:
+        - Pets
+  /api/pets/pet-owners/{id}:
+    get:
+      summary: Get all pets by pet owner ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pet owner.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: An array of pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/PetResponse'
+      tags:
+        - Pets
+
+
+
