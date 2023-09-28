@@ -67,7 +67,7 @@ exports.createServiceListing = async (req, res, next) => {
     }
 
     if (req.files) {
-      data.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files);
+      data.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files, "service-listing");
       data.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
         data.attachmentKeys
       );
@@ -143,7 +143,7 @@ exports.updateServiceListing = async (req, res, next) => {
       await ServiceListingService.deleteFilesOfAServiceListing(
         serviceListingId
       );
-      updateData.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files);
+      updateData.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files, "service-listing");
       updateData.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
         updateData.attachmentKeys
       );

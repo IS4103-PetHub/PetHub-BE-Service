@@ -55,10 +55,8 @@ exports.createPet = async (req, res, next) => {
     data.weight = parseFloat(data.weight);
 
     if (req.files) {
-      data.attachmentKeys = await s3ServiceInstance.uploadPdfFiles(req.files);
-      data.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
-        data.attachmentKeys
-      );
+      data.attachmentKeys = await s3ServiceInstance.uploadPdfFiles(req.files, "pets");
+      data.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(data.attachmentKeys);
     }
 
     const pet = await PetService.createPet(data);
@@ -104,7 +102,7 @@ exports.updatePet = async (req, res, next) => {
     if (req.files && req.files.length > 0) {
       // delete existing files and update with new files
       await PetService.deleteFilesOfAPet(petId);
-      updateData.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files);
+      updateData.attachmentKeys = await s3ServiceInstance.uploadPdfFiles(req.files, "pets");
       updateData.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
         updateData.attachmentKeys
       );

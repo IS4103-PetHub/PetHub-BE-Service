@@ -24,12 +24,12 @@ class S3Service {
     });
   }
 
-  async uploadImgFiles(files) {
+  async uploadImgFiles(files, folder) {
     try {
       const params = files.map((file) => {
         return {
           Bucket: this.bucketName,
-          Key: `uploads/service-listing/img/${uuidv4()}-${file.originalname}`,
+          Key: `uploads/${folder}/img/${uuidv4()}-${file.originalname}`,
           Body: file.buffer,
           ContentType: "image/jpg",
         };
@@ -45,12 +45,12 @@ class S3Service {
     }
   }
 
-  async uploadPdfFiles(files) {
+  async uploadPdfFiles(files, folder) {
     try {
       const params = files.map((file) => {
         return {
           Bucket: this.bucketName,
-          Key: `uploads/service-listing/img/${uuidv4()}-${file.originalname}`,
+          Key: `uploads/${folder}/pdf/${uuidv4()}-${file.originalname}`,
           Body: file.buffer,
           ContentType: "application/pdf",
         };
