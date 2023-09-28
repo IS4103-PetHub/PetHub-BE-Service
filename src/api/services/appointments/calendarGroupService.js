@@ -85,6 +85,31 @@ class CalendarGroupService {
         }
     }
 
+    async getAllPetBusinessCalendarGroup(petBusinessId, includeTimeSlot = false, includeBooking = false) {
+        try {
+            const calendarGroups = await prisma.calendarGroup.findMany({
+                where: { petBusinessId: petBusinessId },
+                include: {
+                    timeslots: includeTimeSlot ? {
+                        include: {
+                            Booking: includeBooking ? {
+                                include: {
+                                    serviceListing: true
+                                }
+                            } : false
+                        }
+                    } : false,
+                    scheduleSettings: true,
+                    ServiceListing: true,
+                }
+            });
+            return calendarGroups;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new CalendarGroupError(error);
+        }
+    }
+
     async getCalendarGroupById(calendarGroupId, includeTimeSlot = false, includeBooking = false) {
         try {
             const calendarGroup = await prisma.calendarGroup.findUnique({

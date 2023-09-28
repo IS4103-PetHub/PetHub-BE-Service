@@ -136,12 +136,16 @@ definitions:
       tagIds:
         type: array
         description: Updated tagIds to attach to this service listing.
+      calendarGroupId:
+        type: string
+        description: Updated calendarGroupId of this service listing.
     example:
       title: "I love to groom for dogs!"
       description: "I love pets"
       category: "PET_GROOMING"
       basePrice: 40
       tagIds: [1, 2, 3]
+      calendarGroupId: 1
 
 paths:
   /api/service-listings/health-check:
@@ -212,6 +216,11 @@ paths:
             type: string
             format: binary
           required: true
+        - name: calendarGroupId
+          in: formData
+          description: Id of calendar group.
+          required: true
+          type: number
       responses:
         201:
           description: Service listing created successfully

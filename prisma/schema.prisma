@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Sep 27 2023 21:54:14 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Thu Sep 28 2023 13:57:58 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -137,6 +137,7 @@ model ServiceListing {
   attachmentURLs   String[]
   dateCreated      DateTime  @default(now())
   lastUpdated      DateTime?
+  duration         Int?
 
   category Category
 
