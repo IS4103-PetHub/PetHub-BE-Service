@@ -20,6 +20,25 @@ exports.getAllCalendarGroups = async (req, res, next) => {
     }
 }
 
+exports.getAllCalendarGroupsByPetBusinessId = async (req, res, next) => {
+    try {
+        const petBusinessId = req.params.petBusinessId;
+        if (!(await baseValidations.isValidInteger(petBusinessId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const includeTimeSlot = req.query.includeTimeSlot === 'true';
+        const includeBooking = req.query.includeBooking === 'true';
+
+        const calendarGroups = await calendarGroupService
+            .getAllPetBusinessCalendarGroup(Number(petBusinessId), includeTimeSlot, includeBooking);
+
+        res.status(200).json(calendarGroups);
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 exports.getCalendarGroupById = async (req, res, next) => {
     try {

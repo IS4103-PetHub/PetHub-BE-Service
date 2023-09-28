@@ -155,6 +155,7 @@ async function seedBusinessData(prisma) {
         description: data.description,
         basePrice: data.basePrice,
         category: data.category,
+        duration: data.duration,
         tags: {
           connect: data.tagIds,
         },
