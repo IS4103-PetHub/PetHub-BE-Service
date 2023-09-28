@@ -11,6 +11,7 @@ model ServiceListing {
   attachmentURLs   String[]
   dateCreated      DateTime  @default(now())
   lastUpdated      DateTime?
+  duration         Int?
 
   category Category
 

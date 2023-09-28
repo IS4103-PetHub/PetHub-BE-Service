@@ -30,6 +30,7 @@ const serviceListings = [
     category: "PET_GROOMING",
     basePrice: 40.0,
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
+    duration: 60
   },
   {
     id: 2,
@@ -39,6 +40,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
+    duration: 60
   },
   {
     id: 3,
@@ -48,6 +50,7 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
+    duration: 60
   },
   {
     id: 4,
@@ -58,6 +61,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 75.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
+    duration: 60
   },
   {
     id: 5,
@@ -67,6 +71,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 50.50,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
+    duration: 60
   },
 ];
 

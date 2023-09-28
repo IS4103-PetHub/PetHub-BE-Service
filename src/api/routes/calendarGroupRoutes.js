@@ -14,6 +14,7 @@ function registerCalendarGroupRoutes(controller) {
     router.post(`/`, controller.createCalendarGroup);
     router.put(`/:calendarGroupId`, controller.updateCalendarGroup);
     router.delete(`/:calendarGroupId`, controller.deleteCalendarGroup);
+    router.get(`/pet-business/:petBusinessId`, controller.getAllCalendarGroupsByPetBusinessId);
 
     // Utility Routes
     router.get('/available-timeslots/:calendarID', controller.getAvailability);

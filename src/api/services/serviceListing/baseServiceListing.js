@@ -45,6 +45,13 @@ exports.createServiceListing = async (data) => {
       }));
     }
 
+    if (data.duration && (data.duration < 0 || data.duration > 180)) {
+      throw new CustomError(
+        "Addresses tagged to service listing should be a subset of parent pet business's address list!",
+        400
+      );
+    }
+
     const serviceListing = await prisma.serviceListing.create({
       data: {
         title: data.title,
@@ -53,6 +60,7 @@ exports.createServiceListing = async (data) => {
         category: data.category,
         attachmentURLs: data.attachmentURLs,
         attachmentKeys: data.attachmentKeys,
+        duration: data.duration,
         tags: {
           connect: tagIdsArray,
         },
@@ -64,10 +72,16 @@ exports.createServiceListing = async (data) => {
             userId: data.petBusinessId,
           },
         },
+        CalendarGroup: {
+          connect: {
+            calendarGroupId: data.calendarGroupId
+          }
+        }
       },
       include: {
         tags: true,
         addresses: true,
+        CalendarGroup: true
       },
     });
     return serviceListing;
@@ -109,6 +123,12 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       }
       addressIdsArray = data.addressIds.map((id) => ({ addressId: id }));
     }
+    if (data.duration && (data.duration < 0 || data.duration > 180)) {
+      throw new CustomError(
+        "Addresses tagged to service listing should be a subset of parent pet business's address list!",
+        400
+      );
+    }
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
       data: {
@@ -118,6 +138,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
         category: data.category,
         attachmentURLs: data.attachmentURLs,
         attachmentKeys: data.attachmentKeys,
+        duration: data.duration,
         tags: {
           set: [],
           connect: tagIdsArray,
@@ -127,10 +148,16 @@ exports.updateServiceListing = async (serviceListingId, data) => {
           connect: addressIdsArray,
         },
         lastUpdated: new Date(),
+        CalendarGroup: {
+          connect: {
+            calendarGroupId: data.calendarGroupId
+          }
+        }
       },
       include: {
         tags: true,
         addresses: true,
+        CalendarGroup: true
       },
     });
 
@@ -158,6 +185,7 @@ exports.getServiceListingById = async (serviceListingId) => {
       include: {
         tags: true,
         addresses: true,
+        CalendarGroup: true
       },
     });
     if (!serviceListing) {
@@ -181,6 +209,7 @@ exports.getServiceListingByCategory = async (categoryInput) => {
       include: {
         tags: true,
         addresses: true,
+        CalendarGroup: true
       },
     });
     return serviceListings;
@@ -204,6 +233,7 @@ exports.getServiceListingByTag = async (id) => {
       include: {
         tags: true,
         addresses: true,
+        CalendarGroup: true
       },
     });
     return serviceListings;
@@ -220,6 +250,7 @@ exports.getServiceListingByPBId = async (id) => {
       include: {
         tags: true,
         addresses: true,
+        CalendarGroup: true
       },
     });
     return serviceListings;
