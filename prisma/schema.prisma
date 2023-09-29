@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Sep 28 2023 22:57:53 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Sep 29 2023 08:26:21 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -157,10 +157,11 @@ model ServiceListing {
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags          Tag[]
-  addresses     Address[]
-  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId Int
+  tags            Tag[]
+  addresses       Address[]
+  petBusiness     PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId   Int
+  favouritedUsers PetOwner[]
 
   calendarGroupId Int?
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
@@ -257,7 +258,8 @@ model PetOwner {
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
 
-  pets Pet[]
+  pets              Pet[]
+  favouriteListings ServiceListing[]
 }
 
 model PetBusiness {

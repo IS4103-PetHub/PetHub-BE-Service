@@ -5,6 +5,7 @@ import { PetBusiness } from "..\..\schema"
 import { Gender, PetType } from "..\enums\accountEnums"
 import { PetOwner } from "..\..\schema"
 import {CalendarGroup} from "../appointments/appointments"
+import { ServiceListing } from "..\..\schema"
 
 // Entities
 model User {
@@ -45,6 +46,7 @@ model PetOwner {
     userId Int  @id @unique
 
     pets Pet[]
+    favouriteListings ServiceListing[]
 }
 
 model PetBusiness {

@@ -1,5 +1,151 @@
 swagger: "2.0"
+
 definitions:
+  FavoriteServiceListing:
+    type: object
+    properties:
+      serviceListingId:
+        type: integer
+        description: The ID of the favorite service listing.
+      title:
+        type: string
+        description: The title of the favorite service listing.
+      description:
+        type: string
+        description: The description of the favorite service listing.
+      basePrice:
+        type: number
+        description: The base price of the favorite service listing.
+      attachmentKeys:
+        type: array
+        items:
+          type: string
+          description: An array of attachment keys.
+      attachmentURLs:
+        type: array
+        items:
+          type: string
+          description: An array of attachment URLs.
+      dateCreated:
+        type: string
+        format: date-time
+        description: The date when the favorite service listing was created.
+      lastUpdated:
+        type: string
+        format: date-time
+        description: The date of the last update to the favorite service listing (can be null).
+      duration:
+        type: integer
+        description: The duration of the favorite service listing in minutes.
+      category:
+        type: string
+        description: The category of the favorite service listing.
+      petBusinessId:
+        type: integer
+        description: The ID of the pet business associated with the favorite service listing.
+      calendarGroupId:
+        type: integer
+        description: The ID of the calendar group associated with the favorite service listing (can be null).
+    example:
+      serviceListingId: 5
+      title: "Reliable Pet Sitting Service"
+      description: "Trustworthy pet sitting services for your beloved pets"
+      basePrice: 50.5
+      attachmentKeys: []
+      attachmentURLs: []
+      dateCreated: "2023-09-29T00:28:21.465Z"
+      lastUpdated: null
+      duration: 60
+      category: "VETERINARY"
+      petBusinessId: 4
+      calendarGroupId: null
+
+  PetOwnerWithFavouritesResponse:
+    type: object
+    properties:
+      firstName:
+        type: string
+        description: The first name of the pet owner.
+      lastName:
+        type: string
+        description: The last name of the pet owner.
+      contactNumber:
+        type: string
+        description: The contact number of the pet owner.
+      dateOfBirth:
+        type: string
+        format: date-time
+        description: The date of birth of the pet owner.
+      userId:
+        type: integer
+        description: The ID of the pet owner.
+      favouriteListings:
+        type: array
+        items:
+          type: object
+          properties:
+            serviceListingId:
+              type: integer
+              description: The ID of the favorite service listing.
+            title:
+              type: string
+              description: The title of the favorite service listing.
+            description:
+              type: string
+              description: The description of the favorite service listing.
+            basePrice:
+              type: number
+              description: The base price of the favorite service listing.
+            attachmentKeys:
+              type: array
+              items:
+                type: string
+                description: An array of attachment keys.
+            attachmentURLs:
+              type: array
+              items:
+                type: string
+                description: An array of attachment URLs.
+            dateCreated:
+              type: string
+              format: date-time
+              description: The date when the favorite service listing was created.
+            lastUpdated:
+              type: string
+              format: date-time
+              description: The date of the last update to the favorite service listing (can be null).
+            duration:
+              type: integer
+              description: The duration of the favorite service listing in minutes.
+            category:
+              type: string
+              description: The category of the favorite service listing.
+            petBusinessId:
+              type: integer
+              description: The ID of the pet business associated with the favorite service listing.
+            calendarGroupId:
+              type: integer
+              description: The ID of the calendar group associated with the favorite service listing (can be null).
+    example:
+      firstName: "Li"
+      lastName: "Chen"
+      contactNumber: "88712892"
+      dateOfBirth: "1985-08-20T00:00:00.000Z"
+      userId: 9
+      favouriteListings:
+        - serviceListingId: 3
+          title: "Adopt a Pet Today"
+          description: "Adopt a Pet Today i."
+          basePrice: 0
+          attachmentKeys: []
+          attachmentURLs: []
+          dateCreated: "2023-09-29T00:28:21.455Z"
+          lastUpdated: null
+          duration: 60
+          category: "PET_RETAIL"
+          petBusinessId: 5
+          calendarGroupId: null
+
   businessAddresses:
     type: array
     description: A list of businesses addresses for this application.
@@ -815,5 +961,91 @@ paths:
             application/json:
               schema:
                 $ref: "#/definitions/UserResponse"
+      tags:
+        - Users
+
+  /api/users/pet-owners/add-to-favourites/{id}:
+    post:
+      summary: Add a service listing to a pet owner's favorites.
+      description: Adds a specified service listing to the favorites of a pet owner with the given ID.
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the pet owner"
+          required: true
+          type: integer
+      requestBody:
+        description: Service Listing ID to add to favourites
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceListingId:
+                  type: integer
+                  description: "ID of the service listing to add to favorites"
+      responses:
+        200:
+          description: Service listing added to favorites successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/PetOwnerWithFavouritesResponse'
+      tags:
+        - Users
+
+  /api/users/pet-owners/remove-from-favourites/{id}:
+    post:
+      summary: Remove a service listing from a pet owner's favorites.
+      description: Removes a specified service listing from the favorites of a pet owner with the given ID.
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the pet owner"
+          required: true
+          type: integer
+      requestBody:
+        description: Service Listing ID to remove from favourites
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceListingId:
+                  type: integer
+                  description: "ID of the service listing to remove from favorites"
+      responses:
+        200:
+          description: Service listing removed from favourites successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/PetOwnerWithFavouritesResponse'
+          
+      tags:
+        - Users
+
+  /api/users/pet-owners/favourites/{id}:
+    get:
+      summary: Retrieve a pet owner's favorite service listings.
+      description: Retrieves the list of favorite service listings for a pet owner with the given ID.
+      parameters:
+        - name: id
+          in: path
+          description: "ID of the pet owner"
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Successful response containing an array of favorite service listings.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/FavoriteServiceListing"
+        # Add other response codes and descriptions as needed
       tags:
         - Users
