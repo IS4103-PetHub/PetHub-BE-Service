@@ -109,12 +109,13 @@ const serviceListings = [
     id: 8,
     title: "Normal grooming waterslide experience",
     description: "Treat your pets to a day of grooming by regular groomers!",
-    petBusinessId: 3,
+    petBusinessId: 1,
     category: "PET_GROOMING",
     basePrice: 80.0,
     tagIds: [{ tagId: 1 }, { tagId: 4 }],
     addressIds: [],
     duration: 60,
+    calendarGroupId: 1
   },
   {
     id: 9,
@@ -132,12 +133,13 @@ const serviceListings = [
     id: 10,
     title: "John's new vet experiment",
     description: "Hi, my name is John and I just got my vet license, let's put it to the test!",
-    petBusinessId: 2,
+    petBusinessId: 1,
     category: "VETERINARY",
     basePrice: 20.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 3 }, { addressId: 4 }],
     duration: 60,
+    calendarGroupId: 3
   },
 ];
 
