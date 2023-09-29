@@ -126,6 +126,54 @@ class BookingService {
         }
     }
 
+    async getBookingByPetBusiness(petBusinessId, startTime, endTime) {
+        try {
+            const bookings = await prisma.booking.findMany({
+                where: {
+                    AND: [
+                        {
+                            serviceListing: {
+                                petBusinessId: petBusinessId
+                            }
+                        },
+                        { startTime: { gte: startTime } },
+                        { endTime: { lte: endTime } }
+                    ]
+                },
+                include: {
+                    serviceListing: {
+                        include: {
+                            tags: true,
+                            addresses: true
+                        }
+                    },
+                    timeSlot: true
+                }
+            });
+            
+            for (let i = 0; i < bookings.length; i++) {
+                const booking = bookings[i];
+                const petOwner = await prisma.petOwner.findUnique({
+                    where: { userId: booking.petOwnerId },
+                    include: { user: true }
+                });
+                const flattenedPetOwner = {
+                    firstName: petOwner.firstName,
+                    lastName: petOwner.lastName,
+                    contactNumber: petOwner.contactNumber,
+                    dateOfBirth: petOwner.dateOfBirth,
+                    email: petOwner.user.email,
+
+                }
+                bookings[i].petOwner = flattenedPetOwner;
+            }
+            return bookings;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new BookingError(error);
+        }
+    }
+
     async updateBooking(bookingId, newStartTime, newEndTime) {
         try {
             const existingBooking = await this.getBookingById(bookingId)

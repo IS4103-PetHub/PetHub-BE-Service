@@ -14,9 +14,7 @@ exports.createServiceListing = async (req, res, next) => {
       !data.petBusinessId ||
       !data.basePrice ||
       !data.category ||
-      !data.description ||
-      !data.calendarGroupId ||
-      !data.duration
+      !data.description
     ) {
       return res.status(400).json({
         message: "Incomplete form data. Please fill in all required fields.",
@@ -93,9 +91,7 @@ exports.updateServiceListing = async (req, res, next) => {
   try {
     const updateData = req.body;
     let serviceListingId = req.params.id;
-    if (!(await BaseValidations.isValidInteger(serviceListingId))||
-    !(await BaseValidations.isValidInteger(updateData.calendarGroupId)) ||
-    !(await BaseValidations.isValidInteger(updateData.duration))) {
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
     serviceListingId = parseInt(serviceListingId, 10);
