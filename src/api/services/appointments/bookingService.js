@@ -118,7 +118,15 @@ class BookingService {
                     ]
                 },
                 include: {
-                    serviceListing: true
+                    serviceListing: {
+                        include: {
+                            petBusiness: {
+                                select: {
+                                    companyName: true
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
