@@ -188,29 +188,9 @@ const calendarGroupPayloads = [
           timePeriods: [
             {
               startTime: "09:30",
-              endTime: "10:00",
-              vacancies: 1,
-            },
-            {
-              startTime: "10:30",
-              endTime: "11:00",
-              vacancies: 1,
-            },
-            {
-              startTime: "12:00",
-              endTime: "12:30",
-              vacancies: 1,
-            },
-            {
-              startTime: "12:30",
-              endTime: "13:00",
-              vacancies: 1,
-            },
-            {
-              startTime: "13:00",
               endTime: "13:30",
               vacancies: 1,
-            },
+            }
           ],
         },
       },
