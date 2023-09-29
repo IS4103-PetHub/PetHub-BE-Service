@@ -14,6 +14,7 @@ function registerBookingRoutes(controller) {
     router.get('/calendar-groups/:calendarGroupId', bookingController.getBookingsByCalendarGroup);
     router.get('/service-listings/:serviceListingId', bookingController.getBookingsByServiceListing);
     router.get('/users/:userId', bookingController.getBookingsByUser);
+    router.get(`/pet-business/:userId`, bookingController.getBookingsByPetBusiness)
 }
 
 registerBookingRoutes(bookingController);

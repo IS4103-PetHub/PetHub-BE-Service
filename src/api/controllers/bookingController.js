@@ -62,6 +62,21 @@ exports.getBookingsByUser = [baseValidations.validateDateQuery, async (req, res,
     }
 }];
 
+exports.getBookingsByPetBusiness = [baseValidations.validateDateQuery, async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        if (!await baseValidations.isValidInteger(userId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID}: userId` });
+        }
+
+        const { startTime, endTime } = req.query;
+        const bookings = await bookingService.getBookingByPetBusiness(Number(userId), new Date(startTime), new Date(endTime));
+        res.status(200).json(bookings);
+    } catch (error) {
+        next(error);
+    }
+}];
+
 exports.createBooking = async (req, res, next) => {
     try {
         // TODO: use middleware to identify creator

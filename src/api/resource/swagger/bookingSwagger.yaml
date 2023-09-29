@@ -225,3 +225,34 @@ paths:
           description: No bookings found
       tags:
         - Booking
+
+  /api/bookings/pet-business/{petBusinessId}:
+    get:
+      summary: Get bookings by pet business id
+      description: Retrieve all bookings for a specific pet business within a specified time period.
+      parameters:
+        - name: petBusinessId
+          in: path
+          required: true
+          type: integer
+        - name: startTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:00:00.000Z"
+        - name: endTime
+          in: query
+          required: true
+          type: string
+          format: date-time
+          example: "2023-10-30T01:30:00.000Z"
+      responses:
+        200:
+          description: Bookings retrieved successfully
+        400:
+          description: Invalid request parameters
+        404:
+          description: No bookings found
+      tags:
+        - Booking
