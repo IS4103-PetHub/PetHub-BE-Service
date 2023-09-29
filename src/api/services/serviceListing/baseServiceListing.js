@@ -51,36 +51,41 @@ exports.createServiceListing = async (data) => {
       );
     }
 
-    const serviceListing = await prisma.serviceListing.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        basePrice: data.basePrice,
-        category: data.category,
-        attachmentURLs: data.attachmentURLs,
-        attachmentKeys: data.attachmentKeys,
-        duration: data.duration,
-        tags: {
-          connect: tagIdsArray,
-        },
-        addresses: {
-          connect: addressIdsArray,
-        },
-        petBusiness: {
-          connect: {
-            userId: data.petBusinessId,
-          },
-        },
-        CalendarGroup: {
-          connect: {
-            calendarGroupId: data.calendarGroupId
-          }
-        }
+    const serviceListingData = {
+      title: data.title,
+      description: data.description,
+      basePrice: data.basePrice,
+      category: data.category,
+      attachmentURLs: data.attachmentURLs,
+      attachmentKeys: data.attachmentKeys,
+      duration: data.duration ? data.duration : null,
+      tags: {
+        connect: tagIdsArray,
       },
+      addresses: {
+        connect: addressIdsArray,
+      },
+      petBusiness: {
+        connect: {
+          userId: data.petBusinessId,
+        },
+      },
+    };
+    
+    if (data.calendarGroupId) {
+      serviceListingData.CalendarGroup = {
+        connect: {
+          calendarGroupId: data.calendarGroupId,
+        },
+      };
+    }
+
+    const serviceListing = await prisma.serviceListing.create({
+      data: serviceListingData,
       include: {
         tags: true,
         addresses: true,
-        CalendarGroup: true
+        CalendarGroup: true, // This will include CalendarGroup only if it was added conditionally
       },
     });
     return serviceListing;
@@ -128,31 +133,37 @@ exports.updateServiceListing = async (serviceListingId, data) => {
         400
       );
     }
+
+    const serviceListingData = {
+      title: data.title,
+      description: data.description,
+      basePrice: data.basePrice,
+      category: data.category,
+      attachmentURLs: data.attachmentURLs,
+      attachmentKeys: data.attachmentKeys,
+      duration: data.duration ? data.duration : null,
+      tags: {
+        set: [],
+        connect: tagIdsArray,
+      },
+      addresses: {
+        set: [],
+        connect: addressIdsArray,
+      },
+      lastUpdated: new Date()
+    }
+    
+    if (data.calendarGroupId) {
+      serviceListingData.CalendarGroup = {
+        connect: {
+          calendarGroupId: data.calendarGroupId
+        }
+      }
+    }
+    
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
-      data: {
-        title: data.title,
-        description: data.description,
-        basePrice: data.basePrice,
-        category: data.category,
-        attachmentURLs: data.attachmentURLs,
-        attachmentKeys: data.attachmentKeys,
-        duration: data.duration,
-        tags: {
-          set: [],
-          connect: tagIdsArray,
-        },
-        addresses: {
-          set: [],
-          connect: addressIdsArray,
-        },
-        lastUpdated: new Date(),
-        CalendarGroup: {
-          connect: {
-            calendarGroupId: data.calendarGroupId
-          }
-        }
-      },
+      data: serviceListingData,
       include: {
         tags: true,
         addresses: true,
