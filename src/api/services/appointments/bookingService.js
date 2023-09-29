@@ -116,6 +116,9 @@ class BookingService {
                         { startTime: { gte: startTime } },
                         { endTime: { lte: endTime } }
                     ]
+                },
+                include: {
+                    serviceListing: true
                 }
             });
 
