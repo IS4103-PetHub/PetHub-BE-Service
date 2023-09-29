@@ -9,12 +9,12 @@ async function main() {
   await prisma.$connect();
   console.log("Seeding users...");
   await seedUser(prisma);
-  console.log("Seeding business data...");
-  await seedBusinessData(prisma);
   console.log("Seeding RBAC...");
   await seedRBAC(prisma); // Execute the RBAC seeding and pass the prisma instance
   console.log("Seeding calendar groups...");
   await seedCalendarGroup();
+  console.log("Seeding business data...");
+  await seedBusinessData(prisma);
   console.log("Seeding bookings for the above calendar groups...");
   await seedBookings();
   console.log("Main seeding completed!");

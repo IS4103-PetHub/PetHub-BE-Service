@@ -33,6 +33,7 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 1 }],
     duration: 60,
+    calendarGroupId: 1
   },
   {
     id: 2,
@@ -45,6 +46,7 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
     addressIds: [{ addressId: 2 }],
     duration: 60,
+    calendarGroupId: 2
   },
   {
     id: 3,
@@ -68,6 +70,7 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     duration: 60,
     addressIds: [{ addressId: 1 }, { addressId: 2 }],
+    calendarGroupId: 3
   },
   {
     id: 5,
@@ -123,6 +126,7 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     addressIds: [],
     duration: 60,
+    calendarGroupId: 2
   },
   {
     id: 10,
@@ -149,27 +153,36 @@ async function seedBusinessData(prisma) {
   }
 
   for (const data of serviceListings) {
+    const createObject = {
+      title: data.title,
+      description: data.description,
+      basePrice: data.basePrice,
+      category: data.category,
+      duration: data.duration,
+      tags: {
+        connect: data.tagIds,
+      },
+      addresses: {
+        connect: data.addressIds,
+      },
+      petBusiness: {
+        connect: {
+          userId: data.petBusinessId,
+        },
+      },
+    };
+
+    // Check if data.calendarGroupId exists before adding it to createObject
+    if (data.calendarGroupId) {
+      createObject.CalendarGroup = {
+        connect: { calendarGroupId: data.calendarGroupId },
+      };
+    }
+
     await prisma.serviceListing.upsert({
       where: { serviceListingId: data.id },
       update: {},
-      create: {
-        title: data.title,
-        description: data.description,
-        basePrice: data.basePrice,
-        category: data.category,
-        duration: data.duration,
-        tags: {
-          connect: data.tagIds,
-        },
-        addresses: {
-          connect: data.addressIds,
-        },
-        petBusiness: {
-          connect: {
-            userId: data.petBusinessId,
-          },
-        },
-      },
+      create: createObject,
     });
   }
 }
