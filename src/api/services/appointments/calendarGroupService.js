@@ -97,19 +97,57 @@ class CalendarGroupService {
         }
     }
 
-    async getCalendarGroupById(calendarGroupId, includeTimeSlot = false, includeBooking = false) {
+    async getCalendarGroupById(calendarGroupId, includeTimeSlot = false, includeBooking = false, formatForFrontend = false) {
         try {
+            let includeField = {
+                timeslots: includeTimeSlot ? {
+                    include: { Booking: includeBooking }
+                } : false,
+                scheduleSettings: true
+            };
+    
+            if (formatForFrontend) {
+                // FE requires timePeriods to be included in scheduleSettings instead
+                includeField = {
+                    scheduleSettings: {
+                        include: { 
+                            timePeriods: true 
+                        },
+                    },
+                };
+            }
+
             const calendarGroup = await prisma.calendarGroup.findUnique({
                 where: { calendarGroupId: calendarGroupId },
-                include: {
-                    timeslots: includeTimeSlot ? {
-                        include: { Booking: includeBooking }
-                    } : false,
-                    scheduleSettings: true
-                }
+                include: includeField
             });
 
             if (!calendarGroup) throw new CustomError(`CalendarGroup with id (${calendarGroupId}) not found`, 404);
+
+            if (formatForFrontend) {
+              // FE requires scheduleSettings to be nested inside a layer of 'recurrence'
+              const transformedCalendarGroup = {
+                calendarGroupId: calendarGroup.calendarGroupId,
+                name: calendarGroup.name,
+                description: calendarGroup.description,
+                scheduleSettings: calendarGroup.scheduleSettings.map((setting) => ({
+                  scheduleSettingsId: setting.scheduleSettingId,
+                  days: setting.days,
+                  recurrence: {
+                    pattern: setting.pattern,
+                    startDate: setting.startDate,
+                    endDate: setting.endDate,
+                    timePeriods: setting.timePeriods.map((period) => ({
+                      timePeriodId: period.timePeriodId,
+                      startTime: period.startTime,
+                      endTime: period.endTime,
+                      vacancies: period.vacancies,
+                    })),
+                  },
+                })),
+              };
+              return transformedCalendarGroup;
+            }
 
             return calendarGroup;
         } catch (error) {
@@ -153,7 +191,7 @@ class CalendarGroupService {
     async deleteCalendarGroup(calendarGroupId) {
         try {
             // Fetch the calendar group with all related bookings.
-            const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true);
+            const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true, false);
             const Bookings = calendarGroup.timeslots.flatMap(timeslot => timeslot.Booking);
 
             // Deleting the entire calendar group.
@@ -182,7 +220,7 @@ class CalendarGroupService {
 
     async updateCalendarGroup(calendarGroupId, calendarGroupData) {
         try {
-            const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true)
+            const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true, false)
             let updatedCalendarGroup;
             if (calendarGroupData.name || calendarGroupData.description) {
                 updatedCalendarGroup = await prisma.calendarGroup.update({
