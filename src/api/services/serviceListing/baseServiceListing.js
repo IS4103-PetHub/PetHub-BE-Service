@@ -357,10 +357,12 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
   // Current logic: Disasicaite a particular service listing from existing connections (tag, PB) and delete
   try {
-    // Send deletion email if INTERNAL_USER is the one that deleted the service listing
+    // Send deletion email if INTERNAL_USER is the one that deleted the service listing and if petBusiness has a business email.
     if (callee.accountType == "INTERNAL_USER") {
       const listingToDelete = await this.getServiceListingById(serviceListingId);
-      await this.sendDeleteServiceListingEmail(listingToDelete.petBusiness.companyName, listingToDelete.petBusiness.businessEmail, listingToDelete.title);
+      if (listingToDelete.petBusiness.businessEmail) {
+        await this.sendDeleteServiceListingEmail(listingToDelete.petBusiness.companyName, listingToDelete.petBusiness.businessEmail, listingToDelete.title);
+      }
     }
 
     await this.deleteFilesOfAServiceListing(serviceListingId);
