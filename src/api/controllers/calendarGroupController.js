@@ -47,9 +47,10 @@ exports.getCalendarGroupById = async (req, res, next) => {
 
         const includeTimeSlot = req.query.includeTimeSlot === 'true';
         const includeBooking = req.query.includeBooking === 'true';
+        const formatForFrontend = req.query.formatForFrontend === 'true';
 
         const calendarGroups = await calendarGroupService
-            .getCalendarGroupById(Number(calendarGroupId), includeTimeSlot, includeBooking);
+            .getCalendarGroupById(Number(calendarGroupId), includeTimeSlot, includeBooking, formatForFrontend);
 
         res.status(200).json(calendarGroups);
     } catch (error) {

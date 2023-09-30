@@ -282,6 +282,12 @@ paths:
           required: false
           type: boolean # Changed from string to boolean
           default: false # Changed from "false" to false
+        - name: formatForFrontend
+          in: query
+          description: Set as true to fetch for a frontend update operation, will override includeBooking and includeTimeSlot if true
+          required: false
+          type: boolean
+          default: false
       responses:
         200:
           description: List of available calendar groups.
