@@ -1,8 +1,9 @@
 const prisma = require("../../../../prisma/prisma");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
+const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
+const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
-// const { deleteFiles } = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
 
 
@@ -352,22 +353,41 @@ exports.filterServiceListing = async (categories, tags) => {
   }
 };
 
-exports.deleteServiceListing = async (serviceListingId) => {
+exports.deleteServiceListing = async (serviceListingId, callee) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
   // Current logic: Disasicaite a particular service listing from existing connections (tag, PB) and delete
   try {
+    // Send deletion email if INTERNAL_USER is the one that deleted the service listing
+    if (callee.accountType == "INTERNAL_USER") {
+      const listingToDelete = await this.getServiceListingById(serviceListingId);
+      await this.sendDeleteServiceListingEmail(listingToDelete.petBusiness.companyName, listingToDelete.petBusiness.businessEmail, listingToDelete.title);
+    }
+
     await this.deleteFilesOfAServiceListing(serviceListingId);
     await prisma.serviceListing.delete({
       where: { serviceListingId },
     });
   } catch (error) {
-    console.error("Error deleting service listing:", error);
+    console.error("Error deleting service listing: ", error);
     if (error instanceof CustomError) {
       throw error;
     }
     throw new ServiceListingError(error);
   }
 };
+
+exports.sendDeleteServiceListingEmail = async (petBusinessName, email, postTitle) => {
+  try {
+    const body = deleteServiceListingEmail(petBusinessName, postTitle);
+    await EmailService.sendEmail(email, 'PetHub: Service Listing Deleted', body);
+  } catch (error) {
+    console.error("Error sending delete service listing email: ", error);
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new ServiceListingError(error);
+  }
+}
 
 exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
   try {
@@ -386,3 +406,4 @@ exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
     throw new ServiceListingError(error);
   }
 };
+
