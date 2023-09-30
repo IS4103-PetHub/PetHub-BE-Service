@@ -1,26 +1,26 @@
-const { BaseUserService } = require('./baseUserService');
-const prisma = require('../../../../prisma/prisma');
-const { AccountType, AccountStatus } = require('@prisma/client');
-const UserError = require('../../errors/userError');
-const CustomError = require('../../errors/customError');
+const { BaseUserService } = require("./baseUserService");
+const prisma = require("../../../../prisma/prisma");
+const { AccountType, AccountStatus } = require("@prisma/client");
+const UserError = require("../../errors/userError");
+const CustomError = require("../../errors/customError");
 
 // Shared selection fields
 const petOwnerSelectFields = {
-    firstName: true,
-    lastName: true,
-    contactNumber: true,
-    dateOfBirth: true,
-    userId: true,
-    user: {
-        select: {
-            userId: true,
-            email: true,
-            accountType: true,
-            accountStatus: true,
-            dateCreated: true,
-            lastUpdated: true,
-        },
+  firstName: true,
+  lastName: true,
+  contactNumber: true,
+  dateOfBirth: true,
+  userId: true,
+  user: {
+    select: {
+      userId: true,
+      email: true,
+      accountType: true,
+      accountStatus: true,
+      dateCreated: true,
+      lastUpdated: true,
     },
+  },
 };
 
 class PetOwnerService extends BaseUserService {
@@ -180,7 +180,17 @@ class PetOwnerService extends BaseUserService {
       return await prisma.petOwner.findUnique({
         where: { userId },
         include: {
-          favouriteListings: true,
+          favouriteListings: {
+            include: {
+              tags: true,
+              addresses: true,
+              petBusiness: {
+                select: {
+                  companyName: true,
+                },
+              },
+            },
+          },
         },
       });
     } catch (error) {
@@ -208,11 +218,15 @@ class PetOwnerService extends BaseUserService {
           favouriteListings: true,
         },
       });
-      const favouriteListings = petOwner.favouriteListings ? petOwner.favouriteListings : [];
+      const favouriteListings = petOwner.favouriteListings
+        ? petOwner.favouriteListings
+        : [];
       if (favouriteListings.length === 0) {
-        throw new CustomError("No favourited listings found!", 404)
+        throw new CustomError("No favourited listings found!", 404);
       }
-      const updatedFavoriteListings = favouriteListings.filter((listing) => listing.serviceListingId !== serviceListingIdToRemove);
+      const updatedFavoriteListings = favouriteListings.filter(
+        (listing) => listing.serviceListingId !== serviceListingIdToRemove
+      );
       return await prisma.petOwner.update({
         where: { userId },
         data: {
