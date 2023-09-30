@@ -18,7 +18,7 @@ const tags = [
   {
     id: 5,
     name: "Adoption",
-  },
+  }
 ];
 
 const serviceListings = [
@@ -141,6 +141,63 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 3
   },
+  // These service listings (id 11-15) are tagged to petBusinessId [6, 7], who are non-active
+  // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
+  {
+    id: 11,
+    title: "Puppy Training Class",
+    description: "Join our fun and interactive puppy training class!",
+    petBusinessId: 6,
+    category: "PET_BOARDING",
+    basePrice: 50.0,
+    tagIds: [{ tagId: 1 }, { tagId: 5 }],
+    addressIds: [],
+    duration: 90,
+  },
+  {
+    id: 12,
+    title: "Pet Boarding and Daycare",
+    description: "Give your pet a home away from home with our boarding and daycare services.",
+    petBusinessId: 6,
+    category: "PET_BOARDING",
+    basePrice: 35.0,
+    tagIds: [{ tagId: 2 }],
+    addressIds: [],
+    duration: 1440, // 24 hours
+  },
+  {
+    id: 13,
+    title: "Cat Grooming Special",
+    description: "Pamper your feline friend with our cat grooming services.",
+    petBusinessId: 7,
+    category: "PET_GROOMING",
+    basePrice: 60.0,
+    tagIds: [],
+    addressIds: [],
+    duration: 45,
+  },
+  {
+    id: 14,
+    title: "Dog Walking Adventure",
+    description: "Let our experienced dog walkers take your furry friend on an exciting adventure!",
+    petBusinessId: 7,
+    category: "PET_RETAIL",
+    basePrice: 30.0,
+    tagIds: [{ tagId: 4 }],
+    addressIds: [],
+    duration: 60,
+  },
+  {
+    id: 15,
+    title: "Pet Photography Session",
+    description: "Capture beautiful moments with your pets in a professional photoshoot.",
+    petBusinessId: 7,
+    category: "PET_RETAIL",
+    basePrice: 75.0,
+    tagIds: [{ tagId: 3 }],
+    addressIds: [],
+    duration: 120,
+  }
 ];
 
 async function seedBusinessData(prisma) {

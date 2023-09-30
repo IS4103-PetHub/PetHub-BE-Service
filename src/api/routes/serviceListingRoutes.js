@@ -18,6 +18,7 @@ router.patch("/:id", upload.array('file'), serviceListingController.updateServic
 
 // RETRIEVE ALL, BY ID, BY CATEGORY, BY TAG, BY PB ID
 router.get("", serviceListingController.getAllServiceListing);
+router.get("/active", serviceListingController.getAllServiceListingsAvailableForPetOwners);
 router.get("/category/:category?", serviceListingController.getServiceListingByCategory);
 router.get("/tag/:tagId?", serviceListingController.getServiceListingByTag);
 router.get("/pet-businesses/:id?", serviceListingController.getServiceListingByPBId);

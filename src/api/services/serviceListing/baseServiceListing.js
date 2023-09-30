@@ -198,6 +198,41 @@ exports.getAllServiceListings = async () => {
   }
 };
 
+// Function will return all service listings that can be accessed by pet owners (customers) and booked.
+// 2 types of listings:
+// - PB that created this listing has an 'ACTIVE' account status
+// - In the future, if we choose to allow PB to "deactivate" their service listings, we can edit this method to only include service listings that have 'ACTIVE' state
+exports.getAllServiceListingsAvailableForPetOwners = async () => {
+  try {
+    return await prisma.serviceListing.findMany({
+      include: {
+        tags: true,
+        addresses: true,
+        petBusiness: {
+          select: {
+            companyName: true,
+            user: {
+              select: {
+                accountStatus: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        petBusiness: {
+          user: {
+            accountStatus: 'ACTIVE', // pet business cannot be an inactive or pending user
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching all active service listings:", error);
+    throw new ServiceListingError(error);
+  }
+};
+
 exports.getServiceListingById = async (serviceListingId) => {
   try {
     const serviceListing = await prisma.serviceListing.findUnique({

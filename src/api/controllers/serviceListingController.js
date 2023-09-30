@@ -175,6 +175,15 @@ exports.getAllServiceListing = async (req, res, next) => {
   }
 };
 
+exports.getAllServiceListingsAvailableForPetOwners = async (req, res, next) => {
+  try {
+    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners();
+    res.status(200).json(serviceListings);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getServiceListingById = async (req, res, next) => {
   try {
     const serviceListingId = req.params.id;
