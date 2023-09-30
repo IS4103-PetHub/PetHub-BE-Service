@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const petOwnerController = require("../controllers/petOwnerController");
+
 
 // user endpoint health check
 router.get('/', async (req, res, next) => {
@@ -25,5 +27,10 @@ function registerRoutes(controller, userType) {
 registerRoutes(userController, 'internal-users');
 registerRoutes(userController, 'pet-owners');
 registerRoutes(userController, 'pet-businesses');
+
+// User specific routes
+router.post(`/pet-owners/add-to-favourites/:id`, petOwnerController.addToFavourites)
+router.post(`/pet-owners/remove-from-favourites/:id`, petOwnerController.removeFromFavourites)
+router.get(`/pet-owners/favourites/:id`, petOwnerController.viewAllFavouriteListings)
 
 module.exports = router;
