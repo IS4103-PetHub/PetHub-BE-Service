@@ -570,6 +570,16 @@ async function seedCalendarGroup() {
   console.log = originalLog; // Restore console.log after the loop
 }
 
+const userIdToPetIdMap = {
+  9: 1, 
+  11: 3, 
+  12: 4,
+  13: 7,
+  15: 8,
+  16: 9,
+  17: 10 
+};
+
 /* For PO with ID: 12, email: petowner5@example.com, password: ilovepets */
 async function seedBookings() {
   const originalLog = console.log;
@@ -580,13 +590,15 @@ async function seedBookings() {
 
       // randomly genereate from userId 9 to 17
       const userId = Math.floor(Math.random() * (17 - 9 + 1)) + 9;
+      const petId = userIdToPetIdMap[userId];
 
       await BookingService.createBooking(
         userId,
         payload.calendarGroupId,
         payload.serviceListingId,
         payload.startTime,
-        payload.endTime
+        payload.endTime,
+        petId
       );
     } catch (error) {
       console.log = originalLog;

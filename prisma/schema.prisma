@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Sep 29 2023 08:26:21 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Mon Oct 02 2023 01:02:30 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -64,6 +64,9 @@ model Booking {
 
   timeSlotId Int?
   timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
+
+  petId Int?
+  pet   Pet? @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
 }
 
 generator client {
@@ -318,6 +321,8 @@ model Pet {
 
   petOwnerId Int
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+
+  bookings Booking[]
 }
 
 model PetBusinessApplication {

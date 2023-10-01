@@ -96,7 +96,7 @@ exports.createBooking = async (req, res, next) => {
 
         const newBooking = await bookingService.createBooking(
             Number(petOwnerId), Number(calendarGroupId), Number(serviceListingId),
-            new Date(payload.startTime), new Date(payload.endTime)
+            new Date(payload.startTime), new Date(payload.endTime), payload.petId
         )
 
         res.status(201).json(newBooking);

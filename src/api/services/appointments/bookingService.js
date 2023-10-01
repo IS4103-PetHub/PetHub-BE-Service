@@ -5,7 +5,7 @@ const prisma = require('../../../../prisma/prisma');
 const PetOwnerService = require('../user/petOwnerService')
 class BookingService {
 
-    async createBooking(petOwnerId, calendarGroupId, serviceListingId, startTime, endTime) {
+    async createBooking(petOwnerId, calendarGroupId, serviceListingId, startTime, endTime, petId) {
         try {
             const petOwner = await PetOwnerService.getUserById(petOwnerId) // Validate if it's pet owner
             const bookingDuration = Math.abs((new Date(endTime) - new Date(startTime)) / 60000);
@@ -22,7 +22,8 @@ class BookingService {
                     startTime: startTime,
                     endTime: endTime,
                     serviceListingId: serviceListingId,
-                    timeSlotId: chosenSlot.timeSlotId
+                    timeSlotId: chosenSlot.timeSlotId,
+                    petId: petId
                 }
             });
 
@@ -38,7 +39,7 @@ class BookingService {
         try {
             const booking = await prisma.booking.findUnique({
                 where: { bookingId: bookingId },
-                include: { timeSlot: true }
+                include: { timeSlot: true, pet: true }
             });
 
             if (!booking) throw new CustomError(`Booking with id (${bookingId}) not found`, 404);
@@ -78,7 +79,10 @@ class BookingService {
                         { endTime: { lte: endTime } }
                     ]
                 },
-                include: { timeSlot: true }
+                include: { 
+                    timeSlot: true,
+                    pet: true
+                }
             });
 
             return bookings;
@@ -97,6 +101,9 @@ class BookingService {
                         { startTime: { gte: startTime } },
                         { endTime: { lte: endTime } }
                     ]
+                },
+                include: {
+                    pet: true
                 }
             });
 
@@ -126,7 +133,8 @@ class BookingService {
                                 }
                             }
                         }
-                    }
+                    },
+                    pet: true
                 }
             });
 
@@ -158,7 +166,8 @@ class BookingService {
                             addresses: true
                         }
                     },
-                    timeSlot: true
+                    timeSlot: true,
+                    pet: true
                 }
             });
             
