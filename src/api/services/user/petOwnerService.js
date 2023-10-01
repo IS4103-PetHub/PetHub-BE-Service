@@ -195,10 +195,7 @@ class PetOwnerService extends BaseUserService {
       });
       // for user's favourited listings, only filter by categories if there are any to be filtered by
       const filteredListings = petOwnerWithListings.favouriteListings.filter((listing) => {
-        if ((categories.length === 0 || categories.includes(listing.category))) {
-          return true; 
-        }
-        return false; 
+        return categories.length === 0 || categories.includes(listing.category);
       });
 
       return filteredListings

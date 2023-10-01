@@ -228,14 +228,10 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags) =>
         },
       },
     });
-    const filteredListings = serviceListings.filter((listing) => {
-      if ((categories.length === 0 || categories.includes(listing.category)) &&
-        (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
-      ) {
-        return true; 
-      }
-      return false; 
-    });
+    const filteredListings = serviceListings.filter((listing) =>
+      (categories.length === 0 || categories.includes(listing.category)) &&
+      (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
+    );
     return filteredListings;
   } catch (error) {
     console.error("Error fetching all active service listings:", error);
