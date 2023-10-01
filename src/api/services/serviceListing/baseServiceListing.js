@@ -203,9 +203,9 @@ exports.getAllServiceListings = async () => {
 // 2 types of listings:
 // - PB that created this listing has an 'ACTIVE' account status
 // - In the future, if we choose to allow PB to "deactivate" their service listings, we can edit this method to only include service listings that have 'ACTIVE' state
-exports.getAllServiceListingsAvailableForPetOwners = async () => {
+exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags) => {
   try {
-    return await prisma.serviceListing.findMany({
+    const serviceListings = await prisma.serviceListing.findMany({
       include: {
         tags: true,
         addresses: true,
@@ -228,6 +228,15 @@ exports.getAllServiceListingsAvailableForPetOwners = async () => {
         },
       },
     });
+    const filteredListings = serviceListings.filter((listing) => {
+      if ((categories.length === 0 || categories.includes(listing.category)) &&
+        (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
+      ) {
+        return true; 
+      }
+      return false; 
+    });
+    return filteredListings;
   } catch (error) {
     console.error("Error fetching all active service listings:", error);
     throw new ServiceListingError(error);
@@ -316,6 +325,8 @@ exports.getServiceListingByPBId = async (id) => {
   }
 };
 
+// to be depreciated
+// will remove after FE finishes integrating
 exports.filterServiceListing = async (categories, tags) => {
   try {
     const serviceListings = await prisma.serviceListing.findMany({

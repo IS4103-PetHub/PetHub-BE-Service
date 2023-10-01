@@ -23,12 +23,13 @@ exports.addToFavourites = async (req, res, next) => {
 
 exports.viewAllFavouriteListings = async (req, res, next) => {
   try {
+    const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
     const userId = req.params.id;
     if (!(await BaseValidations.isValidInteger(userId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
-    const petOwner = await petOwnerService.viewAllFavouriteListings(Number(userId));
-    res.status(200).json(petOwner.favouriteListings);
+    const favouriteListings = await petOwnerService.viewAllFavouriteListings(Number(userId), categories);
+    res.status(200).json(favouriteListings);
   } catch (error) {
     next(error);
   }
