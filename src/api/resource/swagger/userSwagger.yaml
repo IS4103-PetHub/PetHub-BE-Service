@@ -1037,6 +1037,17 @@ paths:
           description: "ID of the pet owner"
           required: true
           type: integer
+        - in: query
+          name: category
+          description: Filter by category
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example:
+              - "PET_DINING"
+              - "PET_GROOMING"
       responses:
         200:
           description: Successful response containing an array of favorite service listings.

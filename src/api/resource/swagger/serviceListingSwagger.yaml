@@ -393,6 +393,44 @@ paths:
       tags:
         - Service Listing
 
+  /api/service-listings/active:
+    get:
+      summary: Get all service listings available for pet owners. Fill in query params to filter accordingly.
+      parameters:
+        - in: query
+          name: category
+          description: Filter by category
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example:
+              - "PET_DINING"
+              - "PET_GROOMING"
+        - in: query
+          name: tag
+          description: Filter by tag
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example:
+              - "Free"
+              - "Healthy"
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
+  
   /api/service-listings/filter:
     get:
       summary: Get service listings by filter
