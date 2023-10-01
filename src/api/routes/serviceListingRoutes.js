@@ -22,6 +22,8 @@ router.get("/active", serviceListingController.getAllServiceListingsAvailableFor
 router.get("/category/:category?", serviceListingController.getServiceListingByCategory);
 router.get("/tag/:tagId?", serviceListingController.getServiceListingByTag);
 router.get("/pet-businesses/:id?", serviceListingController.getServiceListingByPBId);
+// to be depreciated, filtering logic done under /active
+// will remove after FE finishes integrating
 router.get("/filter", serviceListingController.getFilteredServiceListings);
 router.get("/:id", serviceListingController.getServiceListingById);
 

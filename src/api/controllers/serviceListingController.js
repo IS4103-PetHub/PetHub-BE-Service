@@ -178,7 +178,10 @@ exports.getAllServiceListing = async (req, res, next) => {
 
 exports.getAllServiceListingsAvailableForPetOwners = async (req, res, next) => {
   try {
-    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners();
+    const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
+    const tags = req.query.tag ? Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag] : [];
+
+    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners(categories, tags);
     res.status(200).json(serviceListings);
   } catch (error) {
     next(error);
@@ -259,6 +262,8 @@ exports.getServiceListingByPBId = async (req, res, next) => {
   }
 };
 
+// to be depreciated, filtering logic done under /active
+// will remove after FE finishes integrating
 exports.getFilteredServiceListings = async (req, res, next) => {
   try {
     const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];

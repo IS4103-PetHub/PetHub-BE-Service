@@ -165,7 +165,7 @@ class PetOwnerService extends BaseUserService {
     }
   }
 
-  async viewAllFavouriteListings(userId) {
+  async viewAllFavouriteListings(userId, categories) {
     try {
       // Ensure that user exists and is a valid pet owner
       const petOwner = await prisma.user.findUnique({
@@ -177,7 +177,7 @@ class PetOwnerService extends BaseUserService {
           404
         );
       }
-      return await prisma.petOwner.findUnique({
+      const petOwnerWithListings =  await prisma.petOwner.findUnique({
         where: { userId },
         include: {
           favouriteListings: {
@@ -193,6 +193,13 @@ class PetOwnerService extends BaseUserService {
           },
         },
       });
+      // for user's favourited listings, only filter by categories if there are any to be filtered by
+      const filteredListings = petOwnerWithListings.favouriteListings.filter((listing) => {
+        return categories.length === 0 || categories.includes(listing.category);
+      });
+
+      return filteredListings
+      
     } catch (error) {
       console.error("Error during view all favourite listings:", error);
       if (error instanceof CustomError) throw error;
