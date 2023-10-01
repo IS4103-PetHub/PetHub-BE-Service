@@ -70,3 +70,22 @@ exports.rescheduleOrRefundBookingEmail = (name, link, booking) => {
       Pethub
       `;
 };
+
+exports.deleteServiceListingEmail = (name, postTitle) => {
+  return `
+    Dear ${name},
+    
+    We hope this message finds you well. We would like to inform you about an important update regarding your posted service listing on PetHub.
+
+    After a review of our platform's content and policies, it has come to our attention that your post titled "${postTitle}" has been removed from PetHub.
+    
+    We understand that this may come as a surprise, and we apologize for any inconvenience this may cause. Our aim is to maintain a safe and welcoming environment for all users, and in doing so, we occasionally need to remove content that does not meet our standards.
+    
+    If you have any questions or would like further clarification about the removal of your post, please do not hesitate to reach out to our support team. We are here to assist you with any concerns you may have.
+        
+    Best regards,
+      
+    Regards,
+    Pethub
+    `;
+};

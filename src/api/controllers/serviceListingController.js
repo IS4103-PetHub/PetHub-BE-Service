@@ -5,6 +5,7 @@ const constants = require("../../constants/common");
 const limitations = constants.limitations;
 const errorMessages = constants.errorMessages;
 const s3ServiceInstance = require("../services/s3Service.js");
+const { getUserFromToken } = require("../../utils/nextAuth");
 
 exports.createServiceListing = async (req, res, next) => {
   try {
@@ -177,7 +178,10 @@ exports.getAllServiceListing = async (req, res, next) => {
 
 exports.getAllServiceListingsAvailableForPetOwners = async (req, res, next) => {
   try {
-    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners();
+    const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
+    const tags = req.query.tag ? Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag] : [];
+
+    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners(categories, tags);
     res.status(200).json(serviceListings);
   } catch (error) {
     next(error);
@@ -258,6 +262,8 @@ exports.getServiceListingByPBId = async (req, res, next) => {
   }
 };
 
+// to be depreciated, filtering logic done under /active
+// will remove after FE finishes integrating
 exports.getFilteredServiceListings = async (req, res, next) => {
   try {
     const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
@@ -283,8 +289,17 @@ exports.deleteServiceListing = async (req, res, next) => {
     if (!(await BaseValidations.isValidInteger(serviceListingId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
+    if (!req.headers['authorization']) {
+      return res.status(404).json({ message: "Unauthorized: Token missing" });
+    }
+    
+    const token = req.headers['authorization'].split(' ')[1];
+    const callee = await getUserFromToken(token);
+    if (!callee) {
+      return res.status(400).json({ message: "Unable to find request caller!" });
+    }
 
-    await ServiceListingService.deleteServiceListing(Number(serviceListingId));
+    await ServiceListingService.deleteServiceListing(Number(serviceListingId), callee);
     res.status(200).json({ message: "Service listing deleted successfully" });
   } catch (error) {
     next(error);

@@ -1,8 +1,9 @@
 const prisma = require("../../../../prisma/prisma");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
+const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
+const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
-// const { deleteFiles } = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
 
 
@@ -202,9 +203,9 @@ exports.getAllServiceListings = async () => {
 // 2 types of listings:
 // - PB that created this listing has an 'ACTIVE' account status
 // - In the future, if we choose to allow PB to "deactivate" their service listings, we can edit this method to only include service listings that have 'ACTIVE' state
-exports.getAllServiceListingsAvailableForPetOwners = async () => {
+exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags) => {
   try {
-    return await prisma.serviceListing.findMany({
+    const serviceListings = await prisma.serviceListing.findMany({
       include: {
         tags: true,
         addresses: true,
@@ -227,6 +228,11 @@ exports.getAllServiceListingsAvailableForPetOwners = async () => {
         },
       },
     });
+    const filteredListings = serviceListings.filter((listing) =>
+      (categories.length === 0 || categories.includes(listing.category)) &&
+      (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
+    );
+    return filteredListings;
   } catch (error) {
     console.error("Error fetching all active service listings:", error);
     throw new ServiceListingError(error);
@@ -315,6 +321,8 @@ exports.getServiceListingByPBId = async (id) => {
   }
 };
 
+// to be depreciated
+// will remove after FE finishes integrating
 exports.filterServiceListing = async (categories, tags) => {
   try {
     const serviceListings = await prisma.serviceListing.findMany({
@@ -352,22 +360,43 @@ exports.filterServiceListing = async (categories, tags) => {
   }
 };
 
-exports.deleteServiceListing = async (serviceListingId) => {
+exports.deleteServiceListing = async (serviceListingId, callee) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
   // Current logic: Disasicaite a particular service listing from existing connections (tag, PB) and delete
   try {
+    // Send deletion email if INTERNAL_USER is the one that deleted the service listing and if petBusiness has a business email.
+    if (callee.accountType == "INTERNAL_USER") {
+      const listingToDelete = await this.getServiceListingById(serviceListingId);
+      if (listingToDelete.petBusiness.businessEmail) {
+        await this.sendDeleteServiceListingEmail(listingToDelete.petBusiness.companyName, listingToDelete.petBusiness.businessEmail, listingToDelete.title);
+      }
+    }
+
     await this.deleteFilesOfAServiceListing(serviceListingId);
     await prisma.serviceListing.delete({
       where: { serviceListingId },
     });
   } catch (error) {
-    console.error("Error deleting service listing:", error);
+    console.error("Error deleting service listing: ", error);
     if (error instanceof CustomError) {
       throw error;
     }
     throw new ServiceListingError(error);
   }
 };
+
+exports.sendDeleteServiceListingEmail = async (petBusinessName, email, postTitle) => {
+  try {
+    const body = deleteServiceListingEmail(petBusinessName, postTitle);
+    await EmailService.sendEmail(email, 'PetHub: Service Listing Deleted', body);
+  } catch (error) {
+    console.error("Error sending delete service listing email: ", error);
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new ServiceListingError(error);
+  }
+}
 
 exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
   try {
@@ -386,3 +415,4 @@ exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
     throw new ServiceListingError(error);
   }
 };
+
