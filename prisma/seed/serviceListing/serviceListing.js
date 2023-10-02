@@ -33,7 +33,19 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 1 }],
     duration: 60,
-    calendarGroupId: 1
+    calendarGroupId: 1,
+    attachmentKeys: [
+      "uploads/service-listing/img/87406424-b762-42c8-bd0b-a3c353696fca-grooming.jpg",
+      "uploads/service-listing/img/10b616a7-3431-4ed8-9409-85f12482dd2d-grooming2.jpg",
+      "uploads/service-listing/img/dce12868-a4bd-4b04-9b92-2ce0fe334fe7-catgroom.png",
+      "uploads/service-listing/img/bff26a4a-b2e3-482f-8d5c-907299136cf5-images (1).jpg",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/87406424-b762-42c8-bd0b-a3c353696fca-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T155923Z&X-Amz-Expires=604800&X-Amz-Signature=810c9c90b7d568bcecfb0afbafe488e40f2d8c00e7e5509645c9e5bd701faa6b&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/10b616a7-3431-4ed8-9409-85f12482dd2d-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T155923Z&X-Amz-Expires=604800&X-Amz-Signature=69a0dae6dba28e6429c614b4575f1dbf550a227153ac120b391b4392d87e9027&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/dce12868-a4bd-4b04-9b92-2ce0fe334fe7-catgroom.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T161720Z&X-Amz-Expires=604800&X-Amz-Signature=641d4785b42c7007a28af85e737011bbe653497764db4f2fe4df53f71d318ff0&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/bff26a4a-b2e3-482f-8d5c-907299136cf5-images%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T155923Z&X-Amz-Expires=604800&X-Amz-Signature=28f0e81ec01e3391dd93575b36da3dde93406cbdd677b844bcd415603886932d&X-Amz-SignedHeaders=host&x-id=GetObject",
+    ],
   },
   {
     id: 2,
@@ -46,7 +58,13 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
     addressIds: [{ addressId: 2 }],
     duration: 60,
-    calendarGroupId: 4
+    calendarGroupId: 4,
+    attachmentKeys: [
+      "uploads/service-listing/img/7a891169-465d-44c0-bac4-1b7bd70a8e60-download (1).jpg",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/7a891169-465d-44c0-bac4-1b7bd70a8e60-download%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T160737Z&X-Amz-Expires=604800&X-Amz-Signature=e2fa96216526445bb77f26bf692651304c4edd25a5c18cec1c9d19a90b0a07e8&X-Amz-SignedHeaders=host&x-id=GetObject",
+    ],
   },
   {
     id: 3,
@@ -59,6 +77,14 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
     duration: 60,
     addressIds: [],
+    attachmentKeys: [
+      "uploads/service-listing/img/ad39fe6b-9fa2-4802-9c13-b27b1674855b-adoption.jpg",
+      "uploads/service-listing/img/32b4472a-2da4-4dd9-9aa8-a8380ac53754-adoption2.jpg",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ad39fe6b-9fa2-4802-9c13-b27b1674855b-adoption.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T160849Z&X-Amz-Expires=604800&X-Amz-Signature=0dddf7dcd4e74db24994d6a250e32f71ef127c66ae070f076c81a18feb9ad632&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/32b4472a-2da4-4dd9-9aa8-a8380ac53754-adoption2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231002%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231002T160849Z&X-Amz-Expires=604800&X-Amz-Signature=8404190b86ee47b89cb0d19c68b72e2244ca8f8629d31c4b9109d83c0699256f&X-Amz-SignedHeaders=host&x-id=GetObject",
+    ],
   },
   {
     id: 4,
@@ -70,7 +96,7 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     duration: 60,
     addressIds: [{ addressId: 1 }, { addressId: 2 }],
-    calendarGroupId: 3
+    calendarGroupId: 3,
   },
   {
     id: 5,
@@ -115,7 +141,7 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 4 }],
     addressIds: [],
     duration: 60,
-    calendarGroupId: 1
+    calendarGroupId: 1,
   },
   {
     id: 9,
@@ -127,7 +153,7 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     addressIds: [],
     duration: 60,
-    calendarGroupId: 2
+    calendarGroupId: 2,
   },
   {
     id: 10,
@@ -139,7 +165,7 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 1 }],
     duration: 60,
-    calendarGroupId: 3
+    calendarGroupId: 3,
   },
   // These service listings (id 11-15) are tagged to petBusinessId [6, 7], who are non-active
   // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
@@ -209,8 +235,8 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
     addressIds: [{ addressId: 1 }],
     duration: 180,
-    calendarGroupId: 5
-  }
+    calendarGroupId: 5,
+  },
 ];
 
 async function seedBusinessData(prisma) {
@@ -243,6 +269,11 @@ async function seedBusinessData(prisma) {
         },
       },
     };
+    
+    if (data.attachmentKeys && data.attachmentURLs) {
+      createObject.attachmentKeys = data.attachmentKeys;
+      createObject.attachmentURLs = data.attachmentURLs;
+    }
 
     // Check if data.calendarGroupId exists before adding it to createObject
     if (data.calendarGroupId) {
