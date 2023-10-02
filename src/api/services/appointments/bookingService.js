@@ -131,7 +131,8 @@ class BookingService {
                                 select: {
                                     companyName: true
                                 }
-                            }
+                            },
+                            addresses: true
                         }
                     },
                     pet: true
