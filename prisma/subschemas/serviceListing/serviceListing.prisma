@@ -24,7 +24,7 @@ model ServiceListing {
   favouritedUsers PetOwner[]
 
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: SetNull, onUpdate: Cascade)
   Booking         Booking[]
 }
 
