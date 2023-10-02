@@ -77,7 +77,7 @@ const serviceListings = [
     title: "Reliable Pet Sitting Service",
     description: "Trustworthy pet sitting services for your beloved pets",
     petBusinessId: 4,
-    category: "VETERINARY",
+    category: "PET_BOARDING",
     basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
     duration: 60,

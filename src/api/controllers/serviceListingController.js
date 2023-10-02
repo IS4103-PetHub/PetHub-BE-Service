@@ -180,8 +180,9 @@ exports.getAllServiceListingsAvailableForPetOwners = async (req, res, next) => {
   try {
     const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
     const tags = req.query.tag ? Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag] : [];
+    const limit = req.query.limit ? req.query.limit : null;
 
-    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners(categories, tags);
+    const serviceListings = await ServiceListingService.getAllServiceListingsAvailableForPetOwners(categories, tags, limit);
     res.status(200).json(serviceListings);
   } catch (error) {
     next(error);
