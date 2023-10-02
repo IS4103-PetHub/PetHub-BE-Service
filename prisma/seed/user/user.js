@@ -167,7 +167,7 @@ const petBusinesses = [
   },
   {
     id: 5,
-    email: "petstore123@example.com",
+    email: "linensoda@gmail.com",
     password: commonPassword,
     companyName: "PetStore123",
     uen: "12345678E",
@@ -175,11 +175,11 @@ const petBusinesses = [
     businessAddresses: [{ addressId: 7 }, { addressId: 8 }],
     businessDescription: "We groom birds",
     websiteURL: "https://www.google.com",
-    businessEmail: "biz5@example.com",
+    businessEmail: "linensoda@gmail.com",
     businessType: BusinessType.SERVICE,
     petBusinessApplication: {
       businessType: "SERVICE",
-      businessEmail: "biz5@example.com",
+      businessEmail: "linensoda@gmail.com",
       websiteURL: "https://www.google.com",
       businessDescription: "This was my business description before I changed it",
       applicationStatus: BusinessApplicationStatus.APPROVED,
