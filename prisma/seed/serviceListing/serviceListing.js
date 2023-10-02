@@ -41,12 +41,12 @@ const serviceListings = [
     description:
       "Dog Training Session provides expert dog training to teach your pet new tricks. Our dedicated trainers are skilled in working with dogs of all breeds and ages. Whether your dog needs basic obedience training or advanced trick training, we have a program that suits their needs. Our training sessions are designed to be fun and engaging for your pet while ensuring they learn valuable skills. We use positive reinforcement techniques to encourage good behavior and strengthen the bond between you and your furry friend. With Dog Training Session, you'll have a well-behaved and happy dog in no time. Join our training classes and watch your pet's confidence and abilities grow!",
     petBusinessId: 1,
-    category: "PET_RETAIL",
+    category: "PET_BOARDING",
     basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
     addressIds: [{ addressId: 2 }],
     duration: 60,
-    calendarGroupId: 2
+    calendarGroupId: 4
   },
   {
     id: 3,
@@ -77,7 +77,7 @@ const serviceListings = [
     title: "Reliable Pet Sitting Service",
     description: "Trustworthy pet sitting services for your beloved pets",
     petBusinessId: 4,
-    category: "VETERINARY",
+    category: "PET_BOARDING",
     basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
     duration: 60,
@@ -137,7 +137,7 @@ const serviceListings = [
     category: "VETERINARY",
     basePrice: 20.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
-    addressIds: [{ addressId: 3 }, { addressId: 4 }],
+    addressIds: [{ addressId: 1 }],
     duration: 60,
     calendarGroupId: 3
   },
@@ -197,6 +197,19 @@ const serviceListings = [
     tagIds: [{ tagId: 3 }],
     addressIds: [],
     duration: 120,
+  },
+  {
+    id: 16,
+    title: "Dog Sitting with John",
+    description:
+      "Enjoy peace of mind knowing that your dog is in good hands with John. Whether it's for a few hours or an evening, your dog will receive personalized attention and care. We'll make sure your dog feels comfortable and happy while you're away. Book a dog sitting session with us, and let your furry companion have a great time with John!",
+    petBusinessId: 1,
+    category: "PET_BOARDING",
+    basePrice: 30.0,
+    tagIds: [{ tagId: 2 }, { tagId: 4 }],
+    addressIds: [{ addressId: 1 }],
+    duration: 180,
+    calendarGroupId: 5
   }
 ];
 

@@ -15,6 +15,7 @@ exports.isValidCreateBookingPayload = (payload) => {
                 }
                 return value;
             }),
+        petId: baseValidation.integerValidation('petId').optional()
     });
 
     const { error } = schema.validate(payload, { convert: false });

@@ -1,6 +1,9 @@
 const { AccountStatus, AccountType, BusinessType, BusinessApplicationStatus, PetType, Gender } = require("@prisma/client");
 const bcrypt = require("bcryptjs"); // bcrypt for password hashing
 
+// USE COMMON PASSWORD
+const commonPassword = 'password123'
+
 // ADDRESS SEED DATA
 const addresses = [
   {
@@ -82,13 +85,13 @@ const addresses = [
 const petBusinesses = [
   {
     id: 1,
-    email: "john.doe123231@example.com",
-    password: "password1234",
-    companyName: "John Companys",
+    email: "john.doe@example.com",
+    password: commonPassword,
+    companyName: "John's Company",
     uen: "12345678A",
     contactNumber: "93727651",
     businessAddresses: [{ addressId: 1 }, { addressId: 2 }],
-    businessDescription: "John Companys is a leading pet grooming service provider dedicated to enhancing the well-being of your beloved furry friends. With a passion for pets and a team of experienced groomers, we offer top-notch grooming services that go beyond mere pampering. We believe that grooming is an essential part of your pet's overall health and happiness.\n\nOur state-of-the-art grooming facility is designed to ensure the comfort and safety of your pets. We use only the finest pet-friendly products, and our team is trained to provide personalized care to meet your pet's unique needs.\n\nAt John Companys, we understand the significance of the bond between pets and their owners. That's why we strive to make every grooming experience a positive one. From bathing to nail trimming and ear cleaning to haircuts, we take care of it all.\n\nVisit our website at https://www.google.com to learn more about our services and book an appointment. Trust us to keep your pets looking and feeling their best!",
+    businessDescription: "John's Company is a leading pet grooming service provider dedicated to enhancing the well-being of your beloved furry friends. With a passion for pets and a team of experienced groomers, we offer top-notch grooming services that go beyond mere pampering. We believe that grooming is an essential part of your pet's overall health and happiness.\n\nOur state-of-the-art grooming facility is designed to ensure the comfort and safety of your pets. We use only the finest pet-friendly products, and our team is trained to provide personalized care to meet your pet's unique needs.\n\nAt John Companys, we understand the significance of the bond between pets and their owners. That's why we strive to make every grooming experience a positive one. From bathing to nail trimming and ear cleaning to haircuts, we take care of it all.\n\nVisit our website at https://www.google.com to learn more about our services and book an appointment. Trust us to keep your pets looking and feeling their best!",
     websiteURL: "https://www.johnDoe.com",
     businessEmail: "biz1@example.com",
     businessType: BusinessType.SERVICE,
@@ -104,7 +107,7 @@ const petBusinesses = [
   {
     id: 2,
     email: "jane.smith@example.com",
-    password: "pass12345",
+    password: commonPassword,
     companyName: "Smith's Pet Shop",
     uen: "12345678B",
     contactNumber: "88712892",
@@ -124,7 +127,7 @@ const petBusinesses = [
   {
     id: 3,
     email: "mike.petbiz@example.com",
-    password: "secure1234",
+    password: commonPassword,
     companyName: "Mike's Pet Business",
     uen: "12345678C",
     contactNumber: "97128913",
@@ -145,7 +148,7 @@ const petBusinesses = [
   {
     id: 4,
     email: "susan.animalstore@example.com",
-    password: "mypets123",
+    password: commonPassword,
     companyName: "Susan's Animal Store",
     uen: "12345678D",
     contactNumber: "98765432",
@@ -165,7 +168,7 @@ const petBusinesses = [
   {
     id: 5,
     email: "petstore123@example.com",
-    password: "pets12345",
+    password: commonPassword,
     companyName: "PetStore123",
     uen: "12345678E",
     contactNumber: "91789278",
@@ -190,7 +193,7 @@ const nonActivePetBusinesses = [
   {
     id: 6,
     email: "groomer1@example.com",
-    password: "password123",
+    password: commonPassword,
     companyName: "Groomer1",
     uen: "12345678E",
     contactNumber: "91627863",
@@ -206,7 +209,7 @@ const nonActivePetBusinesses = [
   {
     id: 7,
     email: "groomer2@example.com",
-    password: "password123",
+    password: commonPassword,
     companyName: "Groomer2",
     uen: "12345678E",
     contactNumber: "87168812",
@@ -225,7 +228,7 @@ const nonActivePetBusinesses = [
   {
     id: 8,
     email: "groomer3@example.com",
-    password: "password123",
+    password: commonPassword,
     companyName: "Groomer3",
     uen: "12345678E",
     contactNumber: "83192732",
@@ -236,7 +239,7 @@ const petOwners = [
   {
     id:  9,
     email: "petowner2@example.com",
-    password: "pass12345",
+    password: commonPassword,
     firstName: "Li",
     lastName: "Chen",
     contactNumber: "88712892",
@@ -245,7 +248,7 @@ const petOwners = [
   {
     id: 10,
     email: "petowner3@example.com",
-    password: "secure1234",
+    password: commonPassword,
     firstName: "Ming",
     lastName: "Liu",
     contactNumber: "97128913",
@@ -254,7 +257,7 @@ const petOwners = [
   {
     id: 11,
     email: "petowner4@example.com",
-    password: "mypets123",
+    password: commonPassword,
     firstName: "Wei",
     lastName: "Zhang",
     contactNumber: "98765432",
@@ -263,7 +266,7 @@ const petOwners = [
   {
     id: 12,
     email: "petowner5@example.com",
-    password: "ilovepets",
+    password: commonPassword,
     firstName: "Yuki",
     lastName: "Tanaka",
     contactNumber: "91789278",
@@ -272,7 +275,7 @@ const petOwners = [
   {
     id: 13,
     email: "petowner6@example.com",
-    password: "petlover1",
+    password: commonPassword,
     firstName: "Sato",
     lastName: "Nakamura",
     contactNumber: "87654321",
@@ -281,7 +284,7 @@ const petOwners = [
   {
     id: 14,
     email: "petowner7@example.com",
-    password: "furbabies",
+    password: commonPassword,
     firstName: "Han",
     lastName: "Kim",
     contactNumber: "76543210",
@@ -290,7 +293,7 @@ const petOwners = [
   {
     id: 15,
     email: "petowner8@example.com",
-    password: "meow123",
+    password: commonPassword,
     firstName: "Jung",
     lastName: "Park",
     contactNumber: "65432109",
@@ -299,7 +302,7 @@ const petOwners = [
   {
     id: 16,
     email: "petowner9@example.com",
-    password: "pawsandtails",
+    password: commonPassword,
     firstName: "Ming",
     lastName: "Wong",
     contactNumber: "54321098",
@@ -308,12 +311,21 @@ const petOwners = [
   {
     id: 17,
     email: "petowner10@example.com",
-    password: "petparadise",
+    password: commonPassword,
     firstName: "Linh",
     lastName: "Nguyen",
     contactNumber: "43210987",
     dateOfBirth: new Date("1994-02-27"),
   },
+  {
+    id: 18,
+    email: "is4103pethub@gmail.com",
+    password: commonPassword,
+    firstName: "Linda",
+    lastName: "Lim",
+    contactNumber: "43210987",
+    dateOfBirth: new Date("1994-02-27"),
+  }
 ];
 
 const pets = [

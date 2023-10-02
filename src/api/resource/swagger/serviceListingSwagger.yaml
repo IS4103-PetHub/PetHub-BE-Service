@@ -164,6 +164,25 @@ definitions:
       basePrice: 40
       tagIds: [1, 2, 3]
       calendarGroupId: 1
+  ServiceListingActiveResponse:
+      type: object
+      properties:
+        serviceListingId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        basePrice:
+          type: number
+        duration:
+          type: integer
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
 
 paths:
   /api/service-listings/health-check:
@@ -482,4 +501,42 @@ paths:
                 items:
                   $ref: '#/definitions/ServiceListingResponse'
       tags:
+        - Service Listing
+/api/service-listings/active:
+  get:
+    summary: Get all active service listings filtered by Category and tag
+    parameters:
+      - name: category
+        in: query
+        description: IDs of categories
+        required: false
+        schema:
+          type: string
+      - name: tag
+        in: query
+        description: Service listing tags
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Maximum number of results to return
+        required: false
+        schema:
+          type: integer
+          format: int32  # Assuming limit is an integer
+    responses:
+      200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceListingActiveResponse'
+      400:
+        description: Bad request
+      500:
+        description: Internal server error
+    tags:
         - Service Listing

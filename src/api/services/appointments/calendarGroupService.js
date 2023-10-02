@@ -7,7 +7,8 @@ const PetOwnerService = require('../user/petOwnerService')
 const { differenceInDays, addDays, format, parseISO } = require('date-fns');
 const emailTemplate = require('../../resource/emailTemplate');
 const { getAllCalendarGroups } = require('../../controllers/calendarGroupController');
-const PetBusinessService = require('../user/petBusinessService')
+const PetBusinessService = require('../user/petBusinessService');
+const emailService = require('../emailService');
 
 class CalendarGroupService {
 
@@ -101,7 +102,9 @@ class CalendarGroupService {
         try {
             let includeField = {
                 timeslots: includeTimeSlot ? {
-                    include: { Booking: includeBooking }
+                    include: { Booking: includeBooking ? {
+                        include: { serviceListing: true }
+                    } : false }
                 } : false,
                 scheduleSettings: true
             };
@@ -204,9 +207,15 @@ class CalendarGroupService {
                 const petOwner = await PetOwnerService.getUserById(Number(booking.petOwnerId));
                 const emailTitle = "[Notification] Your Booking Has Been Canceled";
 
-                // TODO: email sending code here
-                console.log(`====================== AFFECTED BOOKING ============================`);
-                console.log(`email is sent to ${petOwner.lastName}, affected booking: `, booking);
+                await emailService.sendEmail(
+                    petOwner.user.email,
+                    emailTitle,
+                    emailTemplate.rescheduleOrRefundBookingEmail(
+                        petOwner.firstName,
+                        "localhost:3002/customer/appointments",
+                        booking
+                    )
+                )
             }
 
             return true; // Returning true to indicate successful deletion.
@@ -264,11 +273,15 @@ class CalendarGroupService {
                 for (const booking of unsuccessfulMigration) {
                     const petOwner = await PetOwnerService.getUserById(Number(booking.petOwnerId))
                     const emailTitle = "[Action Required] Reschedule Booking or Request for Refund"
-                    // await EmailService.sendEmail(petOwner.user.email, emailTitle,
-                    //     emailTemplate.rescheduleOrRefundBookingEmail(petOwner.lastName, "todo, update link"));
-
-                    console.log(`====================== AFFECTED BOOKING ============================`)
-                    console.log(`email is sent to ${petOwner.lastName}, affected booking: `, booking)
+                    await emailService.sendEmail(
+                        petOwner.user.email,
+                        emailTitle,
+                        emailTemplate.rescheduleOrRefundBookingEmail(
+                            petOwner.firstName,
+                            "localhost:3002/customer/appointments",
+                            booking
+                        )
+                    )
                 }
             }
 

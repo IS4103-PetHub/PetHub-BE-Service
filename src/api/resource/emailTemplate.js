@@ -51,11 +51,16 @@ exports.petBusinessApplicationRejectionEmail = (name, link, remark) => {
 
 
 
-exports.rescheduleOrRefundBookingEmail = (name, link) => {
+exports.rescheduleOrRefundBookingEmail = (name, link, booking) => {
   return `
       Dear ${name},
       
-      Your appointment has been affected by changes in schedule
+      Your appointment has been affected by changes in schedule. 
+
+      Booking Details:
+      Booking ID: ${booking.bookingId}
+      Service: ${booking.serviceListing.title}
+      Date and Time: ${booking.startTime.toLocaleString()} - ${booking.endTime.toLocaleString()}
         
       Please reschedule your booking or request for refund: ${link}.
   

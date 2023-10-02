@@ -75,7 +75,11 @@ exports.updatePet = async (petId, data) => {
 
 exports.getAllPets = async () => {
   try {
-    return await prisma.pet.findMany();
+    return await prisma.pet.findMany({
+      include: {
+        bookings: true
+      }
+    });
   } catch (error) {
     console.error("Error fetching all pets:", error);
     throw new PetError(error);
@@ -86,6 +90,9 @@ exports.getPetById = async (petId) => {
   try {
     const pet = await prisma.pet.findUnique({
       where: { petId },
+      include: {
+        bookings: true
+      }
     });
     if (!pet) {
       throw new CustomError("Pet not found", 404);
@@ -112,6 +119,9 @@ exports.getPetsByPOId = async (petOwnerId) => {
     }
     const pets = await prisma.pet.findMany({
       where: { petOwnerId: petOwnerId },
+      include: {
+        bookings: true
+      }
     });
     return pets;
   } catch (error) {

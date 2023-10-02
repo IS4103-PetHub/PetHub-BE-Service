@@ -99,7 +99,7 @@ exports.updatePet = async (req, res, next) => {
     }
     updateData.weight = parseFloat(updateData.weight);
 
-    if (req.files && req.files.length > 0) {
+    if (req.files) {
       // delete existing files and update with new files
       await PetService.deleteFilesOfAPet(petId);
       updateData.attachmentKeys = await s3ServiceInstance.uploadPdfFiles(req.files, "pets");
