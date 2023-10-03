@@ -212,7 +212,7 @@ class CalendarGroupService {
                     emailTitle,
                     emailTemplate.rescheduleOrRefundBookingEmail(
                         petOwner.firstName,
-                        "localhost:3002/customer/appointments",
+                        "http://localhost:3002/customer/appointments",
                         booking
                     )
                 )
@@ -278,7 +278,7 @@ class CalendarGroupService {
                         emailTitle,
                         emailTemplate.rescheduleOrRefundBookingEmail(
                             petOwner.firstName,
-                            "localhost:3002/customer/appointments",
+                            "http://localhost:3002/customer/appointments",
                             booking
                         )
                     )
