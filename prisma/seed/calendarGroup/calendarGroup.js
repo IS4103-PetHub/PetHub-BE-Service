@@ -249,7 +249,7 @@ const calendarGroupPayloads = [
         days: ["WEDNESDAY", "SATURDAY"],
         recurrence: {
           pattern: "WEEKLY",
-          startDate: getSuitableDate(1),
+          startDate: getSuitableDate(-30),
           endDate: getSuitableDate(60),
           timePeriods: [
             {
@@ -547,6 +547,16 @@ const bookingPayloads = [
   }
 ];
 
+const pastBookingsPayload =[
+  {
+    bookingIndex: 39,
+    calendarGroupId: 5,
+    serviceListingId: 16,
+    startTime: generateBookingTime(getSuitableSpecialDate(3, -2), "09:00"), // John's pet boarding schedule
+    endTime: generateBookingTime(getSuitableSpecialDate(3, -2), "12:00"),
+  }
+]
+
 /* For PB with ID: 1, email: biz1@example.com, password: password1234 */
 async function seedCalendarGroup() {
   /*
@@ -604,6 +614,26 @@ async function seedBookings() {
       console.log = originalLog;
       console.log(
         `Error seeding booking for booking index: ${payload.bookingIndex}. It is possible that this booking already exists.`
+      );
+      console.log = () => {};
+    }
+  }
+
+  for (const payload of pastBookingsPayload) {
+    try {
+
+      await BookingService.createBooking(
+        18, // past booking for is4103pethub@gmail.com
+        payload.calendarGroupId,
+        payload.serviceListingId,
+        payload.startTime,
+        payload.endTime,
+        null
+      );
+    } catch (error) {
+      console.log = originalLog;
+      console.log(
+        `Error seeding past booking for booking index: ${payload.bookingIndex}. It is possible that this booking already exists.`
       );
       console.log = () => {};
     }

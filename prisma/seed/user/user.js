@@ -455,6 +455,10 @@ const pets = [
 
 
 async function seedUser(prisma) {
+
+  const oneYearFromToday = new Date();
+  oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() - 1);
+
   for (const a of addresses) {
     await prisma.address.upsert({
       where: { addressId: a.id },
@@ -536,6 +540,7 @@ async function seedUser(prisma) {
         password: await bcrypt.hash(po.password, 10),
         accountType: AccountType.PET_OWNER,
         accountStatus: AccountStatus.ACTIVE,
+        dateCreated: oneYearFromToday,
         petOwner: {
           create: {
             firstName: po.firstName,
