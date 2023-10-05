@@ -205,14 +205,14 @@ class CalendarGroupService {
             // Emailing all affected bookings.
             for (const booking of Bookings) {
                 const petOwner = await PetOwnerService.getUserById(Number(booking.petOwnerId));
-                const emailTitle = "[Notification] Your Booking Has Been Canceled";
+                const emailTitle = "[Notification] Your Booking Has Been Cancelled ";
 
                 await emailService.sendEmail(
                     petOwner.user.email,
                     emailTitle,
                     emailTemplate.rescheduleOrRefundBookingEmail(
                         petOwner.firstName,
-                        "localhost:3002/customer/appointments",
+                        "http://localhost:3002/customer/appointments",
                         booking
                     )
                 )
@@ -278,7 +278,7 @@ class CalendarGroupService {
                         emailTitle,
                         emailTemplate.rescheduleOrRefundBookingEmail(
                             petOwner.firstName,
-                            "localhost:3002/customer/appointments",
+                            "http://localhost:3002/customer/appointments",
                             booking
                         )
                     )

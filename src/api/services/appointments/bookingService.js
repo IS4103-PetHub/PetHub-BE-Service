@@ -39,7 +39,7 @@ class BookingService {
         try {
             const booking = await prisma.booking.findUnique({
                 where: { bookingId: bookingId },
-                include: { timeSlot: true, pet: true }
+                include: { timeSlot: true, pet: true, serviceListing: true }
             });
 
             if (!booking) throw new CustomError(`Booking with id (${bookingId}) not found`, 404);
@@ -198,7 +198,7 @@ class BookingService {
     async updateBooking(bookingId, newStartTime, newEndTime) {
         try {
             const existingBooking = await this.getBookingById(bookingId)
-            const calendarGroupId = existingBooking.timeSlot.calendarGroupId
+            const calendarGroupId = existingBooking.serviceListing.calendarGroupId
 
             const bookingDuration = Math.abs((new Date(newStartTime) - new Date(newEndTime)) / 60000);
             const availableSlots = await CalendarGroupService.getAvailability(Number(calendarGroupId), new Date(newStartTime), new Date(newEndTime), bookingDuration);
