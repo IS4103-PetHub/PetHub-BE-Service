@@ -71,6 +71,28 @@ exports.rescheduleOrRefundBookingEmail = (name, link, booking) => {
       `;
 };
 
+exports.refundBookingEmail = (name, booking) => {
+  return `
+    Dear ${name},
+    
+    Your appointment has been affected by changes in schedule. 
+    
+    The following Booking would be refunded:
+
+    Booking Details:
+    Booking ID: ${booking.bookingId}
+    Service: ${booking.serviceListing.title}
+    Date and Time: ${booking.startTime.toLocaleString()} - ${booking.endTime.toLocaleString()}
+      
+    Please note that the refund for this booking will take approximately 5 working days to be processed.
+    
+    Thank you for using PetHub!
+      
+    Regards,
+    Pethub
+    `;
+}
+
 exports.deleteServiceListingEmail = (name, postTitle) => {
   return `
     Dear ${name},
