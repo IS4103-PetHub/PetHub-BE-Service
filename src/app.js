@@ -3,6 +3,9 @@ const createError = require("http-errors");
 const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const errorHandler = require('./api/middlewares/customErrorHandle');
 
 const app = express();
 app.use(express.json());
@@ -22,19 +25,37 @@ app.get("/", async (req, res, next) => {
   res.send({ message: "Awesome it works 🐻" });
 });
 
-app.use("/api", require("./api/routes/route"));
+// swagger api documentation
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'API Documentation',
+    version: '1.0.0',
+  },
+}
+
+const options = {
+  swaggerDefinition,
+  apis: ['src/api/resource/swagger/*.js', 'src/api/resource/swagger/*.yaml'],
+  servers: [
+    {
+      url: 'http://localhost:3000',
+      description: 'Development server',
+    },
+  ],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+// Serve Swagger UI and API documentation
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+app.use("/api", require('./api/routes/index'));
 
 app.use((req, res, next) => {
   next(createError.NotFound());
 });
 
-app.use((err, req, res, next) => {
-  res.status(err.status || 500);
-  res.send({
-    status: err.status || 500,
-    message: err.message,
-  });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`));

@@ -1,0 +1,383 @@
+swagger: "2.0"
+definitions:
+  TimePeriod:
+    type: object
+    required:
+      - startTime
+      - endTime
+    properties:
+      startTime:
+        type: string
+        description: "The start time for the time period. Format: HH:MM"
+      endTime:
+        type: string
+        description: "The end time for the time period. Format: HH:MM"
+      vacancies:
+        type: integer
+        description: number of availability per ScheduleSetting
+
+  Recurrence:
+    type: object
+    required:
+      - pattern
+      - startDate
+      - endDate
+      - timePeriods
+    properties:
+      pattern:
+        type: string
+        enum: [DAILY, WEEKLY]
+        description: The recurrence pattern for the scheduleSettings
+      startDate:
+        type: string
+        description: "The start date for the ScheduleSettings. Format: YYYY-MM-DD"
+      endDate:
+        type: string
+        description: "The end date for the ScheduleSettings. Format: YYYY-MM-DD"
+      timePeriods:
+        type: array
+        items:
+          type: "#/definitions/TimePeriod"
+        description: non overlapping time periods for the time slot
+
+  ScheduleSettings:
+    type: object
+    required:
+      - vacancies
+      - recurrence
+    properties:
+      days:
+        type: array
+        items:
+          enum: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+        description: List of days applied for the ScheduleSetting definition. Optional if all recurrence pattern are DAILY
+      recurrence:
+        type: "#/definitions/Recurrence"
+        description: recurrence rules applied for the indicated days
+
+  CalendarGroupRequest:
+    type: object
+    required:
+      - name
+      - scheduleSettings
+    properties:
+      name:
+        type: string
+        description: name of the calendar group
+      description:
+        type: string
+        description: optional description for the calendar group
+      scheduleSettings:
+        type: array
+        items:
+          type: "#/definitions/ScheduleSettings"
+        description: schedule settings defined for the calendar group
+
+  UpdateCalendarGroupRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        description: name of the calendar group
+      description:
+        type: string
+        description: optional description for the calendar group
+      scheduleSettings:
+        type: array
+        items:
+          type: "#/definitions/ScheduleSettings"
+        description: schedule settings defined for the calendar group
+
+  AvailableTimeSlot:
+    type: object
+    properties:
+      startTime:
+        type: string
+        format: date-time
+        description: Start time of the available slot.
+      endTime:
+        type: string
+        format: date-time
+        description: End time of the available slot.
+      vacancies:
+        type: integer
+        description: Number of vacancies for the slot.
+
+paths:
+  /api/calendar-groups/:
+    get:
+      summary: Get all calendar groups object.
+      description: Get all calendar groups object
+      parameters:
+        - name: includeTimeSlot
+          in: query
+          description: Set as true if include timeslot objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: includeBooking
+          in: query
+          description: Set as true if include booking objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+      responses:
+        200:
+          description: List of available calendar groups.
+        400:
+          description: Invalid input parameters.
+        500:
+          description: Internal server error.
+      tags:
+        - CalendarGroup
+
+    post:
+      summary: Create a new calendar group for pet businesses to accept bookings
+      description: Create a new calendar group for pet businesses to accept bookings
+      parameters:
+        - name: petBusinessId
+          in: query
+          description: ID of the Pet Business creating the calendar group.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      consumes:
+        - application/json
+      requestBody:
+        description: Calendar group details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/CalendarGroupRequest"
+            example:
+              name: "Paws and Relax Grooming Sessions"
+              description: "Available slots for grooming services"
+              scheduleSettings:
+                - days: [MONDAY, WEDNESDAY]
+                  recurrence:
+                    pattern: "WEEKLY"
+                    startDate: "2023-10-18"
+                    endDate: "2023-11-01"
+                    timePeriods:
+                      - startTime: "09:00"
+                        endTime: "10:00"
+                        vacancies: 1
+                - recurrence:
+                    pattern: "DAILY"
+                    startDate: "2023-11-01"
+                    endDate: "2023-11-01"
+                    timePeriods:
+                      - startTime: "12:00"
+                        endTime: "13:00"
+                        vacancies: 2
+      responses:
+        201:
+          description: Calendar group created successfully
+      tags:
+        - CalendarGroup
+
+  /api/calendar-groups/pet-business/{petBusinessId}:
+    get:
+      summary: Get all calendar groups object.
+      description: Get all calendar groups object
+      parameters:
+        - name: includeTimeSlot
+          in: query
+          description: Set as true if include timeslot objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: includeBooking
+          in: query
+          description: Set as true if include booking objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: petBusinessId
+          in: path
+          description: ID of the Pet Business.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: List of available calendar groups.
+        400:
+          description: Invalid input parameters.
+        500:
+          description: Internal server error.
+      tags:
+        - CalendarGroup
+
+  /api/calendar-groups/{calendarGroupId}:
+    put:
+      summary: Update the calendar group for pet businesses to accept bookings
+      description: Update the calendar group for pet businesses to accept bookings
+      parameters:
+        - name: calendarGroupId
+          in: path
+          description: ID of the calendar to update.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      consumes:
+        - application/json
+      requestBody:
+        description: Calendar group details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/UpdateCalendarGroupRequest"
+            example:
+              name: "Updated Paws and Relax Grooming Sessions"
+              description: "Updated Available slots for grooming services"
+              scheduleSettings:
+                - days: [MONDAY, WEDNESDAY]
+                  recurrence:
+                    pattern: "WEEKLY"
+                    startDate: "2023-10-18"
+                    endDate: "2023-11-01"
+                    timePeriods:
+                      - startTime: "09:00"
+                        endTime: "10:00"
+                        vacancies: 1
+                - recurrence:
+                    pattern: "DAILY"
+                    startDate: "2023-11-01"
+                    endDate: "2023-11-01"
+                    timePeriods:
+                      - startTime: "12:00"
+                        endTime: "13:00"
+                        vacancies: 2
+                      - startTime: "13:00"
+                        endTime: "19:00"
+                        vacancies: 5
+      responses:
+        200:
+          description: Calendar group updated successfully
+      tags:
+        - CalendarGroup
+
+    get:
+      summary: Get calendar group object by ID.
+      description: Get calendar group object by ID
+      parameters:
+        - name: calendarGroupId
+          in: path
+          description: ID of the calendar to update.
+          required: true
+          type: integer
+          default: 1 # Example default value
+        - name: includeTimeSlot
+          in: query
+          description: Set as true if include timeslot objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: includeBooking
+          in: query
+          description: Set as true if include booking objects
+          required: false
+          type: boolean # Changed from string to boolean
+          default: false # Changed from "false" to false
+        - name: formatForFrontend
+          in: query
+          description: Set as true to fetch for a frontend update operation, will override includeBooking and includeTimeSlot if true
+          required: false
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: List of available calendar groups.
+        400:
+          description: Invalid input parameters.
+        500:
+          description: Internal server error.
+      tags:
+        - CalendarGroup
+
+    delete:
+      summary: Delete a calendar group
+      description: Delete the specified calendar group and notify all affected bookings.
+      parameters:
+        - name: calendarGroupId
+          in: path
+          description: ID of the calendar to delete.
+          required: true
+          schema:
+            type: integer
+          example: 1 # Example default value
+      responses:
+        200:
+          description: Calendar group deleted successfully
+        400:
+          description: Invalid calendar group ID
+        500:
+          description: Server error while deleting calendar group
+      tags:
+        - CalendarGroup
+
+  /api/calendar-groups/available-timeslots/{calendarID}:
+    get:
+      summary: Get available time slots for a given calendar ID.
+      description: |
+        Retrieve a list of available time slots based on a calendar's configurations. The endpoint calculates sub-slots 
+        of size equal to the desired `duration` provided in the query. For each sub-slot, it verifies if there are 
+        available vacancies by accounting for any overlapping bookings within the main timeslot.
+
+        It's important to note that the endpoint will return every sub-slot of the desired duration that has a 
+        positive number of vacancies. This means that even if two or more of these sub-slots could potentially be 
+        combined into a larger available slot, they will be presented individually. For instance, if you ask for 
+        15-minute sub-slots within an hour that has vacancies for the entire duration, you would get four individual 
+        15-minute slots instead of a single 1-hour slot.
+      parameters:
+        - name: calendarID
+          in: path
+          description: ID of the calendar to retrieve availability for.
+          required: true
+          type: integer
+          default: 1 # Example default value
+        - name: startTime
+          in: query
+          description: Start time for the availability search.
+          required: true
+          type: string
+          format: date-time
+          default: "2023-10-25T01:30:00.000Z" # Example default value
+        - name: endTime
+          in: query
+          description: End time for the availability search.
+          required: true
+          type: string
+          format: date-time
+          default: "2023-11-01T05:00:00.000Z" # Example default value
+        - name: duration
+          in: query
+          description: Desired duration for the slot in minutes.
+          required: true
+          type: integer
+          default: 60 # Example default value
+      responses:
+        200:
+          description: List of available time slots successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/AvailableTimeSlot"
+              example:
+                - startTime: "2023-10-30T01:00:00.000Z"
+                  endTime: "2023-10-30T02:00:00.000Z"
+                  vacancies: 1
+                - startTime: "2023-11-01T04:00:00.000Z"
+                  endTime: "2023-11-01T05:00:00.000Z"
+                  vacancies: 3
+        400:
+          description: Invalid input parameters.
+        500:
+          description: Internal server error.
+      tags:
+        - CalendarGroup

@@ -1,0 +1,131 @@
+import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus} from "../enums/accountEnums"
+import {UserGroupMembership} from "./rbac"
+import {ServiceListing} from "../serviceListing/serviceListing"
+import { PetBusiness } from "..\..\schema"
+import { Gender, PetType } from "..\enums\accountEnums"
+import { PetOwner } from "..\..\schema"
+import {CalendarGroup} from "../appointments/appointments"
+import { ServiceListing } from "..\..\schema"
+import { Booking } from "..\appointments\appointments"
+
+// Entities
+model User {
+    userId        Int           @id @default(autoincrement())
+    email         String        @unique
+    password      String
+    accountType   AccountType
+    accountStatus AccountStatus @default(ACTIVE)
+    dateCreated   DateTime      @default(now())
+    lastUpdated   DateTime?
+
+    // Enforcement of email being associated only with one type of account
+    // must be implemented in your application logic as Prisma does not
+    // support multi-table unique constraints
+    internalUser        InternalUser?
+    petOwner            PetOwner?
+    petBusiness         PetBusiness?
+    UserGroupMembership UserGroupMembership[]
+}
+
+model InternalUser {
+    firstName                       String
+    lastName                        String
+    adminRole                       AdminRole
+    approvedPetBusinessApplications PetBusinessApplication[]
+
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    userId Int  @id @unique
+}
+
+model PetOwner {
+    firstName     String
+    lastName      String
+    contactNumber String
+    dateOfBirth   DateTime
+
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    userId Int  @id @unique
+
+    pets Pet[]
+    favouriteListings ServiceListing[]
+}
+
+model PetBusiness {
+  companyName            String
+  uen                    String
+  contactNumber          String
+  // This section is for the optional fields that are empty during PB signup, but populated during PB app approval //
+  businessType           BusinessType?
+  businessEmail          String?
+  businessDescription    String?
+  websiteURL             String?
+  businessAddresses      Address[]
+  // ------------------------------------------------ Section End ------------------------------------------------ //
+  serviceListings        ServiceListing[]
+  petBusinessApplication PetBusinessApplication?
+  // logo                String // TODO: figure out best way to save logos
+
+  user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId        Int             @id @unique
+  CalendarGroup CalendarGroup[]
+}
+
+model ResetPassword {
+    token      String   @unique
+    expiryDate DateTime
+    email      String
+}
+
+model Address {
+  addressId                Int                     @id @default(autoincrement())
+  addressName              String
+  line1                    String
+  line2                    String?
+  postalCode               String
+  // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
+  petBusinessId            Int?
+  PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
+  petBusinessApplicationId Int?
+  PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+
+  serviceListings ServiceListing[]
+}
+
+model Pet {
+  petId          Int       @id @default(autoincrement())
+  petName        String
+  petType        PetType  
+  gender         Gender   
+  dateOfBirth    DateTime?
+  petWeight      Float?
+  microchipNumber String?
+  attachmentKeys String[]
+  attachmentURLs String[]
+  dateCreated    DateTime  @default(now())
+  lastUpdated    DateTime?
+
+  petOwnerId     Int
+  petOwner       PetOwner  @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+
+  bookings Booking[]
+}
+
+model PetBusinessApplication {
+    petBusinessApplicationId Int                       @id @default(autoincrement())
+    businessType             BusinessType
+    businessEmail            String
+    businessDescription      String
+    businessAddresses        Address[]
+    websiteURL               String?
+    attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
+    applicationStatus        BusinessApplicationStatus @default(PENDING)
+    adminRemarks             String[]
+    dateCreated              DateTime                  @default(now())
+    lastUpdated              DateTime?
+
+    petBusinessId Int         @unique
+    petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade)
+
+    approverId Int?
+    approver   InternalUser? @relation(fields: [approverId], references: [userId])
+}

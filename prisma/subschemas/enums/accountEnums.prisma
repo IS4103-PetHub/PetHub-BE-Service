@@ -1,0 +1,44 @@
+// enums
+enum AccountStatus {
+    ACTIVE
+    INACTIVE
+    PENDING
+}
+
+enum AccountType {
+    PET_OWNER
+    PET_BUSINESS
+    INTERNAL_USER
+}
+
+enum AdminRole {
+    MANAGER
+    ADMINISTRATOR
+}
+
+enum BusinessType {
+    FNB
+    SERVICE
+    HEALTHCARE
+}
+
+enum BusinessApplicationStatus {
+    PENDING
+    REJECTED // This means require changes, but is named `REJECTED` in all of our external documentation
+    APPROVED
+}
+
+enum Gender {
+    MALE
+    FEMALE
+}
+
+enum PetType {
+    DOG
+    CAT
+    BIRD
+    TERRAPIN
+    RABBIT
+    RODENT
+    OTHERS
+}

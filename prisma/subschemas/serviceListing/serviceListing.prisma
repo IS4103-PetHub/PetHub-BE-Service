@@ -1,0 +1,41 @@
+import {Category} from "../enums/businessLogicEnums"
+import {PetBusiness, Address} from "../user/user"
+import {CalendarGroup, Booking} from "../appointments/appointments"
+import { PetOwner } from "..\user\user"
+
+model ServiceListing {
+  serviceListingId Int       @id @default(autoincrement())
+  title            String
+  description      String
+  basePrice        Float     @default(0)
+  attachmentKeys   String[]
+  attachmentURLs   String[]
+  dateCreated      DateTime  @default(now())
+  lastUpdated      DateTime?
+  duration         Int?
+
+  category Category
+
+  // tags that a service listing has (implicit many-to-many relationship)
+  tags          Tag[]
+  addresses     Address[]
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId Int
+  favouritedUsers PetOwner[]
+
+  calendarGroupId Int?
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: SetNull, onUpdate: Cascade)
+  Booking         Booking[]
+}
+
+// m-n relation type between Tag and ServiceListing: implicit
+// https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#implicit-many-to-many-relations
+model Tag {
+  tagId       Int       @id @default(autoincrement())
+  name        String    @unique
+  dateCreated DateTime  @default(now())
+  lastUpdated DateTime?
+
+  // service listings with this tag (implicit many-to-many relationship)
+  serviceListings ServiceListing[]
+}
