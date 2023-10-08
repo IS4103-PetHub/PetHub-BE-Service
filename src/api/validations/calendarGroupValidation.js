@@ -51,7 +51,12 @@ const recurrenceValidation = () => {
         pattern: Joi.string().valid('DAILY', 'WEEKLY')
             .messages({ 'any.only': 'pattern must be one of [DAILY, WEEKLY].' })
             .required(),
-        startDate: startDateValidation(),
+        startDate: Joi.string()
+            .pattern(/^\d{4}-\d{2}-\d{2}$/)
+            .messages({
+                'string.pattern.base': 'startDate match the required format: YYYY-MM-DD',
+            })
+            .required(),
         endDate: Joi.string()
             .pattern(/^\d{4}-\d{2}-\d{2}$/)
             .custom((value, helpers) => {
