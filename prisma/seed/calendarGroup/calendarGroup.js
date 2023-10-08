@@ -144,9 +144,9 @@ const calendarGroupPayloads = [
   {
     name: "Johns Company testing out their vet services schedule",
     description:
-      "Available slots for vet services. Currently there's only 1 vet at work though, its John himself. \
+      "Available slots for vet services. Currently theres only 1 vet at work though, its John himself. \
       He works alternate weekdays for a month, but wants to go golfing next Wednesday in the morning. \
-      In a month's time, john wants the vet service to operate for a full week, this is because this time of the year there tend to be more pet injuries. \
+      In a months time, john wants the vet service to operate for a full week, this is because this time of the year there tend to be more pet injuries. \
       After that john wants to get back to his usual schedule, but oh he hired a new vet that is slated to start work on this day.",
     scheduleSettings: [
       {
@@ -222,7 +222,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns Pet boarding schedule",
     description:
-      "John's daily pet boarding schedule in preparation for the launch of john's new pet daycare service listing",
+      "Johns daily pet boarding schedule in preparation for the launch of johns new pet daycare service listing",
     scheduleSettings: [
       {
         recurrence: {
