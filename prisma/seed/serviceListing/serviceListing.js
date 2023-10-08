@@ -34,18 +34,6 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 60,
     calendarGroupId: 1,
-    attachmentKeys: [
-      "uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg",
-      "uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg",
-      "uploads/service-listing/img/4f080a86-57d0-4892-bca1-a18e35f59bcf-catgroom.png",
-      "uploads/service-listing/img/2ac17578-8cbf-4d31-9526-204da529af84-images (1).jpg"
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=b50f62bb71f55e6e4430c0221a5c095cad64da06c98446afb8773b229254850f&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=40b1bba9cee1240c65ee8a70e2a051a9fa3e2e8b2e5d9d2bf39191abc3da2628&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/4f080a86-57d0-4892-bca1-a18e35f59bcf-catgroom.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010805Z&X-Amz-Expires=604800&X-Amz-Signature=b5fe99291e3a2fe4fff56d504064620c61b4732cade3fc5268d64babda2b4393&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/2ac17578-8cbf-4d31-9526-204da529af84-images%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=c3c7cd559817f94ecdebf0c52e3a37b3083f2166d63e7497469d2dae2bcaa999&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
   },
   {
     id: 2,
@@ -59,12 +47,6 @@ const serviceListings = [
     addressIds: [{ addressId: 2 }],
     duration: 60,
     calendarGroupId: 4,
-    attachmentKeys: [
-      "uploads/service-listing/img/f2556a5a-2ac6-434f-b4c3-799d46700854-download (1).jpg",
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/f2556a5a-2ac6-434f-b4c3-799d46700854-download%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010929Z&X-Amz-Expires=604800&X-Amz-Signature=89b2ad2bff21a51ae08b813cc90270c195052924f35126a509966653b1522824&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
   },
   {
     id: 3,
@@ -154,6 +136,14 @@ const serviceListings = [
     addressIds: [],
     duration: 60,
     calendarGroupId: 2,
+    attachmentKeys: [
+      "uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg",
+      "uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=b50f62bb71f55e6e4430c0221a5c095cad64da06c98446afb8773b229254850f&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=40b1bba9cee1240c65ee8a70e2a051a9fa3e2e8b2e5d9d2bf39191abc3da2628&X-Amz-SignedHeaders=host&x-id=GetObject",
+    ],
   },
   {
     id: 10,
@@ -166,6 +156,12 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 60,
     calendarGroupId: 3,
+    attachmentKeys: [
+      "uploads/service-listing/img/f2556a5a-2ac6-434f-b4c3-799d46700854-download (1).jpg",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/f2556a5a-2ac6-434f-b4c3-799d46700854-download%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010929Z&X-Amz-Expires=604800&X-Amz-Signature=89b2ad2bff21a51ae08b813cc90270c195052924f35126a509966653b1522824&X-Amz-SignedHeaders=host&x-id=GetObject"
+    ],
   },
   // These service listings (id 11-15) are tagged to petBusinessId [6, 7], who are non-active
   // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
@@ -236,6 +232,18 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 180,
     calendarGroupId: 5,
+    attachmentKeys: [
+      "uploads/service-listing/img/2ac17578-8cbf-4d31-9526-204da529af84-images (1).jpg",
+      "uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg",
+      "uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg",
+      "uploads/service-listing/img/4f080a86-57d0-4892-bca1-a18e35f59bcf-catgroom.png",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/2ac17578-8cbf-4d31-9526-204da529af84-images%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=c3c7cd559817f94ecdebf0c52e3a37b3083f2166d63e7497469d2dae2bcaa999&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=b50f62bb71f55e6e4430c0221a5c095cad64da06c98446afb8773b229254850f&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=40b1bba9cee1240c65ee8a70e2a051a9fa3e2e8b2e5d9d2bf39191abc3da2628&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/4f080a86-57d0-4892-bca1-a18e35f59bcf-catgroom.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010805Z&X-Amz-Expires=604800&X-Amz-Signature=b5fe99291e3a2fe4fff56d504064620c61b4732cade3fc5268d64babda2b4393&X-Amz-SignedHeaders=host&x-id=GetObject",
+    ],
   },
 ];
 
