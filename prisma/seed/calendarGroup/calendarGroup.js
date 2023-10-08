@@ -220,7 +220,7 @@ const calendarGroupPayloads = [
     ],
   },
   {
-    name: "John's Pet boarding schedule",
+    name: "Johns Pet boarding schedule",
     description:
       "John's daily pet boarding schedule in preparation for the launch of john's new pet daycare service listing",
     scheduleSettings: [
@@ -241,7 +241,7 @@ const calendarGroupPayloads = [
     ],
   },
   {
-    name: "John's dog sitting schedule",
+    name: "Johns dog sitting schedule",
     description:
       "John has some free time on wednesdays and saturdays in the evening and wants to do some dog sitting",
     scheduleSettings: [
