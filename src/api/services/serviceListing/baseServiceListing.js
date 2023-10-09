@@ -250,7 +250,11 @@ exports.getServiceListingById = async (serviceListingId) => {
       include: {
         tags: true,
         addresses: true,
-        petBusiness: true,
+        petBusiness: {
+          include: {
+            user: true
+          },
+        },
         CalendarGroup: true
       },
     });
@@ -371,8 +375,8 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
     // Send deletion email if INTERNAL_USER is the one that deleted the service listing and if petBusiness has a business email.
     if (callee.accountType == "INTERNAL_USER") {
       const listingToDelete = await this.getServiceListingById(serviceListingId);
-      if (listingToDelete.petBusiness.businessEmail) {
-        await this.sendDeleteServiceListingEmail(listingToDelete.petBusiness.companyName, listingToDelete.petBusiness.businessEmail, listingToDelete.title);
+      if (listingToDelete.petBusiness.user.email) {
+        await this.sendDeleteServiceListingEmail(listingToDelete.petBusiness.companyName, listingToDelete.petBusiness.user.email, listingToDelete.title);
       }
     }
 
