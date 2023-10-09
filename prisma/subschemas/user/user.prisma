@@ -7,6 +7,8 @@ import { PetOwner } from "..\..\schema"
 import {CalendarGroup} from "../appointments/appointments"
 import { ServiceListing } from "..\..\schema"
 import { Booking } from "..\appointments\appointments"
+import { PetLostAndFound } from "..\petLostAndFound\petLostAndFound"
+import { PetLostAndFound } from "..\..\schema"
 
 // Entities
 model User {
@@ -48,6 +50,7 @@ model PetOwner {
 
     pets Pet[]
     favouriteListings ServiceListing[]
+    petLostAndFound PetLostAndFound[]
 }
 
 model PetBusiness {
@@ -108,6 +111,7 @@ model Pet {
   petOwner       PetOwner  @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
   bookings Booking[]
+  petLostAndFound PetLostAndFound[]
 }
 
 model PetBusinessApplication {

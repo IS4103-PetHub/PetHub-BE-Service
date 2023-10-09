@@ -1,0 +1,261 @@
+swagger: '2.0'
+
+paths:
+  /api/lost-and-found/health-check:
+    get:
+      summary: Test endpoint to check if the Pet API is working
+      responses:
+        200:
+          description: API is working
+      tags:
+        - Health
+
+  /api/lost-and-found:
+    get:
+      summary: Get lost and found pets
+      parameters:
+        - name: requestType
+          in: query
+          description: Filter by request type (LOST_PET, FOUND_PET, or empty for both)
+          required: false
+          type: string
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of lost and found pets
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PetLostAndFound'
+      tags:
+        - Pets Lost and Found
+    
+    post:
+      summary: Create a new pet lost and found record
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: petOwnerId
+          in: query
+          description: The ID of the pet owner.
+          required: true
+          type: integer
+        - name: title
+          in: formData
+          description: The title of the pet lost and found record.
+          required: true
+          type: string
+        - name: description
+          in: formData
+          description: The description of the pet lost and found record.
+          required: true
+          type: string
+        - name: requestType
+          in: formData
+          description: The request type (e.g., LOST_PET, FOUND_PET).
+          required: true
+          type: string
+        - name: lastSeenDate
+          in: formData
+          description: The last seen date and time.
+          required: true
+          type: string
+        - name: lastSeenLocation
+          in: formData
+          description: The last seen location.
+          required: true
+          type: string
+        - name: petId
+          in: formData
+          description: The ID of the pet (optional).
+          required: false
+          type: string
+        - name: file
+          in: formData
+          description: The file attachment (optional).
+          required: false
+          type: file
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Pet lost and found record created successfully
+          schema:
+            $ref: '#/definitions/PetLostAndFound'
+      tags:
+        - Pets Lost and Found
+  
+  /api/lost-and-found/pet-owner/{petOwnerId}:
+    get:
+      summary: Get pet lost and found records for a specific pet owner
+      parameters:
+        - name: petOwnerId
+          in: path
+          description: The ID of the pet owner.
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of pet lost and found records for the specified pet owner
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PetLostAndFound'
+      tags:
+        - Pets Lost and Found
+
+  /api/lost-and-found/{petLostAndFoundId}:
+    put:
+      summary: Update a pet lost and found record by ID
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: petLostAndFoundId
+          in: path
+          description: The ID of the pet lost and found record to update.
+          required: true
+          type: integer
+        - name: title
+          in: formData
+          description: The updated title of the pet lost and found record.
+          required: true
+          type: string
+        - name: description
+          in: formData
+          description: The updated description of the pet lost and found record.
+          required: true
+          type: string
+        - name: requestType
+          in: formData
+          description: The updated request type (e.g., LOST_PET, FOUND_PET).
+          required: true
+          type: string
+        - name: lastSeenDate
+          in: formData
+          description: The updated last seen date and time.
+          required: true
+          type: string
+        - name: lastSeenLocation
+          in: formData
+          description: The updated last seen location.
+          required: true
+          type: string
+        - name: petId
+          in: formData
+          description: The updated ID of the pet (optional).
+          required: false
+          type: string
+        - name: file
+          in: formData
+          description: The updated file attachment (optional).
+          required: false
+          type: file
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Pet lost and found record updated successfully
+          schema:
+            $ref: '#/definitions/PetLostAndFound'
+      tags:
+        - Pets Lost and Found
+    delete:
+        summary: Delete a pet lost and found record by ID
+        parameters:
+          - name: petLostAndFoundId
+            in: path
+            description: The ID of the pet lost and found record to delete.
+            required: true
+            type: integer
+        produces:
+          - application/json
+        responses:
+          200:
+            description: Pet lost and found record deleted successfully
+        tags:
+          - Pets Lost and Found
+
+definitions:
+  PetLostAndFound:
+    type: object
+    properties:
+      petLostAndFoundId:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      requestType:
+        type: string
+      lastSeenDate:
+        type: string
+        format: date-time
+      lastSeenLocation:
+        type: string
+      attachmentKeys:
+        type: array
+        items:
+          type: string
+      attachmentURLs:
+        type: array
+        items:
+          type: string
+      petId:
+        type: integer
+      userId:
+        type: integer
+      pet:
+        $ref: '#/definitions/Pet'
+      petOwner:
+        $ref: '#/definitions/PetOwner'
+  Pet:
+    type: object
+    properties:
+      petId:
+        type: integer
+      petName:
+        type: string
+      petType:
+        type: string
+      gender:
+        type: string
+      dateOfBirth:
+        type: string
+        format: date-time
+      petWeight:
+        type: number
+      microchipNumber:
+        type: string
+      attachmentKeys:
+        type: array
+        items:
+          type: string
+      attachmentURLs:
+        type: array
+        items:
+          type: string
+      dateCreated:
+        type: string
+        format: date-time
+      lastUpdated:
+        type: string
+        format: date-time
+      petOwnerId:
+        type: integer
+  PetOwner:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+      contactNumber:
+        type: string
+      dateOfBirth:
+        type: string
+        format: date-time
+      userId:
+        type: integer
