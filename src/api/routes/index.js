@@ -16,6 +16,7 @@ const authRoutes = require("./auth");
 const petBusinessApplicationRoutes = require("./petBusinessApplicationRoutes");
 const calendarGroupRoutes = require('./calendarGroupRoutes')
 const bookingRoutes = require('./bookingRoutes')
+const paymentRoutes = require('./paymentRoutes')
 
 // Use route modules
 router.use("/users", userRoutes);
@@ -27,5 +28,6 @@ router.use("/", authRoutes);
 router.use("/pb-applications", petBusinessApplicationRoutes);
 router.use("/calendar-groups", calendarGroupRoutes);
 router.use("/bookings", bookingRoutes);
+router.use("/payments", paymentRoutes);
 
 module.exports = router;
