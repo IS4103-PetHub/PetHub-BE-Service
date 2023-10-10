@@ -380,7 +380,8 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
       }
     }
 
-    await this.deleteFilesOfAServiceListing(serviceListingId);
+    // TODO: Will uncomment after presentation is over to prevent accidental deletion
+    // await this.deleteFilesOfAServiceListing(serviceListingId);
     await prisma.serviceListing.delete({
       where: { serviceListingId },
     });
