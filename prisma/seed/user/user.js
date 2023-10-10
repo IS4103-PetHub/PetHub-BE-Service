@@ -113,7 +113,8 @@ const petBusinesses = [
     contactNumber: "88712892",
     businessAddresses: [{ addressId: 3 }, { addressId: 4 }],
     businessDescription: "My Pet Shop is your one-stop destination for all your feline grooming needs. We are dedicated to providing the best grooming experience for cats of all breeds and sizes. Our passionate team of cat groomers is well-trained in handling cats with care and patience, ensuring a stress-free grooming session.\n\nWe understand that cats have unique grooming requirements, and we tailor our services to meet those needs. From fur brushing to nail trimming and ear cleaning to baths, we offer a comprehensive range of grooming services.\n\nAt Smith's Pet Shop, we believe that a well-groomed cat is a happy and healthy cat. Our grooming sessions not only keep your cats clean but also help in early detection of any health issues. We use premium, cat-friendly grooming products to ensure your cat's comfort and safety.\n\nVisit our website at https://www.google.com to explore our services and book an appointment. Let us pamper your feline friend and keep them looking and feeling their best!",
-    businessEmail: "janeSmithPet.com",
+    websiteURL: "https://www.janeSmithMOW.com",
+    businessEmail: "janeSmithPet@gmail.com",
     businessType: BusinessType.SERVICE,
     petBusinessApplication: {
       businessType: "SERVICE",
@@ -133,7 +134,7 @@ const petBusinesses = [
     contactNumber: "97128913",
     businessAddresses: [{ addressId: 5 }],
     businessDescription: "I like pets",
-    businessEmail: "biz3@example.com",
+    businessEmail: "mikePets@gmail.com",
     websiteURL: "https://www.mikePetBiz.com",
     businessType: BusinessType.SERVICE,
     petBusinessApplication: {
@@ -154,7 +155,8 @@ const petBusinesses = [
     contactNumber: "98765432",
     businessAddresses: [{ addressId: 6 }],
     businessDescription: "We groom rabbits",
-    businessEmail: "https://www.susanAnimal.com",
+    websiteURL: "https://www.susanAnimal.com",
+    businessEmail: "susanLovesDogs@hotmail.com",
     businessType: BusinessType.SERVICE,
     petBusinessApplication: {
       businessType: "SERVICE",
@@ -491,6 +493,7 @@ async function seedUser(prisma) {
             businessEmail: pb.businessEmail,
             businessDescription: pb.businessDescription,
             businessType: pb.businessType,
+            websiteURL: pb.websiteURL,
             petBusinessApplication: {
               create: pb.petBusinessApplication,
             },
