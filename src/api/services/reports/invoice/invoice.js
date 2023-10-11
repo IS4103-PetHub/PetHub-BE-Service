@@ -49,14 +49,14 @@ function generateTableHeader(doc, baseYValue) {
 
 /* =============================================== Header functions ============================================ */
 
-function generatePethubInfo(doc) {
+function generatePethubInfo(doc, invoiceNumber) {
   doc.fontSize(20).font("Helvetica-Bold").text("PetHub Pte Ltd").moveDown();
   doc
     .fillColor("#000000")
     .fontSize(10)
     .text("Invoice Number:")
     .font("Helvetica")
-    .text("IN04102023-1")
+    .text(invoiceNumber)
     .moveDown();
   doc
     .font("Helvetica-Bold")

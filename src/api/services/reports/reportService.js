@@ -13,10 +13,10 @@ const {
 class ReportService {
   constructor() {}
 
-  generateInvoice(data, fileName) {
+  generateInvoice(data, invoiceNumber) {
     let doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true });
     // header
-    invoiceGeneratePethubInfo(doc);
+    invoiceGeneratePethubInfo(doc, invoiceNumber);
     invoiceGeneratePethubImage(doc);
 
     // order summary
@@ -34,7 +34,7 @@ class ReportService {
     invoiceGeneratePageNumbers(doc);
 
     doc.end();
-    doc.pipe(fs.createWriteStream(fileName)); // Pipe to a file on local first for testing, later can change to pipe to blob for s3
+    doc.pipe(fs.createWriteStream(invoiceNumber + ".pdf")); // Pipe to a file on local first for testing, later can change to pipe to blob for s3
   }
 }
 
