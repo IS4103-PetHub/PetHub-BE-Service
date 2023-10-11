@@ -1,3 +1,6 @@
+const fetch = require('node-fetch');
+const s3ServiceInstance = require('../../../src/api/services/s3Service');
+
 const tags = [
   {
     id: 1,
@@ -20,6 +23,47 @@ const tags = [
     name: "Adoption",
   }
 ];
+
+const groomingUrls = [
+  {
+    url: "https://bpanimalhospital.com/wp-content/uploads/shutterstock_1547371985.jpg",
+    name: "dog_grooming_1"
+  },
+  {
+    url: "https://images.squarespace-cdn.com/content/v1/5dda8663782768313a35b549/1626234766844-5DT4FUEXOY0YSBWOYM7U/Ultimate+List+Of+Best+Dog+Groomers+Singapore",
+    name: "dog_grooming_2"
+  },
+  {
+    url: "https://assets.petco.com/petco/image/upload/f_auto,q_auto:best/grooming-lp-by-appointment-bath-and-haircut-img-1000x667",
+    name: "dog_grooming_3"
+  },
+  {
+    url: "https://assets3.thrillist.com/v1/image/3059921/1200x630/flatten;crop_down;webp=auto;jpeg_quality=70",
+    name: "cat_grooming_1"
+  },
+]
+
+const vetUrls = [
+  {
+    url: "https://i.insider.com/5d289d6921a86120285e5e24?width=700",
+    name: "dog_vet_1"
+  },
+  {
+    url: "https://www.vetmed.com.au/wp-content/uploads/2019/03/How-to-Choose-Right-Vet-Clinic-for-Your-Multi-Breeds-Pets.jpg",
+    name: "dog_vet_2"
+  },
+  {
+    url: "https://img1.wsimg.com/isteam/ip/3b648486-0d2e-4fcd-8deb-ddb6ce935eb3/blob-0010.png",
+    name: "dog_vet_3"
+  },
+]
+
+const sittingUrls = [
+  {
+    url: "https://i.cbc.ca/1.6654160.1668638085!/fileImage/httpImage/image.jpg_gen/derivatives/original_780/what-to-consider-when-looking-for-a-pet-sitter.jpg",
+    name: "dog_sitting_1"
+  }
+]
 
 const serviceListings = [
   {
@@ -136,14 +180,6 @@ const serviceListings = [
     addressIds: [],
     duration: 60,
     calendarGroupId: 2,
-    attachmentKeys: [
-      "uploads/service-listing/img/ea56479b-a07b-4352-8112-b476353774fe-grooming2.jpg",
-      "uploads/service-listing/img/b95d123a-73c3-45c9-98bf-2496d3352a81-pet-grooming.jpg"
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ea56479b-a07b-4352-8112-b476353774fe-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140132Z&X-Amz-Expires=604800&X-Amz-Signature=3b39b2a907921878403968a6736dc2abcd4398300225ee4b9dcfce3a480cb580&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/b95d123a-73c3-45c9-98bf-2496d3352a81-pet-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140132Z&X-Amz-Expires=604800&X-Amz-Signature=b0384c71534bc78aef011309010403ce439e5637ef85f774a03891d075f44c2d&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
   },
   {
     id: 10,
@@ -156,12 +192,6 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 60,
     calendarGroupId: 3,
-    attachmentKeys: [
-      "uploads/service-listing/img/8e4c5b95-ba18-429a-9742-1ca8beb5fa5d-download (1).jpg"
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/8e4c5b95-ba18-429a-9742-1ca8beb5fa5d-download%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140050Z&X-Amz-Expires=604800&X-Amz-Signature=bf9a77561c75bb5f9bebbbd72d7e33c232160b1e2a73163f6d0037ea5886db06&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
   },
   // These service listings (id 11-15) are tagged to petBusinessId [6, 7], who are non-active
   // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
@@ -232,22 +262,37 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 180,
     calendarGroupId: 5,
-    attachmentKeys: [
-      "uploads/service-listing/img/2c53fa30-4108-40c7-8ade-9984e3153d75-catgroom.png",
-      "uploads/service-listing/img/fcff9e0e-82f9-4cf4-8fba-86d22dc5c655-Cover-2-Opt.jpg",
-      "uploads/service-listing/img/e423fad5-b40f-4646-b5fb-7a5d2b3e151a-grooming.jpg",
-      "uploads/service-listing/img/361f4ca4-303c-4a17-b9d2-f4538dacec74-grooming2.jpg"
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/2c53fa30-4108-40c7-8ade-9984e3153d75-catgroom.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140010Z&X-Amz-Expires=604800&X-Amz-Signature=127a643cb7e46d85685093b75f45f1c7edfcaf9ba59b995a3efc798152d9a2b3&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/fcff9e0e-82f9-4cf4-8fba-86d22dc5c655-Cover-2-Opt.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140010Z&X-Amz-Expires=604800&X-Amz-Signature=b1a0174ada09e43875fc39863c88f0cef66c234a1499a9f6211b18d3fbd93083&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/e423fad5-b40f-4646-b5fb-7a5d2b3e151a-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140010Z&X-Amz-Expires=604800&X-Amz-Signature=23776b6177cb24b0e4736cc735347088c99d138d37ab6018172c91dd930fbb14&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/361f4ca4-303c-4a17-b9d2-f4538dacec74-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T140010Z&X-Amz-Expires=604800&X-Amz-Signature=1f094525577d87499c86559baa88785fb78bb130cd7d40832eaf41827fe69297&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
   },
 ];
 
 async function seedBusinessData(prisma) {
+
+  const groomingFiles = [];
+  for (const imageUrl of groomingUrls) {
+    const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
+    groomingFiles.push(file);
+  }
+  
+  const groomingKey = await s3ServiceInstance.uploadImgFiles(groomingFiles, 'service-listing')
+  const groomingUrl = await s3ServiceInstance.getObjectSignedUrl(groomingKey)
+
+  const vetFiles = [];
+  for (const imageUrl of vetUrls) {
+    const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
+    vetFiles.push(file);
+  }
+  const vetKey = await s3ServiceInstance.uploadImgFiles(vetFiles, 'service-listing')
+  const vetUrl = await s3ServiceInstance.getObjectSignedUrl(vetKey)
+
+  const sittingFiles = [];
+  for (const imageUrl of sittingUrls) {
+    const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
+    sittingFiles.push(file);
+  }
+  const sittingKey = await s3ServiceInstance.uploadImgFiles(sittingFiles, 'service-listing')
+  const sittingUrl = await s3ServiceInstance.getObjectSignedUrl(sittingKey)
+
+
   for (const tag of tags) {
     await prisma.tag.upsert({
       where: { tagId: tag.id },
@@ -278,9 +323,21 @@ async function seedBusinessData(prisma) {
       },
     };
     
-    if (data.attachmentKeys && data.attachmentURLs) {
-      createObject.attachmentKeys = data.attachmentKeys;
-      createObject.attachmentURLs = data.attachmentURLs;
+    switch (data.id) {
+      case 9:
+        createObject.attachmentKeys = groomingKey;
+        createObject.attachmentURLs = groomingUrl;
+        break;
+      case 10:
+        createObject.attachmentKeys = vetKey;
+        createObject.attachmentURLs = vetUrl;
+        break;
+      case 16:
+        createObject.attachmentKeys = sittingKey;
+        createObject.attachmentURLs = sittingUrl;
+        break;
+      default:
+        break;
     }
 
     // Check if data.calendarGroupId exists before adding it to createObject
@@ -295,6 +352,20 @@ async function seedBusinessData(prisma) {
       update: {},
       create: createObject,
     });
+  }
+}
+
+async function remoteImageUrlToFile(url, filename) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch the image: ${response.status} - ${response.statusText}`);
+    }
+    const buffer = await response.buffer();
+    return { buffer: buffer, originalname: filename };
+  } catch (error) {
+    console.error('Error converting remote image to File:', error);
+    throw error;
   }
 }
 
