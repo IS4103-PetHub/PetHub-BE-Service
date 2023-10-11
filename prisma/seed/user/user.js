@@ -95,6 +95,7 @@ const petBusinesses = [
     websiteURL: "https://www.johnDoe.com",
     businessEmail: "biz1@example.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz1@example.com",
@@ -116,6 +117,7 @@ const petBusinesses = [
     websiteURL: "https://www.janeSmithMOW.com",
     businessEmail: "janeSmithPet@gmail.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "janeSmithPet.com",
@@ -137,6 +139,7 @@ const petBusinesses = [
     businessEmail: "mikePets@gmail.com",
     websiteURL: "https://www.mikePetBiz.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz3@example.com",
@@ -158,6 +161,7 @@ const petBusinesses = [
     websiteURL: "https://www.susanAnimal.com",
     businessEmail: "susanLovesDogs@hotmail.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz4@example.com",
@@ -179,6 +183,7 @@ const petBusinesses = [
     websiteURL: "https://www.google.com",
     businessEmail: "linensoda@gmail.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "linensoda@gmail.com",
@@ -199,6 +204,7 @@ const nonActivePetBusinesses = [
     companyName: "Groomer1",
     uen: "12345678E",
     contactNumber: "91627863",
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz6@example.com",
@@ -215,6 +221,7 @@ const nonActivePetBusinesses = [
     companyName: "Groomer2",
     uen: "12345678E",
     contactNumber: "87168812",
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz7@example.com",
@@ -234,12 +241,13 @@ const nonActivePetBusinesses = [
     companyName: "Groomer3",
     uen: "12345678E",
     contactNumber: "83192732",
+    commissionRuleId: 1,
   },
 ];
 
 const petOwners = [
   {
-    id:  9,
+    id: 9,
     email: "petowner2@example.com",
     password: commonPassword,
     firstName: "Li",
@@ -494,6 +502,7 @@ async function seedUser(prisma) {
             businessDescription: pb.businessDescription,
             businessType: pb.businessType,
             websiteURL: pb.websiteURL,
+            commissionRuleId: 1,
             petBusinessApplication: {
               create: pb.petBusinessApplication,
             },
@@ -508,6 +517,7 @@ async function seedUser(prisma) {
       companyName: pb.companyName,
       uen: pb.uen,
       contactNumber: pb.contactNumber,
+      commissionRuleId: 1,
     };
     if ([6, 7].includes(pb.id)) {
       petBusinessData.petBusinessApplication = {

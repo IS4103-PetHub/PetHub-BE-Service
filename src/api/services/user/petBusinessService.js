@@ -5,6 +5,7 @@ const UserError = require("../../errors/userError");
 const CustomError = require("../../errors/customError");
 const validations = require("../../validations");
 const AddressService = require("./addressService");
+const constants = require("../../../constants/common");
 
 // Shared selection fields
 const petBusinessSelectFields = {
@@ -62,6 +63,7 @@ class PetBusinessService extends BaseUserService {
               businessDescription: data.businessDescription,
               contactNumber: data.contactNumber,
               websiteURL: data.websiteURL,
+              commissionRuleId: constants.DEFAULT_CR_ID,
             },
           },
         },
