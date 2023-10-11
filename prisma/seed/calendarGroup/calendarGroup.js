@@ -40,7 +40,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns Company Normal grooming facilities schedule",
     description:
-      "Available slots for grooming services: More groomers available in the afternoon and the earliest Thursday 1 week from now is a public holiday.",
+      "Available slots for grooming services. More groomers available in the afternoon and the earliest Thursday 1 week from now is a public holiday.",
     scheduleSettings: [
       {
         days: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
