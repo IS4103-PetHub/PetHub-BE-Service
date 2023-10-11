@@ -40,7 +40,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns Company Normal grooming facilities schedule",
     description:
-      "Available slots for grooming services: More groomers available in the afternoon and the earliest Thursday 1 week from now is a public holiday.",
+      "Available slots for grooming services. More groomers available in the afternoon and the earliest Thursday 1 week from now is a public holiday.",
     scheduleSettings: [
       {
         days: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
@@ -91,7 +91,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns company VIP grooming facilities schedule",
     description:
-      "Available slots for grooming services: After 1 week the VIP groomer is also available to work on Sundays for a while. \
+      "Available slots for grooming services. After 1 week the VIP groomer is also available to work on Sundays for a while. \
       After a month the VIP groomer can only do weekends, but a new VIP groomer is hired then",
     scheduleSettings: [
       {
