@@ -91,7 +91,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns company VIP grooming facilities schedule",
     description:
-      "Available slots for grooming services: After 1 week the VIP groomer is also available to work on Sundays for a while. \
+      "Available slots for grooming services. After 1 week the VIP groomer is also available to work on Sundays for a while. \
       After a month the VIP groomer can only do weekends, but a new VIP groomer is hired then",
     scheduleSettings: [
       {
