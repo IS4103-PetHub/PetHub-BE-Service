@@ -1,0 +1,75 @@
+swagger: '2.0'
+definitions:
+  PaymentRequest:
+    type: object
+    properties:
+      paymentMethodId:
+        type: string
+        description: The ID of the payment method.
+      amount:
+        type: integer
+        description: The payment amount.
+      userId:
+        type: integer
+        description: The ID of the user.
+      itemCount:
+        type: string
+        description: The number of items in the cart.
+      cartItems:
+        type: array
+        items:
+          type: object
+          properties:
+            serviceListingId:
+              type: integer
+              description: The ID of the service listing.
+            quantity:
+              type: integer
+              description: The quantity of the item.
+            cartItemId:
+              type: integer
+              description: The ID of the cart item.
+    example:
+      paymentMethodId: "pm_card_visa"
+      amount: 1700
+      userId: 9
+      itemCount: "8"
+      cartItems:
+        - serviceListingId: 10
+          quantity: 3
+          cartItemId: 1
+        - serviceListingId: 4
+          quantity: 1
+          cartItemId: 2
+        - serviceListingId: 7
+          quantity: 1
+          cartItemId: 3
+  # wil change when OrderItems and Invoice is generated
+  PaymentResponse:
+    type: object
+    properties:
+      paymentIntentId:
+        type: string
+        description: The unique identifier of the payment intent.
+
+paths:
+  /api/payments/checkout:
+    post:
+      summary: Checkout --> Make payment and create order items
+      requestBody:
+        description: Payment details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/PaymentRequest'
+        
+      responses:
+        200:
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/PaymentResponse'
+      tags:
+          - Payments
