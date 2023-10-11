@@ -199,11 +199,11 @@ function generatePageNumbers(doc) {
 }
 
 module.exports = {
-  generatePethubInfo,
-  generatePethubImage,
-  generateCustomerInfo,
-  generateItems,
-  generateTotals,
-  generateFooter,
-  generatePageNumbers,
+  invoiceGeneratePethubInfo: generatePethubInfo,
+  invoiceGeneratePethubImage: generatePethubImage,
+  invoiceGenerateCustomerInfo: generateCustomerInfo,
+  invoiceGenerateItems: generateItems,
+  invoiceGenerateTotals: generateTotals,
+  invoiceGenerateFooter: generateFooter,
+  invoiceGeneratePageNumbers: generatePageNumbers,
 };
