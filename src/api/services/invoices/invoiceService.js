@@ -1,6 +1,4 @@
-const fs = require("fs");
-const PDFDocument = require("pdfkit");
-const InvoiceData = require("./invoiceData.json");
+const sampleOrderData = require("./sampleOrderData.json");
 const ReportService = require("../reports/reportService.js");
 
 class InvoiceService {
@@ -15,4 +13,4 @@ class InvoiceService {
 module.exports = new InvoiceService();
 
 // Test invoice generation: in src\api\services\invoices: `node invoiceService.js`
-ReportService.generateInvoice(InvoiceData, "TEST_INVOICE.pdf");
+ReportService.generateInvoice(sampleOrderData, "TEST_INVOICE.pdf");

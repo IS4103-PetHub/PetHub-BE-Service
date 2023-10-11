@@ -29,19 +29,20 @@ function formatDate(date) {
   return day + "/" + month + "/" + year;
 }
 
-function generateTableRow(doc, y, item, title, voucher, duration, price) {
+function generateTableRow(doc, y, item, itemName, voucherCode, quantity, itemPrice, lineTotal) {
   doc
-    .fontSize(10)
+    .fontSize(8)
     .text(item, PAGE_MARGIN, y)
-    .text(title, 120, y)
-    .text(voucher, 320, y)
-    .text(duration, 390, y, { width: 90, align: "right" })
-    .text(price, 0, y, { align: "right" });
+    .text(itemName, 100, y)
+    .text(voucherCode, 280, y)
+    .text(quantity, 320, y, { width: 90, align: "right" })
+    .text(itemPrice, 385, y, { width: 90, align: "right" })
+    .text(lineTotal, 0, y, { align: "right" });
 }
 
 function generateTableHeader(doc, baseYValue) {
   doc.font("Helvetica-Bold");
-  generateTableRow(doc, baseYValue, "Item", "Title", "Voucher", "Duration", "Price");
+  generateTableRow(doc, baseYValue, "Item", "Title", "Voucher Code", "Quantity", "Unit Price", "Line Total");
   generateHr(doc, baseYValue + 20);
   doc.font("Helvetica");
 }
@@ -94,12 +95,12 @@ function generateCustomerInfo(doc, data) {
   doc
     .font("Helvetica")
     .fontSize(10)
-    .text("Order Number:", colOneXValue, baseYValue)
-    .text(data.invoice_nr, colTwoXValue, baseYValue)
+    .text("Payment ID:", colOneXValue, baseYValue)
+    .text(data.paymentId, colTwoXValue, baseYValue)
     .text("Order Date:", colOneXValue, baseYValue + lineBreakYValue)
     .text(formatDate(new Date()), colTwoXValue, baseYValue + lineBreakYValue)
     .text("Total Paid:", colOneXValue, baseYValue + 2 * lineBreakYValue)
-    .text(formatCurrency(data.paid), colTwoXValue, baseYValue + 2 * lineBreakYValue);
+    .text(formatCurrency(data.totalPrice), colTwoXValue, baseYValue + 2 * lineBreakYValue);
 
   doc
     .text(data.customer.name, colThreeXValue, baseYValue)
@@ -142,10 +143,11 @@ function generateItems(doc, data) {
       doc,
       yPosition,
       i + 1,
-      item.title,
-      "PH-AD145F5X32",
-      item.duration + "m",
-      formatCurrency(item.basePrice)
+      item.itemName,
+      item.voucherCode,
+      item.quantity,
+      formatCurrency(item.itemPrice),
+      formatCurrency(item.quantity * item.itemPrice)
     );
     generateHr(doc, yPosition + 20);
   }
@@ -154,19 +156,20 @@ function generateItems(doc, data) {
 
 function generateTotals(doc, data, yStartPosition) {
   const lineBreakYValue = 20;
-  const gstDetails = getGSTDetails(data.paid);
+  const gstDetails = getGSTDetails(data.totalPrice);
 
   doc.font("Helvetica-Bold");
-  generateTableRow(doc, yStartPosition, "", "", "", "Subtotal", gstDetails.totalWithout);
-  generateTableRow(doc, yStartPosition + lineBreakYValue, "", "", "", "GST (8%)", gstDetails.amount);
+  generateTableRow(doc, yStartPosition, "", "", "", "", "Subtotal", gstDetails.totalWithout);
+  generateTableRow(doc, yStartPosition + lineBreakYValue, "", "", "", "", "GST (8%)", gstDetails.amount);
   generateTableRow(
     doc,
     yStartPosition + 2 * lineBreakYValue,
     "",
     "",
     "",
+    "",
     "Amount Paid",
-    formatCurrency(data.paid)
+    formatCurrency(data.totalPrice)
   );
   generateHr(doc, yStartPosition + 3 * lineBreakYValue, false, true);
   generateHr(doc, yStartPosition + 3 * lineBreakYValue + 2, false, true);

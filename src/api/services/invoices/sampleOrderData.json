@@ -1,0 +1,88 @@
+{
+  "customer": {
+    "name": "John Doe",
+    "email": "johndoe@gmail.com",
+    "contact": "12312312"
+  },
+  "items": [
+    {
+      "orderItemId": 1,
+      "itemName": "Professional Pet Grooming",
+      "itemPrice": 40,
+      "duration": 60,
+      "quantity": 2,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "John's Company"
+      }
+    },
+    {
+      "orderItemId": 2,
+      "itemName": "Dog Training Session",
+      "itemPrice": 60,
+      "duration": 60,
+      "quantity": 1,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "John's Company"
+      }
+    },
+    {
+      "orderItemId": 3,
+      "itemName": "Adopt a Pet Today",
+      "itemPrice": 0,
+      "duration": 60,
+      "quantity": 1,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "PetStore123"
+      }
+    },
+    {
+      "orderItemId": 4,
+      "itemName": "Routine Pet Health Checkup",
+      "itemPrice": 75,
+      "duration": 60,
+      "quantity": 4,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "John's Company"
+      }
+    },
+    {
+      "orderItemId": 5,
+      "itemName": "Reliable Pet Sitting Service",
+      "itemPrice": 50.5,
+      "duration": 60,
+      "quantity": 3,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "Susan's Animal Store"
+      }
+    },
+    {
+      "orderItemId": 4,
+      "itemName": "Routine Pet Health Checkup",
+      "itemPrice": 75,
+      "duration": 60,
+      "quantity": 4,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "John's Company"
+      }
+    },
+    {
+      "orderItemId": 5,
+      "itemName": "Reliable Pet Sitting Service",
+      "itemPrice": 50.5,
+      "duration": 60,
+      "quantity": 3,
+      "voucherCode": "PH945683",
+      "petBusiness": {
+        "companyName": "Susan's Animal Store"
+      }
+    }
+  ],
+  "totalPrice": 8000,
+  "paymentId": "STRIPE-123154"
+}
