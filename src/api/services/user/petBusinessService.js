@@ -20,6 +20,7 @@ const petBusinessSelectFields = {
       petBusinessApplicationId: true,
     },
   },
+  commissionRule: true,
   contactNumber: true,
   websiteURL: true,
   userId: true,
