@@ -15,6 +15,7 @@ model ServiceListing {
   duration          Int?
   defaultExpiryDays Int? // Number of days from purchase for the default expiry
   lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
+  requiresBooking   Boolean   @default(false)
 
   category Category
 

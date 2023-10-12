@@ -20,10 +20,11 @@ model Invoice {
 }
 
 enum OrderItemStatus {
-  PENDING // Ordered but not yet fulfilled
+  PENDING_BOOKING // This OrderItem needs a booking, but user has not booked yet
+  PENDING_FULFILLMENT // Ordered (booked, or not) but not yet fulfilled
   FULFILLED // Service has been delivered
+  PAID_OUT // Revenue for this service has been paid out to PBs
   REFUNDED // Service is refunded
-  PAID_OUT // Earnings paid out to Pet Businesses
   EXPIRED // Service has expired without being fulfilled or refunded
 }
 
