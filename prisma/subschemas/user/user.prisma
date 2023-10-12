@@ -1,53 +1,52 @@
-import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus} from "../enums/accountEnums"
+import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus, Gender, PetType} from "../enums/accountEnums"
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
-import { PetBusiness } from "..\..\schema"
-import { Gender, PetType } from "..\enums\accountEnums"
-import { PetOwner } from "..\..\schema"
-import {CalendarGroup} from "../appointments/appointments"
-import { ServiceListing } from "..\..\schema"
-import { Booking } from "..\appointments\appointments"
+import {CalendarGroup, Booking} from "../appointments/appointments"
+import { OrderItem, Invoice, RefundRequest } from "../finance/transactions"
+import { CommissionRule } from "../finance/commissions"
 
 // Entities
 model User {
-    userId        Int           @id @default(autoincrement())
-    email         String        @unique
-    password      String
-    accountType   AccountType
-    accountStatus AccountStatus @default(ACTIVE)
-    dateCreated   DateTime      @default(now())
-    lastUpdated   DateTime?
+  userId        Int           @id @default(autoincrement())
+  email         String        @unique
+  password      String
+  accountType   AccountType
+  accountStatus AccountStatus @default(ACTIVE)
+  dateCreated   DateTime      @default(now())
+  lastUpdated   DateTime?
 
-    // Enforcement of email being associated only with one type of account
-    // must be implemented in your application logic as Prisma does not
-    // support multi-table unique constraints
-    internalUser        InternalUser?
-    petOwner            PetOwner?
-    petBusiness         PetBusiness?
-    UserGroupMembership UserGroupMembership[]
+  // Enforcement of email being associated only with one type of account
+  // must be implemented in your application logic as Prisma does not
+  // support multi-table unique constraints
+  internalUser        InternalUser?
+  petOwner            PetOwner?
+  petBusiness         PetBusiness?
+  UserGroupMembership UserGroupMembership[]
 }
 
 model InternalUser {
-    firstName                       String
-    lastName                        String
-    adminRole                       AdminRole
-    approvedPetBusinessApplications PetBusinessApplication[]
+  firstName                       String
+  lastName                        String
+  adminRole                       AdminRole
+  approvedPetBusinessApplications PetBusinessApplication[]
 
-    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    userId Int  @id @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 }
 
 model PetOwner {
-    firstName     String
-    lastName      String
-    contactNumber String
-    dateOfBirth   DateTime
+  firstName     String
+  lastName      String
+  contactNumber String
+  dateOfBirth   DateTime
 
-    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    userId Int  @id @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 
-    pets Pet[]
-    favouriteListings ServiceListing[]
+  pets              Pet[]
+  favouriteListings ServiceListing[]
+  invoices          Invoice[]
+  RefundRequest     RefundRequest[]
 }
 
 model PetBusiness {
@@ -68,12 +67,16 @@ model PetBusiness {
   user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId        Int             @id @unique
   CalendarGroup CalendarGroup[]
+  RefundRequest RefundRequest[]
+
+  commissionRuleId Int?
+  commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
 }
 
 model ResetPassword {
-    token      String   @unique
-    expiryDate DateTime
-    email      String
+  token      String   @unique
+  expiryDate DateTime
+  email      String
 }
 
 model Address {
@@ -92,40 +95,40 @@ model Address {
 }
 
 model Pet {
-  petId          Int       @id @default(autoincrement())
-  petName        String
-  petType        PetType  
-  gender         Gender   
-  dateOfBirth    DateTime?
-  petWeight      Float?
+  petId           Int       @id @default(autoincrement())
+  petName         String
+  petType         PetType
+  gender          Gender
+  dateOfBirth     DateTime?
+  petWeight       Float?
   microchipNumber String?
-  attachmentKeys String[]
-  attachmentURLs String[]
-  dateCreated    DateTime  @default(now())
-  lastUpdated    DateTime?
+  attachmentKeys  String[]
+  attachmentURLs  String[]
+  dateCreated     DateTime  @default(now())
+  lastUpdated     DateTime?
 
-  petOwnerId     Int
-  petOwner       PetOwner  @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
   bookings Booking[]
 }
 
 model PetBusinessApplication {
-    petBusinessApplicationId Int                       @id @default(autoincrement())
-    businessType             BusinessType
-    businessEmail            String
-    businessDescription      String
-    businessAddresses        Address[]
-    websiteURL               String?
-    attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
-    applicationStatus        BusinessApplicationStatus @default(PENDING)
-    adminRemarks             String[]
-    dateCreated              DateTime                  @default(now())
-    lastUpdated              DateTime?
+  petBusinessApplicationId Int                       @id @default(autoincrement())
+  businessType             BusinessType
+  businessEmail            String
+  businessDescription      String
+  businessAddresses        Address[]
+  websiteURL               String?
+  attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
+  applicationStatus        BusinessApplicationStatus @default(PENDING)
+  adminRemarks             String[]
+  dateCreated              DateTime                  @default(now())
+  lastUpdated              DateTime?
 
-    petBusinessId Int         @unique
-    petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade)
+  petBusinessId Int         @unique
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade, onDelete: Cascade)
 
-    approverId Int?
-    approver   InternalUser? @relation(fields: [approverId], references: [userId])
+  approverId Int?
+  approver   InternalUser? @relation(fields: [approverId], references: [userId])
 }

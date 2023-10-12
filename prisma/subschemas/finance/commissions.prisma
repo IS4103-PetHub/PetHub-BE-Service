@@ -1,0 +1,10 @@
+import {PetBusiness} from "../user/user"
+
+model CommissionRule {
+    commissionRuleId Int           @id @default(autoincrement())
+    name             String        @unique
+    commissionRate   Float // Represented in percentage. For example, 5.5 for 5.5%
+    createdAt        DateTime      @default(now())
+    updatedAt        DateTime      @default(now()) @updatedAt
+    petBusinesses    PetBusiness[]
+}
