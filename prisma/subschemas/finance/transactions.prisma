@@ -32,7 +32,7 @@ model OrderItem {
   itemName       String // Name of the order item at the time of transaction
   itemPrice      Float // Item Price of the individual item at the time of transaction
   commissionRate Float // The commission rate at the time of transaction
-  expiryDate     DateTime? // Optional expiry date field; from serviceListing
+  expiryDate     DateTime
   voucherCode    String // generated UUID to identify order
   status         OrderItemStatus @default(PENDING_FULFILLMENT)
 
@@ -45,10 +45,9 @@ model OrderItem {
   serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
 
   // (Optional) Bookings associated with the order item
-  booking Booking? @relation(fields: [bookingBookingId], references: [bookingId])
+  booking Booking?
 
-  RefundRequest    RefundRequest?
-  bookingBookingId Int?
+  RefundRequest RefundRequest?
 }
 
 enum RefundStatus {

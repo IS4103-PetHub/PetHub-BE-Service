@@ -10,6 +10,21 @@ const { OrderItemStatus } = require('@prisma/client')
 class OrderItemService {
     constructor() { }
 
+    async getOrderItemById(orderItemId) {
+        try {
+            const orderItem = await prisma.orderItem.findUnique({
+                where: { orderItemId: orderItemId },
+            });
+
+            if (!orderItem) throw new CustomError('Order item not found', 404);
+            return orderItem;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new OrderItemsError(error)
+        }
+    }
+
+
     async getPetOwnerOrderItemsById(petOwnerId, statusFilterArray = undefined) {
         try {
             const petOwner = await petOwnerService.getUserById(petOwnerId)

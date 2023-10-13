@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Oct 13 2023 14:06:10 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Oct 13 2023 21:42:27 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -49,12 +49,10 @@ model TimeSlot {
 }
 
 model Booking {
-  bookingId     Int       @id @default(autoincrement())
-  invoiceId     Int?
-  transactionId Int?
-  petOwnerId    Int
-  dateCreated   DateTime  @default(now())
-  lastUpdated   DateTime?
+  bookingId   Int       @id @default(autoincrement())
+  petOwnerId  Int
+  dateCreated DateTime  @default(now())
+  lastUpdated DateTime?
 
   startTime DateTime
   endTime   DateTime
@@ -65,9 +63,10 @@ model Booking {
   timeSlotId Int?
   timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
 
-  petId     Int?
-  pet       Pet?        @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
-  OrderItem OrderItem[]
+  petId       Int?
+  pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
+  OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+  orderItemId Int       @unique
 }
 
 generator client {
@@ -185,7 +184,7 @@ model OrderItem {
   itemName       String // Name of the order item at the time of transaction
   itemPrice      Float // Item Price of the individual item at the time of transaction
   commissionRate Float // The commission rate at the time of transaction
-  expiryDate     DateTime? // Optional expiry date field; from serviceListing
+  expiryDate     DateTime
   voucherCode    String // generated UUID to identify order
   status         OrderItemStatus @default(PENDING_FULFILLMENT)
 
@@ -198,10 +197,9 @@ model OrderItem {
   serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
 
   // (Optional) Bookings associated with the order item
-  booking Booking? @relation(fields: [bookingBookingId], references: [bookingId])
+  booking Booking?
 
-  RefundRequest    RefundRequest?
-  bookingBookingId Int?
+  RefundRequest RefundRequest?
 }
 
 enum RefundStatus {

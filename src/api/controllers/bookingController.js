@@ -82,7 +82,7 @@ exports.createBooking = async (req, res, next) => {
         // TODO: use middleware to identify creator
         const petOwnerId = req.query.petOwnerId
         const payload = req.body
-        const { calendarGroupId, serviceListingId } = payload
+        const { calendarGroupId, orderItemId } = payload
 
         if (!await baseValidations.isValidInteger(petOwnerId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID} petOwnerId` });
@@ -95,7 +95,7 @@ exports.createBooking = async (req, res, next) => {
         }
 
         const newBooking = await bookingService.createBooking(
-            Number(petOwnerId), Number(calendarGroupId), Number(serviceListingId),
+            Number(petOwnerId), Number(calendarGroupId), Number(orderItemId),
             new Date(payload.startTime), new Date(payload.endTime), payload.petId
         )
 

@@ -133,6 +133,7 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
     duration: 60,
     addressIds: [{ addressId: 6 }],
+    calendarGroupId: 1,
   },
   {
     id: 6,
