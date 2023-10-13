@@ -17,7 +17,11 @@ class OrderItemService {
             const invoices = await prisma.invoice.findMany({
                 where: { petOwnerUserId: petOwner.userId },
                 include: {
-                    orderItems: true
+                    orderItems: {
+                        include: {
+                            booking: true
+                        }
+                    }
                 }
             })
 
@@ -41,7 +45,11 @@ class OrderItemService {
             const serviceListings = await prisma.serviceListing.findMany({
                 where: { petBusinessId: petBusiness.userId },
                 include: {
-                    OrderItem: true
+                    OrderItem: {
+                        include: {
+                            booking: true
+                        }
+                    }
                 }
             })
 
