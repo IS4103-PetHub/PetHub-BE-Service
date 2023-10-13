@@ -13,43 +13,29 @@ exports.createServiceListing = async (data) => {
     const petBusiness = await prisma.user.findUnique({
       where: { userId: data.petBusinessId },
     });
-    if (!petBusiness) {
+    if (!petBusiness || petBusiness.accountType != "PET_BUSINESS") {
       throw new CustomError(
-        "Pet business not found or pet business ID is not valid",
+        "User not found, or id is not tagged to a valid pet business user account",
         404
       );
     }
 
     let tagIdsArray = [], addressIdsArray = [];
-    // format as "[{ tagId: 8 }, { tagId: 9 }, { tagId: 10 }]"
-    // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     if (data.tagIds) {
       tagIdsArray =  data.tagIds.map((id) => ({ tagId: id }));
     }
     if (data.addressIds) {
       // validate that data.addressIds is a subset of petBusiness's addresses
-      const validAddresses = await getAllAddressesForPetBusiness(
-        data.petBusinessId
-      );
+      const validAddresses = await getAllAddressesForPetBusiness(data.petBusinessId);
       const validAddressIds = validAddresses.map((a) => a.addressId);
-      if (
-        !data.addressIds.every((id) => validAddressIds.includes(id))
-      ) {
-        throw new CustomError(
-          "Addresses tagged to service listing should be a subset of parent pet business's address list!",
-          400
-        );
+      if (!data.addressIds.every((id) => validAddressIds.includes(id))) {
+        throw new CustomError("Addresses tagged to service listing should be a subset of parent pet business's address list!", 400);
       }
-      addressIdsArray = data.addressIds.map((id) => ({
-        addressId: id,
-      }));
+      addressIdsArray = data.addressIds.map((id) => ({ addressId: id }));
     }
 
     if (data.duration && (data.duration < 0 || data.duration > 180)) {
-      throw new CustomError(
-        "Addresses tagged to service listing should be a subset of parent pet business's address list!",
-        400
-      );
+      throw new CustomError("Duration should be between 0 - 180 minutes", 400);
     }
 
     const serviceListingData = {
@@ -60,6 +46,8 @@ exports.createServiceListing = async (data) => {
       attachmentURLs: data.attachmentURLs,
       attachmentKeys: data.attachmentKeys,
       requiresBooking: data.requiresBooking,
+      defaultExpiryDays: data.defaultExpiryDays,
+      lastPossibleDate: data.lastPossibleDate ? data.lastPossibleDate : null,
       duration: data.duration ? data.duration : null,
       tags: {
         connect: tagIdsArray,
@@ -108,32 +96,21 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       throw new CustomError("Service listing not found", 404);
     }
     
-    // format as "[{ tagId: 8 }, { tagId: 9 }, { tagId: 10 }]"
-    // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
-    let tagIdsArray = [],
-      addressIdsArray = [];
+    let tagIdsArray = [], addressIdsArray = [];
     if (data.tagIds) {
       tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
     }
     if (data.addressIds) {
       // validate that data.addressIds is a subset of petBusiness's addresses
-      const validAddresses = await getAllAddressesForPetBusiness(
-        serviceListing.petBusinessId
-      );
+      const validAddresses = await getAllAddressesForPetBusiness(serviceListing.petBusinessId);
       const validAddressIds = validAddresses.map((a) => a.addressId);
       if (!data.addressIds.every((id) => validAddressIds.includes(id))) {
-        throw new CustomError(
-          "Addresses tagged to service listing should be a subset of parent pet business's address list!",
-          400
-        );
+        throw new CustomError("Addresses tagged to service listing should be a subset of parent pet business's address list!", 400);
       }
       addressIdsArray = data.addressIds.map((id) => ({ addressId: id }));
     }
     if (data.duration && (data.duration < 0 || data.duration > 180)) {
-      throw new CustomError(
-        "Addresses tagged to service listing should be a subset of parent pet business's address list!",
-        400
-      );
+      throw new CustomError("Duration should be between 0 - 180 minutes", 400);
     }
 
     const serviceListingData = {
@@ -144,6 +121,8 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       attachmentURLs: data.attachmentURLs,
       attachmentKeys: data.attachmentKeys,
       requiresBooking: data.requiresBooking,
+      defaultExpiryDays: data.defaultExpiryDays,
+      lastPossibleDate: data.lastPossibleDate ? data.lastPossibleDate : null,
       duration: data.duration ? data.duration : null,
       tags: {
         set: [],
@@ -204,10 +183,13 @@ exports.getAllServiceListings = async () => {
 // Function will return all service listings that can be accessed by pet owners (customers) and booked.
 // 3 types of listings:
 // - PB that created this listing has an 'ACTIVE' account status
-// - SL that are VALID --> for SLs that requiresBookings, the CG is NOT null
+// - SL must be VALID. Conditions: 
+//     - for SLs that requiresBookings, the CG and duration is NOT null
+//     - SL's lastPossibleDate >= current date 
 // - In the future, if we choose to allow PB to "deactivate" their service listings, we can edit this method to only include service listings that have 'ACTIVE' state
 exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, limit) => {
   try {
+    const currentDate = new Date();
     const serviceListings = await prisma.serviceListing.findMany({
       include: {
         tags: true,
@@ -229,6 +211,9 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
             accountStatus: 'ACTIVE', // pet business cannot be an inactive or pending user
           },
         },
+        lastPossibleDate: {
+          gte: currentDate, // Filter listings with lastPossibleDate >= current date
+        },
       },
     });
 
@@ -243,10 +228,10 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
     }
 
     // Filter based on the INVALID condition:
-    // INVALID if: SL requires booking and CG == null
+    // INVALID if: SL requires booking and (CG == null OR duration == null)
     filteredListings = filteredListings.filter((listing) => {
       if (listing.requiresBooking) {
-        return listing.calendarGroupId !== null;
+        return listing.calendarGroupId !== null && listing.duration !== null;
       }
       return true;
     });

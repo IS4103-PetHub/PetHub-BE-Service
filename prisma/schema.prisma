@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Oct 12 2023 23:31:21 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Oct 13 2023 17:21:36 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -241,7 +241,7 @@ model ServiceListing {
   dateCreated       DateTime  @default(now())
   lastUpdated       DateTime?
   duration          Int?
-  defaultExpiryDays Int? // Number of days from purchase for the default expiry
+  defaultExpiryDays Int // Number of days from purchase for the default expiry
   lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
   requiresBooking   Boolean   @default(false)
 

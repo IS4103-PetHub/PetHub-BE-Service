@@ -79,6 +79,7 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 1,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 2,
@@ -93,6 +94,7 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 4,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 3,
@@ -106,6 +108,7 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 1,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 4,
@@ -119,6 +122,7 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }, { addressId: 2 }],
     calendarGroupId: 3,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 5,
@@ -131,6 +135,7 @@ const serviceListings = [
     duration: 60,
     addressIds: [{ addressId: 6 }],
     requiresBooking: false,
+    defaultExpiryDays: 14,
   },
   {
     id: 6,
@@ -143,6 +148,7 @@ const serviceListings = [
     addressIds: [{ addressId: 7 }, { addressId: 8 }],
     duration: 60,
     requiresBooking: false,
+    defaultExpiryDays: 14,
   },
   {
     id: 7,
@@ -153,7 +159,6 @@ const serviceListings = [
     category: "PET_RETAIL",
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
-    duration: 60,
     addressIds: [],
     requiresBooking: false,
     attachmentKeys: [
@@ -164,6 +169,7 @@ const serviceListings = [
       "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/eefb3b1b-8ecd-4901-acf7-06802cfa0771-adoption.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T135811Z&X-Amz-Expires=604800&X-Amz-Signature=301426c5f724e7ae46d2f55dd0fcbf2230442489ae849e11bd27769c8e5ded8e&X-Amz-SignedHeaders=host&x-id=GetObject",
       "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/4f34978d-afbf-433a-8300-f04a4af8c2ef-adoption2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T135811Z&X-Amz-Expires=604800&X-Amz-Signature=7a7d872a9c5be2b6deaef9c6e196634c026697edf72f6e1a94715a7d7e1e69d6&X-Amz-SignedHeaders=host&x-id=GetObject",
     ],
+    defaultExpiryDays: 14,
   },
   {
     id: 8,
@@ -177,6 +183,7 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 2,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 9,
@@ -190,6 +197,7 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 3,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 10,
@@ -204,6 +212,7 @@ const serviceListings = [
     duration: 180,
     calendarGroupId: 5,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   // This service listings (id 11-12) have requiresBooking: true but no CG
   // On the customer side, pet owners should not be able to see these listings as this SL is invalid.
@@ -218,6 +227,7 @@ const serviceListings = [
     addressIds: [{ addressId: 3 }],
     duration: 60,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
   {
     id: 12,
@@ -230,8 +240,9 @@ const serviceListings = [
     addressIds: [],
     duration: 90,
     requiresBooking: true,
+    defaultExpiryDays: 14,
   },
-  // These service listings (id 13-16) are tagged to petBusinessId [6, 7], who are non-active
+  // These service listings (id 13-15) are tagged to petBusinessId [6, 7], who are non-active
   // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
   {
     id: 13,
@@ -243,6 +254,7 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }],
     addressIds: [],
     duration: 1440, // 24 hours
+    defaultExpiryDays: 14,
   },
   {
     id: 14,
@@ -253,7 +265,7 @@ const serviceListings = [
     basePrice: 60.0,
     tagIds: [],
     addressIds: [],
-    duration: 45,
+    defaultExpiryDays: 14,
   },
   {
     id: 15,
@@ -264,18 +276,20 @@ const serviceListings = [
     basePrice: 30.0,
     tagIds: [{ tagId: 4 }],
     addressIds: [],
-    duration: 60,
+    defaultExpiryDays: 14,
   },
+  // This service listing (id 16) will have a lastPossibleDate to be < currentDate
+  // On the customer side, pet owners should not be able to see these listings as the SL is already invalid.
   {
     id: 16,
     title: "Pet Photography Session",
     description: "Capture beautiful moments with your pets in a professional photoshoot.",
-    petBusinessId: 7,
+    petBusinessId: 2,
     category: "PET_RETAIL",
     basePrice: 75.0,
     tagIds: [{ tagId: 3 }],
     addressIds: [],
-    duration: 120,
+    defaultExpiryDays: 14,
   },
 ];
 
@@ -325,6 +339,8 @@ async function seedBusinessData(prisma) {
       category: data.category,
       duration: data.duration,
       requiresBooking: data.requiresBooking,
+      lastPossibleDate: getRandomFutureDate(),
+      defaultExpiryDays: data.defaultExpiryDays,
       tags: {
         connect: data.tagIds,
       },
@@ -337,6 +353,9 @@ async function seedBusinessData(prisma) {
         },
       },
     };
+
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
     
     switch (data.id) {
       case 9:
@@ -350,6 +369,7 @@ async function seedBusinessData(prisma) {
       case 16:
         createObject.attachmentKeys = sittingKey;
         createObject.attachmentURLs = sittingUrl;
+        createObject.lastPossibleDate = pastDate;
         break;
       default:
         break;
@@ -382,6 +402,14 @@ async function remoteImageUrlToFile(url, filename) {
     console.error('Error converting remote image to File:', error);
     throw error;
   }
+}
+
+// get random future date from today, will be randomized to be between 1-12 weeks from the current date
+function getRandomFutureDate() {
+  const currentDate = new Date();
+  const daysToAdd = Math.floor(Math.random() * 77) + 7; // Random value between 7 and 84 (1 to 12 weeks)
+  currentDate.setDate(currentDate.getDate() + daysToAdd);
+  return currentDate;
 }
 
 module.exports = { serviceListings, tags, seedBusinessData };

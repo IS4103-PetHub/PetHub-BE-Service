@@ -14,12 +14,15 @@ const errorMessages = {
 
   INVALID_BASE_PRICE: `Please enter a valid base price`,
   INVALID_WEIGHT: `Please enter a valid weight`,
+  INVALID_DATE: `Please enter a valid future date`,
 
   INVALID_GENDER: `Please enter a valid gender`,
   EMPTY_GENDER: "Gender cannot be empty",
 
   INVALID_PET_TYPE: `Please enter a valid pet type`,
   EMPTY_PET_TYPE: "Pet type cannot be empty",
+
+  INVALID_INTEGER: 'Please ensure that integer fields are in the correct integer format!'
 
 };
 
