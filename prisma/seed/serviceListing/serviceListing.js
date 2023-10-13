@@ -1,3 +1,6 @@
+const fetch = require('node-fetch');
+const s3ServiceInstance = require('../../../src/api/services/s3Service');
+
 const tags = [
   {
     id: 1,
@@ -20,6 +23,47 @@ const tags = [
     name: "Adoption",
   }
 ];
+
+const groomingUrls = [
+  {
+    url: "https://bpanimalhospital.com/wp-content/uploads/shutterstock_1547371985.jpg",
+    name: "dog_grooming_1"
+  },
+  {
+    url: "https://images.squarespace-cdn.com/content/v1/5dda8663782768313a35b549/1626234766844-5DT4FUEXOY0YSBWOYM7U/Ultimate+List+Of+Best+Dog+Groomers+Singapore",
+    name: "dog_grooming_2"
+  },
+  {
+    url: "https://assets.petco.com/petco/image/upload/f_auto,q_auto:best/grooming-lp-by-appointment-bath-and-haircut-img-1000x667",
+    name: "dog_grooming_3"
+  },
+  {
+    url: "https://assets3.thrillist.com/v1/image/3059921/1200x630/flatten;crop_down;webp=auto;jpeg_quality=70",
+    name: "cat_grooming_1"
+  },
+]
+
+const vetUrls = [
+  {
+    url: "https://i.insider.com/5d289d6921a86120285e5e24?width=700",
+    name: "dog_vet_1"
+  },
+  {
+    url: "https://www.vetmed.com.au/wp-content/uploads/2019/03/How-to-Choose-Right-Vet-Clinic-for-Your-Multi-Breeds-Pets.jpg",
+    name: "dog_vet_2"
+  },
+  {
+    url: "https://img1.wsimg.com/isteam/ip/3b648486-0d2e-4fcd-8deb-ddb6ce935eb3/blob-0010.png",
+    name: "dog_vet_3"
+  },
+]
+
+const sittingUrls = [
+  {
+    url: "https://i.cbc.ca/1.6654160.1668638085!/fileImage/httpImage/image.jpg_gen/derivatives/original_780/what-to-consider-when-looking-for-a-pet-sitter.jpg",
+    name: "dog_sitting_1"
+  }
+]
 
 const serviceListings = [
   {
@@ -50,23 +94,15 @@ const serviceListings = [
   },
   {
     id: 3,
-    title: "Adopt a Pet Today",
-    description:
-      "Adopt a Pet Today is your golden opportunity to embark on a heartwarming journey of discovering your perfect furry companion at our extraordinary adoption event. We proudly collaborate with local animal shelters, forging invaluable partnerships that allow us to present you with an irresistibly diverse selection of cats and dogs, each yearning for the love and warmth of a forever home.\n\nOur adoption process is not just simple; it's a straightforward path paved with compassion and care, making your journey to find a new pet as effortless as it is rewarding. Whether your heart desires the playful antics of a frisky kitten or the unwavering loyalty of a devoted canine companion, rest assured that our adoption center has a plethora of charming and charismatic pets eagerly waiting to make your acquaintance.\n\nOne of the most remarkable aspects of Adopt a Pet Today is our commitment to affordability. We firmly believe that love knows no price tag, and every pet deserves a chance to find a loving family. That's why our adoption fees are exceptionally reasonable, ensuring that you can open your heart and home to a deserving pet without breaking the bank.\n\nBut our dedication doesn't stop there. We go the extra mile to ensure that every pet who leaves our adoption center is equipped for a bright future. Before they become a part of your family, each of our pets undergoes essential medical care. They are spayed or neutered to help control the pet population and reduce the number of homeless animals. Our dedicated veterinary team administers vaccinations to keep your new companion in the pink of health. Additionally, we take the critical step of microchipping every pet, providing an extra layer of security to reunite lost pets with their loving owners.\n\nWhen you visit Adopt a Pet Today, you're not just finding a new best friend; you're giving a homeless pet a second chance at a happy, fulfilling life. It's a heartwarming journey filled with love, compassion, and boundless joy. Your decision to adopt a pet from our event is a powerful testament to your commitment to making the world a better place for animals in need.\n\nCome, be a part of this beautiful journey, and let us guide you toward your new best friend. Visit Adopt a Pet Today, where love knows no bounds, and where the extraordinary adventure of pet adoption begins.",
-    petBusinessId: 5,
-    category: "PET_RETAIL",
-    basePrice: 0,
-    tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
-    duration: 60,
+    title: "Normal grooming waterslide experience",
+    description: "Treat your pets to a day of grooming by regular groomers!",
+    petBusinessId: 1,
+    category: "PET_GROOMING",
+    basePrice: 80.0,
+    tagIds: [{ tagId: 1 }, { tagId: 4 }],
     addressIds: [],
-    attachmentKeys: [
-      "uploads/service-listing/img/672033a8-3611-4c93-9b83-52245dcd2c82-adoption.jpg",
-      "uploads/service-listing/img/81f2b44c-d660-4b99-b624-effc7ea994b5-adoption2.jpg",
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/672033a8-3611-4c93-9b83-52245dcd2c82-adoption.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010843Z&X-Amz-Expires=604800&X-Amz-Signature=187a0f416c068872860df698baa41a7cdbfef800f0b24a76d4fe7ed80e44b8d6&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/81f2b44c-d660-4b99-b624-effc7ea994b5-adoption2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010843Z&X-Amz-Expires=604800&X-Amz-Signature=89882fa0fdc8b79768b75d035bb6d72aedde01751f465cd49b46cbd7f47413e7&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
+    duration: 60,
+    calendarGroupId: 1,
   },
   {
     id: 4,
@@ -115,15 +151,23 @@ const serviceListings = [
   },
   {
     id: 8,
-    title: "Normal grooming waterslide experience",
-    description: "Treat your pets to a day of grooming by regular groomers!",
-    petBusinessId: 1,
-    category: "PET_GROOMING",
-    basePrice: 80.0,
-    tagIds: [{ tagId: 1 }, { tagId: 4 }],
-    addressIds: [],
+    title: "Adopt a Pet Today",
+    description:
+      "Adopt a Pet Today is your golden opportunity to embark on a heartwarming journey of discovering your perfect furry companion at our extraordinary adoption event. We proudly collaborate with local animal shelters, forging invaluable partnerships that allow us to present you with an irresistibly diverse selection of cats and dogs, each yearning for the love and warmth of a forever home.\n\nOur adoption process is not just simple; it's a straightforward path paved with compassion and care, making your journey to find a new pet as effortless as it is rewarding. Whether your heart desires the playful antics of a frisky kitten or the unwavering loyalty of a devoted canine companion, rest assured that our adoption center has a plethora of charming and charismatic pets eagerly waiting to make your acquaintance.\n\nOne of the most remarkable aspects of Adopt a Pet Today is our commitment to affordability. We firmly believe that love knows no price tag, and every pet deserves a chance to find a loving family. That's why our adoption fees are exceptionally reasonable, ensuring that you can open your heart and home to a deserving pet without breaking the bank.\n\nBut our dedication doesn't stop there. We go the extra mile to ensure that every pet who leaves our adoption center is equipped for a bright future. Before they become a part of your family, each of our pets undergoes essential medical care. They are spayed or neutered to help control the pet population and reduce the number of homeless animals. Our dedicated veterinary team administers vaccinations to keep your new companion in the pink of health. Additionally, we take the critical step of microchipping every pet, providing an extra layer of security to reunite lost pets with their loving owners.\n\nWhen you visit Adopt a Pet Today, you're not just finding a new best friend; you're giving a homeless pet a second chance at a happy, fulfilling life. It's a heartwarming journey filled with love, compassion, and boundless joy. Your decision to adopt a pet from our event is a powerful testament to your commitment to making the world a better place for animals in need.\n\nCome, be a part of this beautiful journey, and let us guide you toward your new best friend. Visit Adopt a Pet Today, where love knows no bounds, and where the extraordinary adventure of pet adoption begins.",
+    petBusinessId: 5,
+    category: "PET_RETAIL",
+    basePrice: 0,
+    tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
     duration: 60,
-    calendarGroupId: 1,
+    addressIds: [],
+    attachmentKeys: [
+      "uploads/service-listing/img/eefb3b1b-8ecd-4901-acf7-06802cfa0771-adoption.jpg",
+      "uploads/service-listing/img/4f34978d-afbf-433a-8300-f04a4af8c2ef-adoption2.jpg",
+    ],
+    attachmentURLs: [
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/eefb3b1b-8ecd-4901-acf7-06802cfa0771-adoption.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T135811Z&X-Amz-Expires=604800&X-Amz-Signature=301426c5f724e7ae46d2f55dd0fcbf2230442489ae849e11bd27769c8e5ded8e&X-Amz-SignedHeaders=host&x-id=GetObject",
+      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/4f34978d-afbf-433a-8300-f04a4af8c2ef-adoption2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T135811Z&X-Amz-Expires=604800&X-Amz-Signature=7a7d872a9c5be2b6deaef9c6e196634c026697edf72f6e1a94715a7d7e1e69d6&X-Amz-SignedHeaders=host&x-id=GetObject",
+    ],
   },
   {
     id: 9,
@@ -136,14 +180,6 @@ const serviceListings = [
     addressIds: [],
     duration: 60,
     calendarGroupId: 2,
-    attachmentKeys: [
-      "uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg",
-      "uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg",
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=b50f62bb71f55e6e4430c0221a5c095cad64da06c98446afb8773b229254850f&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=40b1bba9cee1240c65ee8a70e2a051a9fa3e2e8b2e5d9d2bf39191abc3da2628&X-Amz-SignedHeaders=host&x-id=GetObject",
-    ],
   },
   {
     id: 10,
@@ -156,12 +192,6 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 60,
     calendarGroupId: 3,
-    attachmentKeys: [
-      "uploads/service-listing/img/f2556a5a-2ac6-434f-b4c3-799d46700854-download (1).jpg",
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/f2556a5a-2ac6-434f-b4c3-799d46700854-download%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010929Z&X-Amz-Expires=604800&X-Amz-Signature=89b2ad2bff21a51ae08b813cc90270c195052924f35126a509966653b1522824&X-Amz-SignedHeaders=host&x-id=GetObject"
-    ],
   },
   // These service listings (id 11-15) are tagged to petBusinessId [6, 7], who are non-active
   // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
@@ -232,22 +262,37 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 180,
     calendarGroupId: 5,
-    attachmentKeys: [
-      "uploads/service-listing/img/2ac17578-8cbf-4d31-9526-204da529af84-images (1).jpg",
-      "uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg",
-      "uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg",
-      "uploads/service-listing/img/4f080a86-57d0-4892-bca1-a18e35f59bcf-catgroom.png",
-    ],
-    attachmentURLs: [
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/2ac17578-8cbf-4d31-9526-204da529af84-images%20%281%29.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=c3c7cd559817f94ecdebf0c52e3a37b3083f2166d63e7497469d2dae2bcaa999&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/747a2f37-bbeb-48a7-bbcd-a002c452f11f-grooming.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=b50f62bb71f55e6e4430c0221a5c095cad64da06c98446afb8773b229254850f&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/ab585a86-6cd1-45bd-a800-d4a04f446393-grooming2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010708Z&X-Amz-Expires=604800&X-Amz-Signature=40b1bba9cee1240c65ee8a70e2a051a9fa3e2e8b2e5d9d2bf39191abc3da2628&X-Amz-SignedHeaders=host&x-id=GetObject",
-      "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/4f080a86-57d0-4892-bca1-a18e35f59bcf-catgroom.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231007%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231007T010805Z&X-Amz-Expires=604800&X-Amz-Signature=b5fe99291e3a2fe4fff56d504064620c61b4732cade3fc5268d64babda2b4393&X-Amz-SignedHeaders=host&x-id=GetObject",
-    ],
   },
 ];
 
 async function seedBusinessData(prisma) {
+
+  const groomingFiles = [];
+  for (const imageUrl of groomingUrls) {
+    const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
+    groomingFiles.push(file);
+  }
+  
+  const groomingKey = await s3ServiceInstance.uploadImgFiles(groomingFiles, 'service-listing')
+  const groomingUrl = await s3ServiceInstance.getObjectSignedUrl(groomingKey)
+
+  const vetFiles = [];
+  for (const imageUrl of vetUrls) {
+    const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
+    vetFiles.push(file);
+  }
+  const vetKey = await s3ServiceInstance.uploadImgFiles(vetFiles, 'service-listing')
+  const vetUrl = await s3ServiceInstance.getObjectSignedUrl(vetKey)
+
+  const sittingFiles = [];
+  for (const imageUrl of sittingUrls) {
+    const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
+    sittingFiles.push(file);
+  }
+  const sittingKey = await s3ServiceInstance.uploadImgFiles(sittingFiles, 'service-listing')
+  const sittingUrl = await s3ServiceInstance.getObjectSignedUrl(sittingKey)
+
+
   for (const tag of tags) {
     await prisma.tag.upsert({
       where: { tagId: tag.id },
@@ -278,9 +323,21 @@ async function seedBusinessData(prisma) {
       },
     };
     
-    if (data.attachmentKeys && data.attachmentURLs) {
-      createObject.attachmentKeys = data.attachmentKeys;
-      createObject.attachmentURLs = data.attachmentURLs;
+    switch (data.id) {
+      case 9:
+        createObject.attachmentKeys = groomingKey;
+        createObject.attachmentURLs = groomingUrl;
+        break;
+      case 10:
+        createObject.attachmentKeys = vetKey;
+        createObject.attachmentURLs = vetUrl;
+        break;
+      case 16:
+        createObject.attachmentKeys = sittingKey;
+        createObject.attachmentURLs = sittingUrl;
+        break;
+      default:
+        break;
     }
 
     // Check if data.calendarGroupId exists before adding it to createObject
@@ -295,6 +352,20 @@ async function seedBusinessData(prisma) {
       update: {},
       create: createObject,
     });
+  }
+}
+
+async function remoteImageUrlToFile(url, filename) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch the image: ${response.status} - ${response.statusText}`);
+    }
+    const buffer = await response.buffer();
+    return { buffer: buffer, originalname: filename };
+  } catch (error) {
+    console.error('Error converting remote image to File:', error);
+    throw error;
   }
 }
 

@@ -1,5 +1,6 @@
 const { seedRBAC } = require("./rbac/rbac.js");
 const { PrismaClient } = require("@prisma/client");
+const { seedCommissionRule } = require("./finance/commissionRules.js")
 const { seedUser } = require("./user/user.js");
 const { seedBusinessData } = require("./serviceListing/serviceListing.js");
 const { seedCalendarGroup, seedBookings } = require("./calendarGroup/calendarGroup.js");
@@ -7,6 +8,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.$connect();
+  console.log("Seeding Commission Rules...");
+  await seedCommissionRule(prisma);
   console.log("Seeding users...");
   await seedUser(prisma);
   console.log("Seeding RBAC...");

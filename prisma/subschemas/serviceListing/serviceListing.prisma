@@ -1,31 +1,36 @@
 import {Category} from "../enums/businessLogicEnums"
-import {PetBusiness, Address} from "../user/user"
+import {PetBusiness, Address, PetOwner} from "../user/user"
 import {CalendarGroup, Booking} from "../appointments/appointments"
-import { PetOwner } from "..\user\user"
+import {OrderItem, Invoice} from "../finance/transactions"
 
 model ServiceListing {
-  serviceListingId Int       @id @default(autoincrement())
-  title            String
-  description      String
-  basePrice        Float     @default(0)
-  attachmentKeys   String[]
-  attachmentURLs   String[]
-  dateCreated      DateTime  @default(now())
-  lastUpdated      DateTime?
-  duration         Int?
+  serviceListingId  Int       @id @default(autoincrement())
+  title             String
+  description       String
+  basePrice         Float     @default(0)
+  attachmentKeys    String[]
+  attachmentURLs    String[]
+  dateCreated       DateTime  @default(now())
+  lastUpdated       DateTime?
+  duration          Int?
+  defaultExpiryDays Int? // Number of days from purchase for the default expiry
+  lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
+  requiresBooking   Boolean   @default(false)
 
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags          Tag[]
-  addresses     Address[]
-  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId Int
+  tags            Tag[]
+  addresses       Address[]
+  petBusiness     PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId   Int
   favouritedUsers PetOwner[]
 
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: SetNull, onUpdate: Cascade)
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
+  OrderItem       OrderItem[]
+  Invoice         Invoice[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
