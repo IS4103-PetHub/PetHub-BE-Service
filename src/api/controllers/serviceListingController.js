@@ -15,7 +15,8 @@ exports.createServiceListing = async (req, res, next) => {
       !data.petBusinessId ||
       !data.basePrice ||
       !data.category ||
-      !data.description
+      !data.description ||
+      !data.requiresBooking
     ) {
       return res.status(400).json({
         message: "Incomplete form data. Please fill in all required fields.",
@@ -42,6 +43,13 @@ exports.createServiceListing = async (req, res, next) => {
     data.petBusinessId = parseInt(data.petBusinessId, 10);
     data.calendarGroupId = parseInt(data.calendarGroupId, 10);
     data.duration = parseInt(data.duration, 10);
+
+    if (!(await BaseValidations.isValidBooleanString(data.requiresBooking))) {
+      return res
+        .status(400)
+        .json({ message: "Requires Booking field should be `true` or `false`" });
+    }
+    data.requiresBooking = (data.requiresBooking === 'true') // convert to bool
 
     if (!(await BaseValidations.isValidFloat(data.basePrice))) {
       return res
@@ -99,9 +107,7 @@ exports.updateServiceListing = async (req, res, next) => {
     updateData.calendarGroupId = parseInt(updateData.calendarGroupId, 10);
     updateData.duration = parseInt(updateData.duration, 10);
 
-    if (
-      updateData.title &&
-      !(await BaseValidations.isValidLength(
+    if (updateData.title && !(await BaseValidations.isValidLength(
         updateData.title,
         limitations.SERVICE_LISTING_TITLE_LENGTH
       ))
@@ -111,9 +117,7 @@ exports.updateServiceListing = async (req, res, next) => {
       });
     }
 
-    if (
-      updateData.basePrice &&
-      !(await BaseValidations.isValidFloat(updateData.basePrice))
+    if (updateData.basePrice && !(await BaseValidations.isValidFloat(updateData.basePrice))
     ) {
       return res
         .status(400)
@@ -121,9 +125,7 @@ exports.updateServiceListing = async (req, res, next) => {
     }
     updateData.basePrice = parseFloat(updateData.basePrice);
 
-    if (
-      updateData.category &&
-      !(await ServiceListingValidations.isValidCategory(updateData.category))
+    if (updateData.category && !(await ServiceListingValidations.isValidCategory(updateData.category))
     ) {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
@@ -135,6 +137,13 @@ exports.updateServiceListing = async (req, res, next) => {
           .json({ message: "Please ensure that every tag ID is valid" });
       }
       updateData.tagIds = updateData.tagIds.map((id) => parseInt(id, 10));
+    }
+
+    if (updateData.requiresBooking) {
+      if (!(await BaseValidations.isValidBooleanString(updateData.requiresBooking))) {
+        return res.status(400).json({ message: "Requires Booking field should be `true` or `false`" });
+      }
+      updateData.requiresBooking = (updateData.requiresBooking === 'true') // convert to bool
     }
 
     if (updateData.addressIds) {
@@ -256,22 +265,6 @@ exports.getServiceListingByPBId = async (req, res, next) => {
 
     const serviceListings = await ServiceListingService.getServiceListingByPBId(
       Number(petBusinessId)
-    );
-    res.status(200).json(serviceListings);
-  } catch (error) {
-    next(error);
-  }
-};
-
-// to be depreciated, filtering logic done under /active
-// will remove after FE finishes integrating
-exports.getFilteredServiceListings = async (req, res, next) => {
-  try {
-    const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
-    const tags = req.query.tag ? Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag] : [];
-
-    const serviceListings = await ServiceListingService.filterServiceListing(
-      categories, tags
     );
     res.status(200).json(serviceListings);
   } catch (error) {

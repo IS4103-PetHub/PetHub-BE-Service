@@ -14,7 +14,7 @@ async function seedCommissionRule(prisma) {
         });
     }
 
-    console.log('Seeding completed!');
+    console.log('Seeding commission rule completed!');
 }
 
 module.exports = {

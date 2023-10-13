@@ -59,6 +59,7 @@ exports.createServiceListing = async (data) => {
       category: data.category,
       attachmentURLs: data.attachmentURLs,
       attachmentKeys: data.attachmentKeys,
+      requiresBooking: data.requiresBooking,
       duration: data.duration ? data.duration : null,
       tags: {
         connect: tagIdsArray,
@@ -142,6 +143,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       category: data.category,
       attachmentURLs: data.attachmentURLs,
       attachmentKeys: data.attachmentKeys,
+      requiresBooking: data.requiresBooking,
       duration: data.duration ? data.duration : null,
       tags: {
         set: [],
@@ -200,8 +202,9 @@ exports.getAllServiceListings = async () => {
 };
 
 // Function will return all service listings that can be accessed by pet owners (customers) and booked.
-// 2 types of listings:
+// 3 types of listings:
 // - PB that created this listing has an 'ACTIVE' account status
+// - SL that are VALID --> for SLs that requiresBookings, the CG is NOT null
 // - In the future, if we choose to allow PB to "deactivate" their service listings, we can edit this method to only include service listings that have 'ACTIVE' state
 exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, limit) => {
   try {
@@ -228,7 +231,9 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
         },
       },
     });
-    const filteredListings = serviceListings.filter((listing) =>
+
+    // Filter according to query params, if any
+    let filteredListings = serviceListings.filter((listing) =>
     (categories.length === 0 || categories.includes(listing.category)) &&
     (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
     );
@@ -236,6 +241,16 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
     if (limit !== null && limit > 0) {
       return filteredListings.slice(0, limit);
     }
+
+    // Filter based on the INVALID condition:
+    // INVALID if: SL requires booking and CG == null
+    filteredListings = filteredListings.filter((listing) => {
+      if (listing.requiresBooking) {
+        return listing.calendarGroupId !== null;
+      }
+      return true;
+    });
+
     return filteredListings;
   } catch (error) {
     console.error("Error fetching all active service listings:", error);
@@ -325,45 +340,6 @@ exports.getServiceListingByPBId = async (id) => {
     return serviceListings;
   } catch (error) {
     console.error("Error fetching service listings by pet business ID:", error);
-    throw new ServiceListingError(error);
-  }
-};
-
-// to be depreciated
-// will remove after FE finishes integrating
-exports.filterServiceListing = async (categories, tags) => {
-  try {
-    const serviceListings = await prisma.serviceListing.findMany({
-      where: {
-        OR: [
-          {
-            tags: {
-              some: {
-                name: {
-                  in: tags,
-                },
-              },
-            },
-          },
-          {
-            category: {
-              in: categories,
-            },
-          },
-        ],
-      },
-      include: {
-        tags: true,
-        petBusiness: {
-          select: {
-            companyName: true,
-          },
-        },
-      },
-    });
-    return serviceListings;
-  } catch (error) {
-    console.error("Error fetching all service listings:", error);
     throw new ServiceListingError(error);
   }
 };

@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Oct 12 2023 22:13:45 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Thu Oct 12 2023 23:31:21 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
