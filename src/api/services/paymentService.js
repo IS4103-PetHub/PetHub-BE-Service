@@ -5,6 +5,8 @@ const stripeServiceInstance = require("./stripeService.js");
 const petOwnerService = require('../services/user/petOwnerService')
 const transactionService = require('../services/finance/transactionService')
 // const { v4: uuidv4 } = require("uuid"); // uncomment to test without stripe service 
+const emailService = require('../services/emailService')
+const emailTemplate = require('../resource/emailTemplate');
 
 class PaymentService {
   constructor() { }
@@ -29,6 +31,11 @@ class PaymentService {
 
       // 4) Once Payment service confirms payment, payment service must confirm the transaction with the paymentIntentId
       const confirmedInvoice = await transactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId)
+
+      await emailService.sendEmail(
+        user.email,
+        `Thank You for Your Purchase, ${user.firstName}! Your PetHub Order is Confirmed`,
+        emailTemplate.checkoutSuccessEmail(user.firstName, invoice, "")) // TODO: create link
 
       return confirmedInvoice;
     } catch (error) {
