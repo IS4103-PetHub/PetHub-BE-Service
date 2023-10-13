@@ -8,8 +8,8 @@ router.get('/health-check', async (req, res, next) => {
 
 
 function registerOrderItemRoutes(controller) {
-    // router.get('/pet-businesses/:petBusinessId', controller.getPetBusinessOrdersById);
     router.get('/pet-owners/:petOwnerId', controller.getPetOwnerOrderItemsById);
+    router.get('/pet-businesses/:petBusinessId', controller.getPetBusinessOrderItemsById);
 }
 
 registerOrderItemRoutes(transactionController);

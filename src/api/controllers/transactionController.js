@@ -27,15 +27,28 @@ exports.getPetOwnerOrderItemsById = async (req, res, next) => {
 }
 
 
-exports.getAllOrderItems = async (req, res, next) => {
+exports.getPetBusinessOrderItemsById = async (req, res, next) => {
     try {
+        const petBusinessId = req.params.petBusinessId; // must be valid number
+        if (!(await baseValidations.isValidInteger(petBusinessId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
 
+        const statusFilters = req.query.statusFilter;
+        let statusFilterArray = undefined;
+        if (statusFilters) {
+            if (!orderItemValidations.validateStatusFilters(statusFilters)) return res.status(400).json({ message: "invalid statusFilter query" })
+            statusFilterArray = statusFilters.split(',');
+        }
+
+        const orderItems = await orderItemService.getPetBusinessOrderItemsById(Number(petBusinessId), statusFilterArray)
+        res.status(200).json(orderItems)
     } catch (error) {
         next(error)
     }
 }
 
-exports.getPetBusinessOrderItemsById = async (req, res, next) => {
+exports.getAllOrderItems = async (req, res, next) => {
     try {
 
     } catch (error) {

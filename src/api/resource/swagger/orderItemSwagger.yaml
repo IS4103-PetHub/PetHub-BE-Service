@@ -4,15 +4,41 @@ swagger: "2.0"
 paths:
   /api/order-items/pet-owners/{petOwnerId}:
     get:
-      summary: Get order items by pet owner IDs.
-      description: Get order items by pet owner IDs. Use statusFilter to filter for specific status. all orderItems are returned if not provided
+      summary: Get order items by pet owner ID.
+      description: Get order items by pet owner ID. Use statusFilter to filter for specific status. all orderItems are returned if not provided
       parameters:
         - name: petOwnerId
           in: path
           description: ID of the pet owner.
           required: true
           type: integer
-          default: 1 # Example default value
+          default: 9 # Example default value
+        - name: statusFilter
+          in: query
+          description: comma deliminated filters e.g., ?statusFilter=PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED
+          required: false
+          type: string
+          default: PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED
+      responses:
+        200:
+          description: List of order items
+          content:
+            application/json:
+              schema:
+                type: array
+      tags:
+        - Order Items
+  /api/order-items/pet-businesses/{petBusinessId}:
+    get:
+      summary: Get order items by pet business ID.
+      description: Get order items by pet business ID. Use statusFilter to filter for specific status. all orderItems are returned if not provided
+      parameters:
+        - name: petBusinessId
+          in: path
+          description: ID of the pet business.
+          required: true
+          type: integer
+          default: 5 # Example default value
         - name: statusFilter
           in: query
           description: comma deliminated filters e.g., ?statusFilter=PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED

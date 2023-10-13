@@ -14,14 +14,39 @@ class OrderItemService {
         try {
             const petOwner = await petOwnerService.getUserById(petOwnerId)
 
-            const serviceListings = await prisma.invoice.findMany({
+            const invoices = await prisma.invoice.findMany({
                 where: { petOwnerUserId: petOwner.userId },
                 include: {
                     orderItems: true
                 }
             })
+
+            let orderItems = invoices
+                .map(invoices => invoices.orderItems)
+                .flat()
+
+            if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray)
+
+            return orderItems
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new OrderItemsError(error)
+        }
+    }
+
+    async getPetBusinessOrderItemsById(petBusinessId, statusFilterArray = undefined) {
+        try {
+            const petBusiness = await petBusinessService.getUserById(petBusinessId)
+
+            const serviceListings = await prisma.serviceListing.findMany({
+                where: { petBusinessId: petBusiness.userId },
+                include: {
+                    OrderItem: true
+                }
+            })
+
             let orderItems = serviceListings
-                .map(serviceListing => serviceListing.orderItems)
+                .map(serviceListing => serviceListing.OrderItem)
                 .flat()
 
             if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray)
