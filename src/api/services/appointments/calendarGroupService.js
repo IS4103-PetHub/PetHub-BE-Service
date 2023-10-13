@@ -6,7 +6,6 @@ const EmailService = require('../emailService')
 const PetOwnerService = require('../user/petOwnerService')
 const { differenceInDays, addDays, format, parseISO } = require('date-fns');
 const emailTemplate = require('../../resource/emailTemplate');
-const { getAllCalendarGroups } = require('../../controllers/calendarGroupController');
 const PetBusinessService = require('../user/petBusinessService');
 const emailService = require('../emailService');
 
@@ -14,7 +13,6 @@ class CalendarGroupService {
 
     async getAvailability(calendarGroupId, startTime, endTime, bookingDuration) {
         // 1. Fetch all the timeslots
-
         const queryStartDate = new Date(startTime);
         queryStartDate.setHours(0, 0, 0, 0);
 
@@ -102,19 +100,21 @@ class CalendarGroupService {
         try {
             let includeField = {
                 timeslots: includeTimeSlot ? {
-                    include: { Booking: includeBooking ? {
-                        include: { serviceListing: true }
-                    } : false }
+                    include: {
+                        Booking: includeBooking ? {
+                            include: { serviceListing: true }
+                        } : false
+                    }
                 } : false,
                 scheduleSettings: true
             };
-    
+
             if (formatForFrontend) {
                 // FE requires timePeriods to be included in scheduleSettings instead
                 includeField = {
                     scheduleSettings: {
-                        include: { 
-                            timePeriods: true 
+                        include: {
+                            timePeriods: true
                         },
                     },
                 };
@@ -128,28 +128,28 @@ class CalendarGroupService {
             if (!calendarGroup) throw new CustomError(`CalendarGroup with id (${calendarGroupId}) not found`, 404);
 
             if (formatForFrontend) {
-              // FE requires scheduleSettings to be nested inside a layer of 'recurrence'
-              const transformedCalendarGroup = {
-                calendarGroupId: calendarGroup.calendarGroupId,
-                name: calendarGroup.name,
-                description: calendarGroup.description,
-                scheduleSettings: calendarGroup.scheduleSettings.map((setting) => ({
-                  scheduleSettingsId: setting.scheduleSettingId,
-                  days: setting.days,
-                  recurrence: {
-                    pattern: setting.pattern,
-                    startDate: setting.startDate,
-                    endDate: setting.endDate,
-                    timePeriods: setting.timePeriods.map((period) => ({
-                      timePeriodId: period.timePeriodId,
-                      startTime: period.startTime,
-                      endTime: period.endTime,
-                      vacancies: period.vacancies,
+                // FE requires scheduleSettings to be nested inside a layer of 'recurrence'
+                const transformedCalendarGroup = {
+                    calendarGroupId: calendarGroup.calendarGroupId,
+                    name: calendarGroup.name,
+                    description: calendarGroup.description,
+                    scheduleSettings: calendarGroup.scheduleSettings.map((setting) => ({
+                        scheduleSettingsId: setting.scheduleSettingId,
+                        days: setting.days,
+                        recurrence: {
+                            pattern: setting.pattern,
+                            startDate: setting.startDate,
+                            endDate: setting.endDate,
+                            timePeriods: setting.timePeriods.map((period) => ({
+                                timePeriodId: period.timePeriodId,
+                                startTime: period.startTime,
+                                endTime: period.endTime,
+                                vacancies: period.vacancies,
+                            })),
+                        },
                     })),
-                  },
-                })),
-              };
-              return transformedCalendarGroup;
+                };
+                return transformedCalendarGroup;
             }
 
             return calendarGroup;

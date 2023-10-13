@@ -1,12 +1,11 @@
-
 const serviceListingService = require('../../services/serviceListing/baseServiceListing')
 const { OrderItemStatus } = require('@prisma/client');
 const CustomError = require('../../errors/customError')
+const TransactionError = require('../../errors/transactionError');
 const { v4: uuidv4 } = require("uuid");
 const crypto = require('crypto');
 const prisma = require('../../../../prisma/prisma');
 const constants = require("../../../constants/common");
-
 
 // 1) Payment service builds transaction which returns invoice and orderItems
 // 2) Once Payment service confirms payment, payment service must confirm the transaction with the payment ID
@@ -24,8 +23,7 @@ class TransactionService {
             return invoice;
         } catch (error) {
             if (error instanceof CustomError) throw error
-            // TODO: Create custom error for commission rule
-            // throw new CommissionRuleError(error);
+            throw new TransactionError(error);
         }
     }
 
@@ -57,12 +55,10 @@ class TransactionService {
 
             return await this.getInvoiceById(newInvoice.invoiceId);
         } catch (error) {
-            console.error("Error confirming transaction:", error);
-            throw error;
+            if (error instanceof CustomError) throw error
+            throw new TransactionError(error);
         }
     }
-
-
 
     async buildTransaction(cartItems) {
         try {
@@ -86,8 +82,8 @@ class TransactionService {
                 orderItems
             }
         } catch (error) {
-            console.error('Error building transaction:', error);
-            throw error; // Re-throwing the error or you can handle it based on your application's requirement
+            if (error instanceof CustomError) throw error
+            throw new TransactionError(error);
         }
     }
 
@@ -114,8 +110,8 @@ class TransactionService {
             orderItemArr.forEach(item => { item.voucherCode = this.createSixCharacterCode(); });
             return orderItemArr;
         } catch (error) {
-            console.error('Error building order item:', error);
-            throw error; // Re-throwing the error or you can handle it based on your application's requirement
+            if (error instanceof CustomError) throw error
+            throw new TransactionError(error);
         }
     }
 
