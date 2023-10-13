@@ -73,6 +73,7 @@ const serviceListings = [
       "Professional Pet Grooming offers top-quality pet grooming services for your beloved furry friend. Our dedicated team of experienced groomers is passionate about making your pet look and feel their best. We provide a range of grooming services, including bathing, nail trimming, ear cleaning, and haircuts, all designed to keep your pet clean, healthy, and happy. Our state-of-the-art grooming facility is equipped with the latest tools and equipment to ensure the safety and comfort of your pet during the grooming process. We use only premium, pet-friendly grooming products to ensure that your pet's skin and coat remain in excellent condition. At Professional Pet Grooming, we understand that every pet is unique, and we tailor our services to meet their specific needs. Whether your pet is a dog or a cat, a small breed or a large one, we provide personalized care to ensure they leave looking and feeling their best. Book an appointment with us today, and let us pamper your pet with the care and attention they deserve. Your furry friend will thank you for it!",
     petBusinessId: 1,
     category: "PET_GROOMING",
+    defaultExpiryDays: 30,
     basePrice: 40.0,
     tagIds: [{ tagId: 1 }, { tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 1 }],
@@ -86,6 +87,7 @@ const serviceListings = [
       "Dog Training Session provides expert dog training to teach your pet new tricks. Our dedicated trainers are skilled in working with dogs of all breeds and ages. Whether your dog needs basic obedience training or advanced trick training, we have a program that suits their needs. Our training sessions are designed to be fun and engaging for your pet while ensuring they learn valuable skills. We use positive reinforcement techniques to encourage good behavior and strengthen the bond between you and your furry friend. With Dog Training Session, you'll have a well-behaved and happy dog in no time. Join our training classes and watch your pet's confidence and abilities grow!",
     petBusinessId: 1,
     category: "PET_BOARDING",
+    defaultExpiryDays: 30,
     basePrice: 60.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }, { tagId: 4 }],
     addressIds: [{ addressId: 2 }],
@@ -98,6 +100,7 @@ const serviceListings = [
     description: "Treat your pets to a day of grooming by regular groomers!",
     petBusinessId: 1,
     category: "PET_GROOMING",
+    defaultExpiryDays: 30,
     basePrice: 80.0,
     tagIds: [{ tagId: 1 }, { tagId: 4 }],
     addressIds: [],
@@ -110,6 +113,7 @@ const serviceListings = [
     description: "Ensure your pet's well-being with our thorough health checkup",
     petBusinessId: 1,
     category: "VETERINARY",
+    defaultExpiryDays: 30,
     basePrice: 75.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     duration: 60,
@@ -122,6 +126,9 @@ const serviceListings = [
     description: "Trustworthy pet sitting services for your beloved pets",
     petBusinessId: 4,
     category: "PET_BOARDING",
+    requiresBooking: true,
+    defaultExpiryDays: 30,
+    lastPossibleDate: "2023-11-10T15:59:59.999Z",
     basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
     duration: 60,
@@ -133,6 +140,8 @@ const serviceListings = [
     description: "Find your purr-fect feline friend at our cat adoption event",
     petBusinessId: 5,
     category: "PET_RETAIL",
+    defaultExpiryDays: 30,
+    lastPossibleDate: "2023-12-30T15:59:59.999Z",
     basePrice: 0,
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
     addressIds: [{ addressId: 7 }, { addressId: 8 }],
@@ -144,6 +153,7 @@ const serviceListings = [
     description: "Treat your pets to a day of grooming by regular groomers!",
     petBusinessId: 2,
     category: "PET_GROOMING",
+    defaultExpiryDays: 30,
     basePrice: 70.0,
     tagIds: [{ tagId: 3 }, { tagId: 5 }],
     addressIds: [{ addressId: 3 }],
@@ -156,6 +166,7 @@ const serviceListings = [
       "Adopt a Pet Today is your golden opportunity to embark on a heartwarming journey of discovering your perfect furry companion at our extraordinary adoption event. We proudly collaborate with local animal shelters, forging invaluable partnerships that allow us to present you with an irresistibly diverse selection of cats and dogs, each yearning for the love and warmth of a forever home.\n\nOur adoption process is not just simple; it's a straightforward path paved with compassion and care, making your journey to find a new pet as effortless as it is rewarding. Whether your heart desires the playful antics of a frisky kitten or the unwavering loyalty of a devoted canine companion, rest assured that our adoption center has a plethora of charming and charismatic pets eagerly waiting to make your acquaintance.\n\nOne of the most remarkable aspects of Adopt a Pet Today is our commitment to affordability. We firmly believe that love knows no price tag, and every pet deserves a chance to find a loving family. That's why our adoption fees are exceptionally reasonable, ensuring that you can open your heart and home to a deserving pet without breaking the bank.\n\nBut our dedication doesn't stop there. We go the extra mile to ensure that every pet who leaves our adoption center is equipped for a bright future. Before they become a part of your family, each of our pets undergoes essential medical care. They are spayed or neutered to help control the pet population and reduce the number of homeless animals. Our dedicated veterinary team administers vaccinations to keep your new companion in the pink of health. Additionally, we take the critical step of microchipping every pet, providing an extra layer of security to reunite lost pets with their loving owners.\n\nWhen you visit Adopt a Pet Today, you're not just finding a new best friend; you're giving a homeless pet a second chance at a happy, fulfilling life. It's a heartwarming journey filled with love, compassion, and boundless joy. Your decision to adopt a pet from our event is a powerful testament to your commitment to making the world a better place for animals in need.\n\nCome, be a part of this beautiful journey, and let us guide you toward your new best friend. Visit Adopt a Pet Today, where love knows no bounds, and where the extraordinary adventure of pet adoption begins.",
     petBusinessId: 5,
     category: "PET_RETAIL",
+    defaultExpiryDays: 30,
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
     duration: 60,
@@ -175,6 +186,7 @@ const serviceListings = [
     description: "Treat your pets to a day of grooming by VIP groomers!",
     petBusinessId: 1,
     category: "PET_GROOMING",
+    defaultExpiryDays: 30,
     basePrice: 120.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     addressIds: [],
@@ -187,6 +199,7 @@ const serviceListings = [
     description: "Hi, my name is John and I just got my vet license, let's put it to the test!",
     petBusinessId: 1,
     category: "VETERINARY",
+    defaultExpiryDays: 30,
     basePrice: 20.0,
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 1 }],
@@ -201,6 +214,7 @@ const serviceListings = [
     description: "Join our fun and interactive puppy training class!",
     petBusinessId: 6,
     category: "PET_BOARDING",
+    defaultExpiryDays: 30,
     basePrice: 50.0,
     tagIds: [{ tagId: 1 }, { tagId: 5 }],
     addressIds: [],
@@ -212,6 +226,7 @@ const serviceListings = [
     description: "Give your pet a home away from home with our boarding and daycare services.",
     petBusinessId: 6,
     category: "PET_BOARDING",
+    defaultExpiryDays: 30,
     basePrice: 35.0,
     tagIds: [{ tagId: 2 }],
     addressIds: [],
@@ -223,6 +238,7 @@ const serviceListings = [
     description: "Pamper your feline friend with our cat grooming services.",
     petBusinessId: 7,
     category: "PET_GROOMING",
+    defaultExpiryDays: 30,
     basePrice: 60.0,
     tagIds: [],
     addressIds: [],
@@ -234,6 +250,7 @@ const serviceListings = [
     description: "Let our experienced dog walkers take your furry friend on an exciting adventure!",
     petBusinessId: 7,
     category: "PET_RETAIL",
+    defaultExpiryDays: 30,
     basePrice: 30.0,
     tagIds: [{ tagId: 4 }],
     addressIds: [],
@@ -245,6 +262,7 @@ const serviceListings = [
     description: "Capture beautiful moments with your pets in a professional photoshoot.",
     petBusinessId: 7,
     category: "PET_RETAIL",
+    defaultExpiryDays: 30,
     basePrice: 75.0,
     tagIds: [{ tagId: 3 }],
     addressIds: [],
@@ -257,6 +275,7 @@ const serviceListings = [
       "Enjoy peace of mind knowing that your dog is in good hands with John. Whether it's for a few hours or an evening, your dog will receive personalized attention and care. We'll make sure your dog feels comfortable and happy while you're away. Book a dog sitting session with us, and let your furry companion have a great time with John!",
     petBusinessId: 1,
     category: "PET_BOARDING",
+    defaultExpiryDays: 30,
     basePrice: 30.0,
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
     addressIds: [{ addressId: 1 }],
@@ -272,7 +291,7 @@ async function seedBusinessData(prisma) {
     const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
     groomingFiles.push(file);
   }
-  
+
   const groomingKey = await s3ServiceInstance.uploadImgFiles(groomingFiles, 'service-listing')
   const groomingUrl = await s3ServiceInstance.getObjectSignedUrl(groomingKey)
 
@@ -307,6 +326,9 @@ async function seedBusinessData(prisma) {
     const createObject = {
       title: data.title,
       description: data.description,
+      defaultExpiryDays: data.defaultExpiryDays,
+      lastPossibleDate: data.lastPossibleDate,
+      requiresBooking: data.requiresBooking,
       basePrice: data.basePrice,
       category: data.category,
       duration: data.duration,
@@ -322,7 +344,7 @@ async function seedBusinessData(prisma) {
         },
       },
     };
-    
+
     switch (data.id) {
       case 9:
         createObject.attachmentKeys = groomingKey;
@@ -349,7 +371,7 @@ async function seedBusinessData(prisma) {
 
     await prisma.serviceListing.upsert({
       where: { serviceListingId: data.id },
-      update: {},
+      update: createObject,
       create: createObject,
     });
   }

@@ -13,7 +13,7 @@ model ServiceListing {
   dateCreated       DateTime  @default(now())
   lastUpdated       DateTime?
   duration          Int?
-  defaultExpiryDays Int? // Number of days from purchase for the default expiry
+  defaultExpiryDays Int // Number of days from purchase for the default expiry
   lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
   requiresBooking   Boolean   @default(false)
 
@@ -30,7 +30,6 @@ model ServiceListing {
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
-  Invoice         Invoice[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
