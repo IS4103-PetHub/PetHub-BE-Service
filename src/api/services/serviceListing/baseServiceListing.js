@@ -24,7 +24,7 @@ exports.createServiceListing = async (data) => {
     // format as "[{ tagId: 8 }, { tagId: 9 }, { tagId: 10 }]"
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     if (data.tagIds) {
-      tagIdsArray =  data.tagIds.map((id) => ({ tagId: id }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
     }
     if (data.addressIds) {
       // validate that data.addressIds is a subset of petBusiness's addresses
@@ -72,7 +72,7 @@ exports.createServiceListing = async (data) => {
         },
       },
     };
-    
+
     if (data.calendarGroupId) {
       serviceListingData.CalendarGroup = {
         connect: {
@@ -106,7 +106,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
     if (!serviceListing) {
       throw new CustomError("Service listing not found", 404);
     }
-    
+
     // format as "[{ tagId: 8 }, { tagId: 9 }, { tagId: 10 }]"
     // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#connect-multiple-records
     let tagIdsArray = [],
@@ -153,7 +153,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       },
       lastUpdated: new Date()
     }
-    
+
     if (data.calendarGroupId) {
       serviceListingData.CalendarGroup = {
         connect: {
@@ -161,7 +161,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
         }
       }
     }
-    
+
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
       data: serviceListingData,
@@ -229,8 +229,8 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
       },
     });
     const filteredListings = serviceListings.filter((listing) =>
-    (categories.length === 0 || categories.includes(listing.category)) &&
-    (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
+      (categories.length === 0 || categories.includes(listing.category)) &&
+      (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
     );
     filteredListings.sort((a, b) => b.dateCreated - a.dateCreated);
     if (limit !== null && limit > 0) {
@@ -243,7 +243,7 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
   }
 };
 
-exports.getServiceListingById = async (serviceListingId) => {
+exports.getServiceListingById = async (serviceListingId, showCommissionRule = false) => {
   try {
     const serviceListing = await prisma.serviceListing.findUnique({
       where: { serviceListingId },
@@ -252,7 +252,8 @@ exports.getServiceListingById = async (serviceListingId) => {
         addresses: true,
         petBusiness: {
           include: {
-            user: true
+            user: true,
+            commissionRule: showCommissionRule
           },
         },
         CalendarGroup: true

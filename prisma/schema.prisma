@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Mon Oct 09 2023 20:30:51 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Fri Oct 13 2023 21:42:27 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -49,12 +49,10 @@ model TimeSlot {
 }
 
 model Booking {
-  bookingId     Int       @id @default(autoincrement())
-  invoiceId     Int?
-  transactionId Int?
-  petOwnerId    Int
-  dateCreated   DateTime  @default(now())
-  lastUpdated   DateTime?
+  bookingId   Int       @id @default(autoincrement())
+  petOwnerId  Int
+  dateCreated DateTime  @default(now())
+  lastUpdated DateTime?
 
   startTime DateTime
   endTime   DateTime
@@ -65,9 +63,10 @@ model Booking {
   timeSlotId Int?
   timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
 
-  petId     Int?
-  pet       Pet?        @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
-  OrderItem OrderItem[]
+  petId       Int?
+  pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
+  OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+  orderItemId Int       @unique
 }
 
 generator client {
@@ -179,19 +178,16 @@ model CommissionRule {
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
-  invoiceId      Int      @id @default(autoincrement())
-  totalPrice     Float // The total price of the time of transaction
-  commissionRate Float // The commission rate at the time of transaction
-  createdAt      DateTime @default(now())
-  paymentId      Int      @unique // to be obtained from Stripe transaction
+  invoiceId  Int      @id @default(autoincrement())
+  totalPrice Float // The total price of the time of transaction
+  createdAt  DateTime @default(now())
+  paymentId  String   @unique // to be obtained from Stripe transaction
 
   miscCharge Float // to account for tax/stripe_charge etc
 
-  orderItems                     OrderItem[]
-  PetOwner                       PetOwner        @relation(fields: [petOwnerUserId], references: [userId])
-  petOwnerUserId                 Int
-  ServiceListing                 ServiceListing? @relation(fields: [serviceListingServiceListingId], references: [serviceListingId])
-  serviceListingServiceListingId Int?
+  orderItems     OrderItem[]
+  PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
+  petOwnerUserId Int
 }
 
 enum OrderItemStatus {
@@ -205,25 +201,26 @@ enum OrderItemStatus {
 
 // Note: OrderItem must remain immutable as much as possible for accounting purposes
 model OrderItem {
-  orderItemId Int       @id @default(autoincrement())
-  itemName    String // Name of the order item at the time of transaction
-  itemPrice   Float // Item Price of the individual item at the time of transaction
-  quantity    Int // maybe don't need Quantity of the item ordered
-  expiryDate  DateTime? // Optional expiry date field; from serviceListing
-  voucherCode String // generated UUID to identify order
+  orderItemId    Int             @id @default(autoincrement())
+  itemName       String // Name of the order item at the time of transaction
+  itemPrice      Float // Item Price of the individual item at the time of transaction
+  commissionRate Float // The commission rate at the time of transaction
+  expiryDate     DateTime
+  voucherCode    String // generated UUID to identify order
+  status         OrderItemStatus @default(PENDING_FULFILLMENT)
+
   // Must be associated to invoice
-  invoiceId   Int
-  invoice     Invoice   @relation(fields: [invoiceId], references: [invoiceId])
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
 
   // associated to service listing for additional info
   serviceListingId Int
   serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
 
   // (Optional) Bookings associated with the order item
-  booking Booking? @relation(fields: [bookingBookingId], references: [bookingId])
+  booking Booking?
 
-  RefundRequest    RefundRequest?
-  bookingBookingId Int?
+  RefundRequest RefundRequest?
 }
 
 enum RefundStatus {
@@ -262,7 +259,7 @@ model ServiceListing {
   dateCreated       DateTime  @default(now())
   lastUpdated       DateTime?
   duration          Int?
-  defaultExpiryDays Int? // Number of days from purchase for the default expiry
+  defaultExpiryDays Int // Number of days from purchase for the default expiry
   lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
   requiresBooking   Boolean   @default(false)
 
@@ -279,7 +276,6 @@ model ServiceListing {
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
-  Invoice         Invoice[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit

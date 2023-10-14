@@ -1,22 +1,20 @@
 import {PetOwner, PetBusiness} from "../user/user"
 import {ServiceListing} from "../serviceListing/serviceListing"
 import {Booking} from "../appointments/appointments"
+import { OrderItemStatus } from "../../schema"
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
-  invoiceId      Int      @id @default(autoincrement())
-  totalPrice     Float // The total price of the time of transaction
-  commissionRate Float // The commission rate at the time of transaction
-  createdAt      DateTime @default(now())
-  paymentId      Int      @unique // to be obtained from Stripe transaction
+  invoiceId  Int      @id @default(autoincrement())
+  totalPrice Float // The total price of the time of transaction
+  createdAt  DateTime @default(now())
+  paymentId  String   @unique // to be obtained from Stripe transaction
 
   miscCharge Float // to account for tax/stripe_charge etc
 
-  orderItems                     OrderItem[]
-  PetOwner                       PetOwner        @relation(fields: [petOwnerUserId], references: [userId])
-  petOwnerUserId                 Int
-  ServiceListing                 ServiceListing? @relation(fields: [serviceListingServiceListingId], references: [serviceListingId])
-  serviceListingServiceListingId Int?
+  orderItems     OrderItem[]
+  PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
+  petOwnerUserId Int
 }
 
 enum OrderItemStatus {
@@ -30,25 +28,26 @@ enum OrderItemStatus {
 
 // Note: OrderItem must remain immutable as much as possible for accounting purposes
 model OrderItem {
-  orderItemId Int       @id @default(autoincrement())
-  itemName    String // Name of the order item at the time of transaction
-  itemPrice   Float // Item Price of the individual item at the time of transaction
-  quantity    Int // maybe don't need Quantity of the item ordered
-  expiryDate  DateTime? // Optional expiry date field; from serviceListing
-  voucherCode String // generated UUID to identify order
+  orderItemId    Int             @id @default(autoincrement())
+  itemName       String // Name of the order item at the time of transaction
+  itemPrice      Float // Item Price of the individual item at the time of transaction
+  commissionRate Float // The commission rate at the time of transaction
+  expiryDate     DateTime
+  voucherCode    String // generated UUID to identify order
+  status         OrderItemStatus @default(PENDING_FULFILLMENT)
+
   // Must be associated to invoice
-  invoiceId   Int
-  invoice     Invoice   @relation(fields: [invoiceId], references: [invoiceId])
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
 
   // associated to service listing for additional info
   serviceListingId Int
   serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
 
   // (Optional) Bookings associated with the order item
-  booking Booking? @relation(fields: [bookingBookingId], references: [bookingId])
+  booking Booking?
 
-  RefundRequest    RefundRequest?
-  bookingBookingId Int?
+  RefundRequest RefundRequest?
 }
 
 enum RefundStatus {

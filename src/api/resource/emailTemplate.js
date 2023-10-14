@@ -111,3 +111,29 @@ exports.deleteServiceListingEmail = (name, postTitle) => {
     Pethub
     `;
 };
+
+exports.checkoutSuccessEmail = (name, invoice, link) => {
+  return `
+    Dear ${name},
+
+    Thank you for your purchase at PetHub!
+
+    We are pleased to inform you that your order has been successfully processed.
+
+    Order Summary:
+    - Invoice ID: ${invoice.invoiceId}
+    - Payment ID: ${invoice.paymentId}
+
+    Billing Details:
+    - Subtotal: $${invoice.totalPrice - invoice.miscCharge}
+    - Tax (7%): $${invoice.miscCharge}
+    - Total Amount: $${invoice.totalPrice}
+
+    You can view your order details and track the delivery status by clicking the following link: [View Order Details](${link})
+
+    We appreciate your business and look forward to serving you again.
+
+    Warm regards,
+    The PetHub Team
+`;
+}
