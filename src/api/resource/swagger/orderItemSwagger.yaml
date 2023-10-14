@@ -2,6 +2,44 @@ swagger: "2.0"
 # definitions:
 
 paths:
+  /api/order-items:
+    get:
+      summary: Get all order items.
+      description: Get order items. Use statusFilter to filter for specific status. all orderItems are returned if not provided
+      parameters:
+        - name: statusFilter
+          in: query
+          description: comma deliminated filters e.g., ?statusFilter=PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED
+          required: false
+          type: string
+          default: PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED
+      responses:
+        200:
+          description: List of order items
+          content:
+            application/json:
+              schema:
+                type: array
+      tags:
+        - Order Items
+
+  /api/order-items/{orderItemId}:
+    get:
+      summary: Get order items by ID.
+      description: Get order items by ID. Use statusFilter to filter for specific status. all orderItems are returned if not provided
+      parameters:
+        - name: orderItemId
+          in: path
+          description: ID of the order item.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: order item details
+      tags:
+        - Order Items
+
   /api/order-items/pet-owners/{petOwnerId}:
     get:
       summary: Get order items by pet owner ID.

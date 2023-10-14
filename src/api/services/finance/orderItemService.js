@@ -14,6 +14,7 @@ class OrderItemService {
         try {
             const orderItem = await prisma.orderItem.findUnique({
                 where: { orderItemId: orderItemId },
+                include: { booking: true },
             });
 
             if (!orderItem) throw new CustomError('Order item not found', 404);
@@ -24,6 +25,21 @@ class OrderItemService {
         }
     }
 
+    async getAllOrderItems(statusFilterArray = undefined) {
+        try {
+            let orderItems = await prisma.orderItem.findMany({
+                include: {
+                    booking: true
+                }
+            })
+
+            if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray)
+            return orderItems
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new OrderItemsError(error)
+        }
+    }
 
     async getPetOwnerOrderItemsById(petOwnerId, statusFilterArray = undefined) {
         try {
@@ -80,7 +96,6 @@ class OrderItemService {
             throw new OrderItemsError(error)
         }
     }
-
 
     filterOrderItems(orderItems, statusFilterArray = Object.values(OrderItemStatus)) {
         const statusFilter = new Set(statusFilterArray);
