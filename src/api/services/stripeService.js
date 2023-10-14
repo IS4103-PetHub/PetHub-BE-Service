@@ -1,7 +1,9 @@
 require("dotenv").config();
+const CustomError = require("../errors/customError");
 
 // global instance
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const DEC_PLACE = 100
 
 class StripeService {
   constructor() {
@@ -9,11 +11,11 @@ class StripeService {
   }
 
   // SERVICE FUNCTIONS
-  
+
   async processPayment(paymentMethodId, amount, email, currency = 'SGD') {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: amount,
+        amount: amount * DEC_PLACE,
         currency: currency,
         payment_method: paymentMethodId,
         confirm: true,
@@ -21,11 +23,13 @@ class StripeService {
         return_url: "http://localhost:3000/payments" // TODO: discuss with FE what page to route to after payments
       });
 
+      if (!paymentIntent) throw new CustomError("Stripe: Unable to process payment", 500);
       // TODO: Maybe save card after payment --> Tag to customer ID
 
       return paymentIntent.id;
     } catch (error) {
-      throw new Error('Payment processing failed: ' + error.message);
+      if (error instanceof CustomError) throw error;
+      throw new CustomError('Stripe: Unknown payment processing failure: ' + error.message, 500);
     }
   }
 
@@ -33,7 +37,7 @@ class StripeService {
     try {
       const refund = await this.stripe.refunds.create({
         payment_intent: paymentIntentId,
-        amount: amount,
+        amount: amount * DEC_PLACE,
       });
       return refund;
     } catch (error) {
@@ -46,7 +50,7 @@ class StripeService {
   async checkBalance() {
     try {
       const balance = await stripe.balance.retrieve();
-      console.log(balance);
+      console.log(balance / DEC_PLACE);
     } catch (error) {
       console.error('Error checking balance:', error);
     }

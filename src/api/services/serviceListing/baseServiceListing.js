@@ -22,7 +22,7 @@ exports.createServiceListing = async (data) => {
 
     let tagIdsArray = [], addressIdsArray = [];
     if (data.tagIds) {
-      tagIdsArray =  data.tagIds.map((id) => ({ tagId: id }));
+      tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
     }
     if (data.addressIds) {
       // validate that data.addressIds is a subset of petBusiness's addresses
@@ -61,7 +61,7 @@ exports.createServiceListing = async (data) => {
         },
       },
     };
-    
+
     if (data.calendarGroupId) {
       serviceListingData.CalendarGroup = {
         connect: {
@@ -134,7 +134,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       },
       lastUpdated: new Date()
     }
-    
+
     if (data.calendarGroupId) {
       serviceListingData.CalendarGroup = {
         connect: {
@@ -142,7 +142,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
         }
       }
     }
-    
+
     const updatedListing = await prisma.serviceListing.update({
       where: { serviceListingId },
       data: serviceListingData,
@@ -243,7 +243,7 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
   }
 };
 
-exports.getServiceListingById = async (serviceListingId) => {
+exports.getServiceListingById = async (serviceListingId, showCommissionRule = false) => {
   try {
     const serviceListing = await prisma.serviceListing.findUnique({
       where: { serviceListingId },
@@ -252,7 +252,8 @@ exports.getServiceListingById = async (serviceListingId) => {
         addresses: true,
         petBusiness: {
           include: {
-            user: true
+            user: true,
+            commissionRule: showCommissionRule
           },
         },
         CalendarGroup: true

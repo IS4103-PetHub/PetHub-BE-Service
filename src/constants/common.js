@@ -27,9 +27,11 @@ const errorMessages = {
 };
 
 const DEFAULT_CR_ID = 1; // Default Commission Rule is Seeded to ID 1
+const MISC_CHARGE_PCT = 0.07; // Default Commission Rule is Seeded to ID 1
 
 module.exports = {
   limitations,
   errorMessages,
-  DEFAULT_CR_ID
+  DEFAULT_CR_ID,
+  MISC_CHARGE_PCT
 };

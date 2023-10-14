@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: "2.0"
 definitions:
   PaymentRequest:
     type: object
@@ -6,15 +6,12 @@ definitions:
       paymentMethodId:
         type: string
         description: The ID of the payment method.
-      amount:
+      totalPrice:
         type: integer
-        description: The payment amount.
+        description: total amount payable.
       userId:
         type: integer
         description: The ID of the user.
-      itemCount:
-        type: string
-        description: The number of items in the cart.
       cartItems:
         type: array
         items:
@@ -26,24 +23,19 @@ definitions:
             quantity:
               type: integer
               description: The quantity of the item.
-            cartItemId:
-              type: integer
-              description: The ID of the cart item.
     example:
       paymentMethodId: "pm_card_visa"
-      amount: 1700
+      totalPrice: 177.09
       userId: 9
-      itemCount: "8"
       cartItems:
         - serviceListingId: 10
-          quantity: 3
-          cartItemId: 1
+          quantity: 2
         - serviceListingId: 4
           quantity: 1
-          cartItemId: 2
-        - serviceListingId: 7
+        - serviceListingId: 5
           quantity: 1
-          cartItemId: 3
+        - serviceListingId: 6
+          quantity: 1
   # wil change when OrderItems and Invoice is generated
   PaymentResponse:
     type: object
@@ -62,14 +54,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/PaymentRequest'
-        
+              $ref: "#/definitions/PaymentRequest"
+
       responses:
         200:
           description: Payment intent created successfully
           content:
             application/json:
               schema:
-                $ref: '#/definitions/PaymentResponse'
+                $ref: "#/definitions/PaymentResponse"
       tags:
-          - Payments
+        - Payments

@@ -30,7 +30,6 @@ model ServiceListing {
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
-  Invoice         Invoice[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
