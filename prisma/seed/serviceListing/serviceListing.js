@@ -1,5 +1,5 @@
-const fetch = require('node-fetch');
-const s3ServiceInstance = require('../../../src/api/services/s3Service');
+const fetch = require("node-fetch");
+const s3ServiceInstance = require("../../../src/api/services/s3Service");
 
 const tags = [
   {
@@ -21,49 +21,49 @@ const tags = [
   {
     id: 5,
     name: "Adoption",
-  }
+  },
 ];
 
 const groomingUrls = [
   {
     url: "https://bpanimalhospital.com/wp-content/uploads/shutterstock_1547371985.jpg",
-    name: "dog_grooming_1"
+    name: "dog_grooming_1",
   },
   {
     url: "https://images.squarespace-cdn.com/content/v1/5dda8663782768313a35b549/1626234766844-5DT4FUEXOY0YSBWOYM7U/Ultimate+List+Of+Best+Dog+Groomers+Singapore",
-    name: "dog_grooming_2"
+    name: "dog_grooming_2",
   },
   {
     url: "https://assets.petco.com/petco/image/upload/f_auto,q_auto:best/grooming-lp-by-appointment-bath-and-haircut-img-1000x667",
-    name: "dog_grooming_3"
+    name: "dog_grooming_3",
   },
   {
     url: "https://assets3.thrillist.com/v1/image/3059921/1200x630/flatten;crop_down;webp=auto;jpeg_quality=70",
-    name: "cat_grooming_1"
+    name: "cat_grooming_1",
   },
-]
+];
 
 const vetUrls = [
   {
     url: "https://i.insider.com/5d289d6921a86120285e5e24?width=700",
-    name: "dog_vet_1"
+    name: "dog_vet_1",
   },
   {
     url: "https://www.vetmed.com.au/wp-content/uploads/2019/03/How-to-Choose-Right-Vet-Clinic-for-Your-Multi-Breeds-Pets.jpg",
-    name: "dog_vet_2"
+    name: "dog_vet_2",
   },
   {
     url: "https://img1.wsimg.com/isteam/ip/3b648486-0d2e-4fcd-8deb-ddb6ce935eb3/blob-0010.png",
-    name: "dog_vet_3"
+    name: "dog_vet_3",
   },
-]
+];
 
 const sittingUrls = [
   {
     url: "https://i.cbc.ca/1.6654160.1668638085!/fileImage/httpImage/image.jpg_gen/derivatives/original_780/what-to-consider-when-looking-for-a-pet-sitter.jpg",
-    name: "dog_sitting_1"
-  }
-]
+    name: "dog_sitting_1",
+  },
+];
 
 const serviceListings = [
   {
@@ -213,7 +213,7 @@ const serviceListings = [
     id: 11,
     title: "Puppy Training Class",
     description: "Join our fun and interactive puppy training class!",
-    petBusinessId: 6,
+    petBusinessId: 5,
     category: "PET_BOARDING",
     defaultExpiryDays: 30,
     basePrice: 50.0,
@@ -225,7 +225,7 @@ const serviceListings = [
     id: 12,
     title: "Pet Boarding and Daycare",
     description: "Give your pet a home away from home with our boarding and daycare services.",
-    petBusinessId: 6,
+    petBusinessId: 5,
     category: "PET_BOARDING",
     defaultExpiryDays: 30,
     basePrice: 35.0,
@@ -237,7 +237,7 @@ const serviceListings = [
     id: 13,
     title: "Cat Grooming Special",
     description: "Pamper your feline friend with our cat grooming services.",
-    petBusinessId: 7,
+    petBusinessId: 5,
     category: "PET_GROOMING",
     defaultExpiryDays: 30,
     basePrice: 60.0,
@@ -249,7 +249,7 @@ const serviceListings = [
     id: 14,
     title: "Dog Walking Adventure",
     description: "Let our experienced dog walkers take your furry friend on an exciting adventure!",
-    petBusinessId: 7,
+    petBusinessId: 5,
     category: "PET_RETAIL",
     defaultExpiryDays: 30,
     basePrice: 30.0,
@@ -261,7 +261,7 @@ const serviceListings = [
     id: 15,
     title: "Pet Photography Session",
     description: "Capture beautiful moments with your pets in a professional photoshoot.",
-    petBusinessId: 7,
+    petBusinessId: 5,
     category: "PET_RETAIL",
     defaultExpiryDays: 30,
     basePrice: 75.0,
@@ -286,32 +286,30 @@ const serviceListings = [
 ];
 
 async function seedBusinessData(prisma) {
-
   const groomingFiles = [];
   for (const imageUrl of groomingUrls) {
     const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
     groomingFiles.push(file);
   }
 
-  const groomingKey = await s3ServiceInstance.uploadImgFiles(groomingFiles, 'service-listing')
-  const groomingUrl = await s3ServiceInstance.getObjectSignedUrl(groomingKey)
+  const groomingKey = await s3ServiceInstance.uploadImgFiles(groomingFiles, "service-listing");
+  const groomingUrl = await s3ServiceInstance.getObjectSignedUrl(groomingKey);
 
   const vetFiles = [];
   for (const imageUrl of vetUrls) {
     const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
     vetFiles.push(file);
   }
-  const vetKey = await s3ServiceInstance.uploadImgFiles(vetFiles, 'service-listing')
-  const vetUrl = await s3ServiceInstance.getObjectSignedUrl(vetKey)
+  const vetKey = await s3ServiceInstance.uploadImgFiles(vetFiles, "service-listing");
+  const vetUrl = await s3ServiceInstance.getObjectSignedUrl(vetKey);
 
   const sittingFiles = [];
   for (const imageUrl of sittingUrls) {
     const file = await remoteImageUrlToFile(imageUrl.url, imageUrl.name);
     sittingFiles.push(file);
   }
-  const sittingKey = await s3ServiceInstance.uploadImgFiles(sittingFiles, 'service-listing')
-  const sittingUrl = await s3ServiceInstance.getObjectSignedUrl(sittingKey)
-
+  const sittingKey = await s3ServiceInstance.uploadImgFiles(sittingFiles, "service-listing");
+  const sittingUrl = await s3ServiceInstance.getObjectSignedUrl(sittingKey);
 
   for (const tag of tags) {
     await prisma.tag.upsert({
@@ -387,7 +385,7 @@ async function remoteImageUrlToFile(url, filename) {
     const buffer = await response.buffer();
     return { buffer: buffer, originalname: filename };
   } catch (error) {
-    console.error('Error converting remote image to File:', error);
+    console.error("Error converting remote image to File:", error);
     throw error;
   }
 }

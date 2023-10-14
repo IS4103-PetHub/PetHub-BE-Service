@@ -329,233 +329,233 @@ const bookingPayloads = [
     endTime: generateBookingTime(getSuitableSpecialDate(3, 2), "10:00"),
   },
   {
-    bookingIndex: 9,
-    calendarGroupId: 1,
-    serviceListingId: 8,
-    startTime: generateBookingTime(getSuitableSpecialDate(3, 2), "10:00"), // Normal grooming waterslide experience
-    endTime: generateBookingTime(getSuitableSpecialDate(3, 2), "11:00"),
-  },
-  {
-    bookingIndex: 9,
-    calendarGroupId: 1,
-    serviceListingId: 8,
-    startTime: generateBookingTime(getSuitableSpecialDate(3, 2), "10:00"), // Normal grooming waterslide experience
-    endTime: generateBookingTime(getSuitableSpecialDate(3, 2), "11:00"),
-  },
-  {
     bookingIndex: 10,
+    calendarGroupId: 1,
+    serviceListingId: 8,
+    startTime: generateBookingTime(getSuitableSpecialDate(3, 2), "10:00"), // Normal grooming waterslide experience
+    endTime: generateBookingTime(getSuitableSpecialDate(3, 2), "11:00"),
+  },
+  {
+    bookingIndex: 11,
+    calendarGroupId: 1,
+    serviceListingId: 8,
+    startTime: generateBookingTime(getSuitableSpecialDate(3, 2), "10:00"), // Normal grooming waterslide experience
+    endTime: generateBookingTime(getSuitableSpecialDate(3, 2), "11:00"),
+  },
+  {
+    bookingIndex: 12,
     calendarGroupId: 1,
     serviceListingId: 8,
     startTime: generateBookingTime(getSuitableSpecialDate(4, 2), "13:00"), // Normal grooming waterslide experience
     endTime: generateBookingTime(getSuitableSpecialDate(4, 2), "14:00"),
   },
   {
-    bookingIndex: 11,
+    bookingIndex: 13,
     calendarGroupId: 1,
     serviceListingId: 8,
     startTime: generateBookingTime(getSuitableSpecialDate(4, 2), "15:00"), // Normal grooming waterslide experience
     endTime: generateBookingTime(getSuitableSpecialDate(4, 2), "17:00"),
   },
   {
-    bookingIndex: 12,
+    bookingIndex: 14,
     calendarGroupId: 1,
     serviceListingId: 8,
     startTime: generateBookingTime(getSuitableSpecialDate(5, 2), "13:00"), // Normal grooming waterslide experience
     endTime: generateBookingTime(getSuitableSpecialDate(5, 2), "14:00"),
   },
   {
-    bookingIndex: 13,
+    bookingIndex: 15,
     calendarGroupId: 1,
     serviceListingId: 1,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 3), "10:00"), // Normal grooming fun times
     endTime: generateBookingTime(getSuitableSpecialDate(1, 3), "11:00"),
   },
   {
-    bookingIndex: 14,
+    bookingIndex: 16,
     calendarGroupId: 1,
     serviceListingId: 1,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 3), "13:00"), // Normal grooming fun times
     endTime: generateBookingTime(getSuitableSpecialDate(1, 3), "14:00"),
   },
   {
-    bookingIndex: 15,
+    bookingIndex: 17,
     calendarGroupId: 1,
     serviceListingId: 1,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 3), "14:00"), // Normal grooming fun times
     endTime: generateBookingTime(getSuitableSpecialDate(2, 3), "17:00"),
   },
   {
-    bookingIndex: 16,
+    bookingIndex: 18,
     calendarGroupId: 1,
     serviceListingId: 1,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 3), "13:00"), // Normal grooming fun times
     endTime: generateBookingTime(getSuitableSpecialDate(2, 3), "14:00"),
   },
   {
-    bookingIndex: 17,
+    bookingIndex: 19,
     calendarGroupId: 1,
     serviceListingId: 1,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 4), "13:00"), // Normal grooming fun times
     endTime: generateBookingTime(getSuitableSpecialDate(2, 4), "14:00"),
   },
   {
-    bookingIndex: 18,
+    bookingIndex: 20,
     calendarGroupId: 1,
     serviceListingId: 8,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 4), "14:00"), // Normal grooming fun times
     endTime: generateBookingTime(getSuitableSpecialDate(2, 4), "15:00"),
   },
   {
-    bookingIndex: 19,
+    bookingIndex: 21,
     calendarGroupId: 2,
     serviceListingId: 9,
     startTime: generateBookingTime(getSuitableSpecialDate(4, 0), "12:00"), // VIP grooming ninja offering
     endTime: generateBookingTime(getSuitableSpecialDate(4, 0), "14:00"),
   },
   {
-    bookingIndex: 20,
+    bookingIndex: 22,
     calendarGroupId: 2,
     serviceListingId: 9,
     startTime: generateBookingTime(getSuitableSpecialDate(5, 0), "14:00"), // VIP grooming ninja offering
     endTime: generateBookingTime(getSuitableSpecialDate(5, 0), "15:00"),
   },
   {
-    bookingIndex: 21,
+    bookingIndex: 23,
     calendarGroupId: 2,
     serviceListingId: 9,
     startTime: generateBookingTime(getSuitableSpecialDate(7, 2), "12:00"), // VIP grooming ninja offering
     endTime: generateBookingTime(getSuitableSpecialDate(7, 2), "13:00"),
   },
   {
-    bookingIndex: 22,
+    bookingIndex: 24,
     calendarGroupId: 2,
     serviceListingId: 9,
     startTime: generateBookingTime(getSuitableSpecialDate(7, 2), "13:00"), // VIP grooming ninja offering
     endTime: generateBookingTime(getSuitableSpecialDate(7, 2), "14:00"),
   },
   {
-    bookingIndex: 23,
+    bookingIndex: 25,
     calendarGroupId: 3,
     serviceListingId: 10,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 0), "09:30"), // John's new vet experiment
     endTime: generateBookingTime(getSuitableSpecialDate(1, 0), "10:30"),
   },
   {
-    bookingIndex: 24,
+    bookingIndex: 26,
     calendarGroupId: 3,
     serviceListingId: 10,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 0), "12:00"), // John's new vet experiment
     endTime: generateBookingTime(getSuitableSpecialDate(1, 0), "13:00"),
   },
   {
-    bookingIndex: 25,
+    bookingIndex: 27,
     calendarGroupId: 3,
     serviceListingId: 10,
     startTime: generateBookingTime(getSuitableSpecialDate(5, 0), "10:00"), // John's new vet experiment
     endTime: generateBookingTime(getSuitableSpecialDate(5, 0), "11:00"),
   },
   {
-    bookingIndex: 26,
+    bookingIndex: 28,
     calendarGroupId: 3,
     serviceListingId: 10,
     startTime: generateBookingTime(getSuitableSpecialDate(5, 1), "11:00"), // John's new vet experiment
     endTime: generateBookingTime(getSuitableSpecialDate(5, 1), "12:00"),
   },
   {
-    bookingIndex: 27,
+    bookingIndex: 29,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 1), "11:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(1, 1), "12:00"),
   },
   {
-    bookingIndex: 28,
+    bookingIndex: 30,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 1), "12:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(1, 1), "13:00"),
   },
   {
-    bookingIndex: 29,
+    bookingIndex: 31,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 1), "13:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(1, 1), "14:00"),
   },
   {
-    bookingIndex: 30,
+    bookingIndex: 32,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 1), "11:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(1, 1), "12:00"),
   },
   {
-    bookingIndex: 31,
+    bookingIndex: 33,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(1, 1), "12:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(1, 1), "13:00"),
   },
   {
-    bookingIndex: 32,
+    bookingIndex: 34,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(5, 1), "13:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(5, 1), "14:00"),
   },
   {
-    bookingIndex: 33,
-    calendarGroupId: 4,
-    serviceListingId: 2,
-    startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "15:00"), // John's pet boarding schedule
-    endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "16:00"),
-  },
-  {
-    bookingIndex: 34,
-    calendarGroupId: 4,
-    serviceListingId: 2,
-    startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "15:00"), // John's pet boarding schedule
-    endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "16:00"),
-  },
-  {
     bookingIndex: 35,
+    calendarGroupId: 4,
+    serviceListingId: 2,
+    startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "15:00"), // John's pet boarding schedule
+    endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "16:00"),
+  },
+  {
+    bookingIndex: 36,
+    calendarGroupId: 4,
+    serviceListingId: 2,
+    startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "15:00"), // John's pet boarding schedule
+    endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "16:00"),
+  },
+  {
+    bookingIndex: 37,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "16:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "17:00"),
   },
   {
-    bookingIndex: 36,
+    bookingIndex: 38,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "17:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "18:00"),
   },
   {
-    bookingIndex: 37,
+    bookingIndex: 39,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "18:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "19:00"),
   },
   {
-    bookingIndex: 38,
+    bookingIndex: 40,
     calendarGroupId: 4,
     serviceListingId: 2,
     startTime: generateBookingTime(getSuitableSpecialDate(2, 1), "19:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(2, 1), "20:00"),
-  }
+  },
 ];
 
-const pastBookingsPayload =[
+const pastBookingsPayload = [
   {
-    bookingIndex: 39,
+    bookingIndex: 41,
     calendarGroupId: 5,
     serviceListingId: 16,
     startTime: generateBookingTime(getSuitableSpecialDate(3, -2), "09:00"), // John's pet boarding schedule
     endTime: generateBookingTime(getSuitableSpecialDate(3, -2), "12:00"),
-  }
-]
+  },
+];
 
 /* For PB with ID: 1, email: biz1@example.com, password: password1234 */
 async function seedCalendarGroup() {
@@ -581,13 +581,13 @@ async function seedCalendarGroup() {
 }
 
 const userIdToPetIdMap = {
-  9: 1, 
-  11: 3, 
+  9: 1,
+  11: 3,
   12: 4,
   13: 7,
   15: 8,
   16: 9,
-  17: 10 
+  17: 10,
 };
 
 /* For PO with ID: 12, email: petowner5@example.com, password: ilovepets */
@@ -597,7 +597,6 @@ async function seedBookings() {
 
   for (const payload of bookingPayloads) {
     try {
-
       // randomly genereate from userId 9 to 17
       const userId = Math.floor(Math.random() * (17 - 9 + 1)) + 9;
       const petId = userIdToPetIdMap[userId];
@@ -621,7 +620,6 @@ async function seedBookings() {
 
   for (const payload of pastBookingsPayload) {
     try {
-
       await BookingService.createBooking(
         18, // past booking for is4103pethub@gmail.com
         payload.calendarGroupId,
