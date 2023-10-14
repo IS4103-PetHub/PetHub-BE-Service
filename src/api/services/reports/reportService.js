@@ -45,7 +45,7 @@ class ReportService {
       invoiceGenerateCustomerInfo(doc, data);
 
       // main content
-      let yEndPosition = invoiceGenerateItems(doc, data);
+      let yEndPosition = invoiceGenerateItems(doc, data, singleItem ? true : false);
       invoiceGenerateTotals(doc, data, yEndPosition + 40);
 
       // footer

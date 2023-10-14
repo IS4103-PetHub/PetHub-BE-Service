@@ -38,9 +38,9 @@ function generateTableRow(doc, y, item, itemName, voucherCode, itemPrice) {
     .text(itemPrice, 445, y, { width: 90, align: "right" });
 }
 
-function generateTableHeader(doc, baseYValue) {
+function generateTableHeader(doc, baseYValue, removeVoucherCode = false) {
   doc.font("Helvetica-Bold");
-  generateTableRow(doc, baseYValue, "Item", "Title", "Voucher Code", "Price");
+  generateTableRow(doc, baseYValue, "Item", "Title", removeVoucherCode ? "" : "Voucher Code", "Price");
   generateHr(doc, baseYValue + 20);
   doc.font("Helvetica");
 }
@@ -105,13 +105,13 @@ function generateCustomerInfo(doc, data) {
 
 /* =============================================== Content functions ============================================ */
 
-function generateItems(doc, data) {
+function generateItems(doc, data, removeVoucherCode = false) {
   let isFirstPage = true;
   let baseYValue = 360;
   let yPosition = baseYValue;
   let pageItemCount = 0;
 
-  generateTableHeader(doc, baseYValue);
+  generateTableHeader(doc, baseYValue, removeVoucherCode);
 
   for (let i = 0; i < data.orderItems.length; i++) {
     const item = data.orderItems[i];
@@ -125,13 +125,20 @@ function generateItems(doc, data) {
     ) {
       generateFooter(doc, "~~continues on the next page~~");
       doc.addPage();
-      generateTableHeader(doc, PAGE_MARGIN);
+      generateTableHeader(doc, PAGE_MARGIN, removeVoucherCode);
       yPosition = PAGE_MARGIN + 30;
       pageItemCount = 1;
       isFirstPage = false;
     }
 
-    generateTableRow(doc, yPosition, i + 1, item.itemName, item.voucherCode, formatCurrency(item.itemPrice));
+    generateTableRow(
+      doc,
+      yPosition,
+      i + 1,
+      item.itemName,
+      removeVoucherCode ? "" : item.voucherCode,
+      formatCurrency(item.itemPrice)
+    );
     generateHr(doc, yPosition + 20);
   }
   return yPosition;
