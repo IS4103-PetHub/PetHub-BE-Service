@@ -79,6 +79,7 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     duration: 60,
     calendarGroupId: 1,
+    requiresBooking: false,
   },
   {
     id: 2,
@@ -93,6 +94,7 @@ const serviceListings = [
     addressIds: [{ addressId: 2 }],
     duration: 60,
     calendarGroupId: 4,
+    requiresBooking: false,
   },
   {
     id: 3,
@@ -106,6 +108,7 @@ const serviceListings = [
     addressIds: [],
     duration: 60,
     calendarGroupId: 1,
+    requiresBooking: false,
   },
   {
     id: 4,
@@ -118,7 +121,8 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     duration: 60,
     addressIds: [{ addressId: 1 }, { addressId: 2 }],
-    calendarGroupId: 3,
+    calendarGroupId: 1,
+    requiresBooking: true,
   },
   {
     id: 5,
@@ -134,6 +138,7 @@ const serviceListings = [
     duration: 60,
     addressIds: [{ addressId: 6 }],
     calendarGroupId: 1,
+    requiresBooking: true,
   },
   {
     id: 6,
@@ -147,6 +152,7 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
     addressIds: [{ addressId: 7 }, { addressId: 8 }],
     duration: 60,
+    requiresBooking: false,
   },
   {
     id: 7,
@@ -159,6 +165,7 @@ const serviceListings = [
     tagIds: [{ tagId: 3 }, { tagId: 5 }],
     addressIds: [{ addressId: 3 }],
     duration: 60,
+    requiresBooking: true,
   },
   {
     id: 8,
@@ -172,6 +179,7 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
     duration: 60,
     addressIds: [],
+    requiresBooking: false,
     attachmentKeys: [
       "uploads/service-listing/img/eefb3b1b-8ecd-4901-acf7-06802cfa0771-adoption.jpg",
       "uploads/service-listing/img/4f34978d-afbf-433a-8300-f04a4af8c2ef-adoption2.jpg",
@@ -192,7 +200,8 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     addressIds: [],
     duration: 60,
-    calendarGroupId: 2,
+    calendarGroupId: 1,
+    requiresBooking: true,
   },
   {
     id: 10,
@@ -205,7 +214,8 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 3 }],
     addressIds: [{ addressId: 1 }],
     duration: 60,
-    calendarGroupId: 3,
+    calendarGroupId: 1,
+    requiresBooking: true,
   },
   // These service listings (id 11-15) are tagged to petBusinessId [6, 7], who are non-active
   // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
@@ -220,6 +230,7 @@ const serviceListings = [
     tagIds: [{ tagId: 1 }, { tagId: 5 }],
     addressIds: [],
     duration: 90,
+    requiresBooking: true,
   },
   {
     id: 12,
@@ -232,6 +243,7 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }],
     addressIds: [],
     duration: 1440, // 24 hours
+    requiresBooking: true,
   },
   {
     id: 13,
@@ -244,6 +256,7 @@ const serviceListings = [
     tagIds: [],
     addressIds: [],
     duration: 45,
+    requiresBooking: true,
   },
   {
     id: 14,
@@ -256,6 +269,7 @@ const serviceListings = [
     tagIds: [{ tagId: 4 }],
     addressIds: [],
     duration: 60,
+    requiresBooking: true,
   },
   {
     id: 15,
@@ -268,6 +282,7 @@ const serviceListings = [
     tagIds: [{ tagId: 3 }],
     addressIds: [],
     duration: 120,
+    requiresBooking: true,
   },
   {
     id: 16,
@@ -280,8 +295,9 @@ const serviceListings = [
     basePrice: 30.0,
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
     addressIds: [{ addressId: 1 }],
-    duration: 180,
-    calendarGroupId: 5,
+    duration: 60,
+    calendarGroupId: 1,
+    requiresBooking: true,
   },
 ];
 

@@ -20,7 +20,7 @@ async function main() {
   console.log("Seeding business data...");
   await seedBusinessData(prisma);
   console.log("Seeding invoices and order items...");
-  await seedInvoicesAndOrders();
+  await seedInvoicesAndOrders(prisma);
   console.log("Seeding bookings for the above calendar groups...");
   // await seedBookings();
   console.log("Main seeding completed!");
