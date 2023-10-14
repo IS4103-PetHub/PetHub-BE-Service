@@ -33,9 +33,16 @@ class PaymentService {
       const confirmedInvoice = await transactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId)
 
       await emailService.sendEmail(
-        user.email,
+        user.user.email,
         `Thank You for Your Purchase, ${user.firstName}! Your PetHub Order is Confirmed`,
-        emailTemplate.checkoutSuccessEmail(user.firstName, invoice, "")) // TODO: create link
+        emailTemplate.checkoutSuccessEmail(
+          user.firstName,
+          confirmedInvoice,
+          `http://localhost:3002/customer/orders`
+        ),
+        "invoice.pdf",
+        invoice.attachmentURL
+      );
 
       return confirmedInvoice;
     } catch (error) {
