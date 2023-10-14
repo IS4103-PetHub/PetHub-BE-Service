@@ -71,6 +71,28 @@ exports.rescheduleOrRefundBookingEmail = (name, link, booking) => {
       `;
 };
 
+exports.refundBookingEmail = (name, booking) => {
+  return `
+    Dear ${name},
+    
+    Your appointment has been affected by changes in schedule. 
+    
+    The following Booking would be refunded:
+
+    Booking Details:
+    Booking ID: ${booking.bookingId}
+    Service: ${booking.serviceListing.title}
+    Date and Time: ${booking.startTime.toLocaleString()} - ${booking.endTime.toLocaleString()}
+      
+    Please note that the refund for this booking will take approximately 5 working days to be processed.
+    
+    Thank you for using PetHub!
+      
+    Regards,
+    Pethub
+    `;
+}
+
 exports.deleteServiceListingEmail = (name, postTitle) => {
   return `
     Dear ${name},
@@ -89,3 +111,29 @@ exports.deleteServiceListingEmail = (name, postTitle) => {
     Pethub
     `;
 };
+
+exports.checkoutSuccessEmail = (name, invoice, link) => {
+  return `
+    Dear ${name},
+
+    Thank you for your purchase at PetHub!
+
+    We are pleased to inform you that your order has been successfully processed.
+
+    Order Summary:
+    - Invoice ID: ${invoice.invoiceId}
+    - Payment ID: ${invoice.paymentId}
+
+    Billing Details:
+    - Subtotal: $${invoice.totalPrice - invoice.miscCharge}
+    - Tax (7%): $${invoice.miscCharge}
+    - Total Amount: $${invoice.totalPrice}
+
+    You can view your order details and track the delivery status by clicking the following link: [View Order Details](${link})
+
+    We appreciate your business and look forward to serving you again.
+
+    Warm regards,
+    The PetHub Team
+`;
+}

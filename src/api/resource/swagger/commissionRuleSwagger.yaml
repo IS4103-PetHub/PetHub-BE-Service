@@ -1,0 +1,150 @@
+swagger: "2.0"
+definitions:
+  CommissionRule:
+    type: object
+    required:
+      - name
+      - commissionRate
+    properties:
+      name:
+        type: string
+        description: "The unique name for the commission rule. Can contain alphabets, numbers, spaces, periods, and commas and must contain at least one alphabet character."
+      commissionRate:
+        type: number
+        format: float
+        minimum: 0.0001
+        maximum: 1
+        description: "The commission rate represented as a float. For example, 0.05 represents 5% and 1 represents 100%. Minimum value is 0.0001 (i.e., 0.01%) and maximum value is 1 (i.e., 100%)."
+
+paths:
+  /api/commission-rules:
+    get:
+      summary: Get all commission rules object.
+      description: Get all commission rules object
+      responses:
+        200:
+          description: List of available commission rules
+      tags:
+        - Commission Rules
+
+    post:
+      summary: Create new commission rule object.
+      description: Create new commission rule object
+      consumes:
+        - application/json
+      requestBody:
+        description: New commission rule details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/CommissionRule"
+            example:
+              name: "Commission Rule 2"
+              commissionRate: 0.001
+      responses:
+        201:
+          description: List of available commission rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/CommissionRule"
+              example:
+                - name: "Commission Rule 1"
+                  commissionRate: "0.01"
+                  petBusinesses: "object"
+                - name: "Commission Rule 2"
+                  commissionRate: "0.11"
+                  petBusinesses: "object"
+      tags:
+        - Commission Rules
+
+  /api/commission-rules/{commissionRuleId}:
+    get:
+      summary: Get commission rules object by ID.
+      description: Get commission rules object by ID
+      parameters:
+        - name: commissionRuleId
+          in: path
+          description: ID of the commission rule to retrieve.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: List of available commission rules
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/definitions/CommissionRule"
+              example:
+                - name: "Commission Rule 1"
+                  commissionRate: "0.01"
+                  petBusinesses: "object"
+      tags:
+        - Commission Rules
+    patch:
+      summary: Update Commission Rule Name, Commission Rate or Associated Pet Businesses
+      description: Update Commission Rule Name, Commission Rate or Associated Pet Businesses
+      parameters:
+        - name: commissionRuleId
+          in: path
+          description: ID of the commission rule to update.
+          required: true
+          type: integer
+          default: 2 # Example default value
+      consumes:
+        - application/json
+      requestBody:
+        description: updated commission rule details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/CommissionRule"
+            example:
+              name: "Commission Rule 2"
+              commissionRate: 0.001
+              petBusinessIds: [1, 2, 3, 4]
+      responses:
+        200:
+          description: List of updated  commission rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/CommissionRule"
+              example:
+                - name: "Commission Rule 1"
+                  commissionRate: "0.01"
+                  petBusinesses: "object"
+                - name: "Commission Rule 2"
+                  commissionRate: "0.11"
+                  petBusinesses: "object"
+      tags:
+        - Commission Rules
+    delete:
+      summary: Delete a commission rule
+      description: Delete the specified commission rule.
+      parameters:
+        - name: commissionRuleId
+          in: path
+          description: ID of the commission rule to delete.
+          required: true
+          schema:
+            type: integer
+          example: 2 # Example default value
+      responses:
+        200:
+          description: Commission rule deleted successfully
+        400:
+          description: Invalid commission rule ID
+        500:
+          description: Server error while deleting commission rule
+      tags:
+        - Commission Rules

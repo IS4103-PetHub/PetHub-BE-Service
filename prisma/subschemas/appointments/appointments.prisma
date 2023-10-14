@@ -1,7 +1,7 @@
 import { DayOfWeek, RecurrencePattern } from "../enums/appointmentsEnum"
 import { PetBusiness } from "../user/user"
 import { ServiceListing } from "../serviceListing/serviceListing"
-import { ServiceListing } from "../../schema"
+import { OrderItem } from "../finance/transactions"
 import { Pet } from "../user/user"
 
 model CalendarGroup {
@@ -53,12 +53,10 @@ model TimeSlot {
 }
 
 model Booking {
-    bookingId     Int       @id @default(autoincrement())
-    invoiceId     Int?
-    transactionId Int?
-    petOwnerId    Int
-    dateCreated   DateTime  @default(now())
-    lastUpdated   DateTime?
+    bookingId   Int       @id @default(autoincrement())
+    petOwnerId  Int
+    dateCreated DateTime  @default(now())
+    lastUpdated DateTime?
 
     startTime DateTime
     endTime   DateTime
@@ -69,6 +67,8 @@ model Booking {
     timeSlotId Int?
     timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
 
-    petId Int?
-    pet Pet? @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
+    petId       Int?
+    pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
+    OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+    orderItemId Int       @unique
 }

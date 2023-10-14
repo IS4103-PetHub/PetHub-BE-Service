@@ -14,7 +14,7 @@ const errorMessages = {
 
   INVALID_BASE_PRICE: `Please enter a valid base price`,
   INVALID_WEIGHT: `Please enter a valid weight`,
-  
+
   INVALID_GENDER: `Please enter a valid gender`,
   EMPTY_GENDER: "Gender cannot be empty",
 
@@ -23,4 +23,12 @@ const errorMessages = {
 
 };
 
-module.exports = { limitations, errorMessages };
+const DEFAULT_CR_ID = 1; // Default Commission Rule is Seeded to ID 1
+const MISC_CHARGE_PCT = 0.07; // Default Commission Rule is Seeded to ID 1
+
+module.exports = {
+  limitations,
+  errorMessages,
+  DEFAULT_CR_ID,
+  MISC_CHARGE_PCT
+};

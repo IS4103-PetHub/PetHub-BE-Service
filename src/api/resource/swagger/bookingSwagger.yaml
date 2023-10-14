@@ -4,16 +4,16 @@ definitions:
     type: object
     required:
       - calendarGroupId
-      - serviceListingId
+      - orderItemId
       - startTime
       - endTime
     properties:
       calendarGroupId:
         type: integer
         description: The Id of the calendar group to book from.
-      serviceListingId:
+      orderItemId:
         type: integer
-        description: The associated service listing for the booking.
+        description: The associated order item for the booking.
       startTime:
         type: string
         format: date-time
@@ -78,7 +78,7 @@ paths:
           description: ID of the Pet Owner creating the booking.
           required: true
           type: integer
-          default: 1 # Example default value
+          default: 9 # Example default value
       consumes:
         - application/json
       requestBody:
@@ -90,7 +90,7 @@ paths:
               $ref: "#/definitions/createBookingRequest"
             example:
               calendarGroupId: 1
-              serviceListingId: 1
+              orderItemId: 1
               startTime: "2023-10-30T01:00:00.000Z"
               endTime: "2023-10-30T01:30:00.000Z"
               petId: 1

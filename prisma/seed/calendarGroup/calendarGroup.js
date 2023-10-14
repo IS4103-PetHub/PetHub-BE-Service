@@ -40,7 +40,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns Company Normal grooming facilities schedule",
     description:
-      "Available slots for grooming services: More groomers available in the afternoon and the earliest Thursday 1 week from now is a public holiday.",
+      "Available slots for grooming services. More groomers available in the afternoon and the earliest Thursday 1 week from now is a public holiday.",
     scheduleSettings: [
       {
         days: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
@@ -91,7 +91,7 @@ const calendarGroupPayloads = [
   {
     name: "Johns company VIP grooming facilities schedule",
     description:
-      "Available slots for grooming services: After 1 week the VIP groomer is also available to work on Sundays for a while. \
+      "Available slots for grooming services. After 1 week the VIP groomer is also available to work on Sundays for a while. \
       After a month the VIP groomer can only do weekends, but a new VIP groomer is hired then",
     scheduleSettings: [
       {
@@ -144,9 +144,9 @@ const calendarGroupPayloads = [
   {
     name: "Johns Company testing out their vet services schedule",
     description:
-      "Available slots for vet services. Currently there's only 1 vet at work though, its John himself. \
+      "Available slots for vet services. Currently theres only 1 vet at work though, its John himself. \
       He works alternate weekdays for a month, but wants to go golfing next Wednesday in the morning. \
-      In a month's time, john wants the vet service to operate for a full week, this is because this time of the year there tend to be more pet injuries. \
+      In a months time, john wants the vet service to operate for a full week, this is because this time of the year there tend to be more pet injuries. \
       After that john wants to get back to his usual schedule, but oh he hired a new vet that is slated to start work on this day.",
     scheduleSettings: [
       {
@@ -220,9 +220,9 @@ const calendarGroupPayloads = [
     ],
   },
   {
-    name: "John's Pet boarding schedule",
+    name: "Johns Pet boarding schedule",
     description:
-      "John's daily pet boarding schedule in preparation for the launch of john's new pet daycare service listing",
+      "Johns daily pet boarding schedule in preparation for the launch of johns new pet daycare service listing",
     scheduleSettings: [
       {
         recurrence: {
@@ -241,7 +241,7 @@ const calendarGroupPayloads = [
     ],
   },
   {
-    name: "John's dog sitting schedule",
+    name: "Johns dog sitting schedule",
     description:
       "John has some free time on wednesdays and saturdays in the evening and wants to do some dog sitting",
     scheduleSettings: [
@@ -249,7 +249,7 @@ const calendarGroupPayloads = [
         days: ["WEDNESDAY", "SATURDAY"],
         recurrence: {
           pattern: "WEEKLY",
-          startDate: getSuitableDate(1),
+          startDate: getSuitableDate(-30),
           endDate: getSuitableDate(60),
           timePeriods: [
             {
@@ -547,6 +547,16 @@ const bookingPayloads = [
   }
 ];
 
+const pastBookingsPayload =[
+  {
+    bookingIndex: 39,
+    calendarGroupId: 5,
+    serviceListingId: 16,
+    startTime: generateBookingTime(getSuitableSpecialDate(3, -2), "09:00"), // John's pet boarding schedule
+    endTime: generateBookingTime(getSuitableSpecialDate(3, -2), "12:00"),
+  }
+]
+
 /* For PB with ID: 1, email: biz1@example.com, password: password1234 */
 async function seedCalendarGroup() {
   /*
@@ -604,6 +614,26 @@ async function seedBookings() {
       console.log = originalLog;
       console.log(
         `Error seeding booking for booking index: ${payload.bookingIndex}. It is possible that this booking already exists.`
+      );
+      console.log = () => {};
+    }
+  }
+
+  for (const payload of pastBookingsPayload) {
+    try {
+
+      await BookingService.createBooking(
+        18, // past booking for is4103pethub@gmail.com
+        payload.calendarGroupId,
+        payload.serviceListingId,
+        payload.startTime,
+        payload.endTime,
+        null
+      );
+    } catch (error) {
+      console.log = originalLog;
+      console.log(
+        `Error seeding past booking for booking index: ${payload.bookingIndex}. It is possible that this booking already exists.`
       );
       console.log = () => {};
     }

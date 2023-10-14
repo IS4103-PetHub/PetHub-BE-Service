@@ -95,6 +95,7 @@ const petBusinesses = [
     websiteURL: "https://www.johnDoe.com",
     businessEmail: "biz1@example.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz1@example.com",
@@ -113,8 +114,10 @@ const petBusinesses = [
     contactNumber: "88712892",
     businessAddresses: [{ addressId: 3 }, { addressId: 4 }],
     businessDescription: "My Pet Shop is your one-stop destination for all your feline grooming needs. We are dedicated to providing the best grooming experience for cats of all breeds and sizes. Our passionate team of cat groomers is well-trained in handling cats with care and patience, ensuring a stress-free grooming session.\n\nWe understand that cats have unique grooming requirements, and we tailor our services to meet those needs. From fur brushing to nail trimming and ear cleaning to baths, we offer a comprehensive range of grooming services.\n\nAt Smith's Pet Shop, we believe that a well-groomed cat is a happy and healthy cat. Our grooming sessions not only keep your cats clean but also help in early detection of any health issues. We use premium, cat-friendly grooming products to ensure your cat's comfort and safety.\n\nVisit our website at https://www.google.com to explore our services and book an appointment. Let us pamper your feline friend and keep them looking and feeling their best!",
-    businessEmail: "janeSmithPet.com",
+    websiteURL: "https://www.janeSmithMOW.com",
+    businessEmail: "janeSmithPet@gmail.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "janeSmithPet.com",
@@ -133,9 +136,10 @@ const petBusinesses = [
     contactNumber: "97128913",
     businessAddresses: [{ addressId: 5 }],
     businessDescription: "I like pets",
-    businessEmail: "biz3@example.com",
+    businessEmail: "mikePets@gmail.com",
     websiteURL: "https://www.mikePetBiz.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz3@example.com",
@@ -154,8 +158,10 @@ const petBusinesses = [
     contactNumber: "98765432",
     businessAddresses: [{ addressId: 6 }],
     businessDescription: "We groom rabbits",
-    businessEmail: "https://www.susanAnimal.com",
+    websiteURL: "https://www.susanAnimal.com",
+    businessEmail: "susanLovesDogs@hotmail.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz4@example.com",
@@ -177,6 +183,7 @@ const petBusinesses = [
     websiteURL: "https://www.google.com",
     businessEmail: "linensoda@gmail.com",
     businessType: BusinessType.SERVICE,
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "linensoda@gmail.com",
@@ -197,6 +204,7 @@ const nonActivePetBusinesses = [
     companyName: "Groomer1",
     uen: "12345678E",
     contactNumber: "91627863",
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz6@example.com",
@@ -213,6 +221,7 @@ const nonActivePetBusinesses = [
     companyName: "Groomer2",
     uen: "12345678E",
     contactNumber: "87168812",
+    commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
       businessEmail: "biz7@example.com",
@@ -232,12 +241,13 @@ const nonActivePetBusinesses = [
     companyName: "Groomer3",
     uen: "12345678E",
     contactNumber: "83192732",
+    commissionRuleId: 1,
   },
 ];
 
 const petOwners = [
   {
-    id:  9,
+    id: 9,
     email: "petowner2@example.com",
     password: commonPassword,
     firstName: "Li",
@@ -455,6 +465,10 @@ const pets = [
 
 
 async function seedUser(prisma) {
+
+  const oneYearFromToday = new Date();
+  oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() - 1);
+
   for (const a of addresses) {
     await prisma.address.upsert({
       where: { addressId: a.id },
@@ -487,6 +501,8 @@ async function seedUser(prisma) {
             businessEmail: pb.businessEmail,
             businessDescription: pb.businessDescription,
             businessType: pb.businessType,
+            websiteURL: pb.websiteURL,
+            commissionRuleId: 1,
             petBusinessApplication: {
               create: pb.petBusinessApplication,
             },
@@ -501,6 +517,7 @@ async function seedUser(prisma) {
       companyName: pb.companyName,
       uen: pb.uen,
       contactNumber: pb.contactNumber,
+      commissionRuleId: 1,
     };
     if ([6, 7].includes(pb.id)) {
       petBusinessData.petBusinessApplication = {
@@ -536,6 +553,7 @@ async function seedUser(prisma) {
         password: await bcrypt.hash(po.password, 10),
         accountType: AccountType.PET_OWNER,
         accountStatus: AccountStatus.ACTIVE,
+        dateCreated: oneYearFromToday,
         petOwner: {
           create: {
             firstName: po.firstName,

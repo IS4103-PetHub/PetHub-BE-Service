@@ -30,6 +30,10 @@ const permissions = [
     // Service Listings
     { code: "WRITE_SERVICE_LISTINGS", name: "Write Service Listings", description: "Permission to write Service Listings" },
     { code: "READ_SERVICE_LISTINGS", name: "Read Service Listings", description: "Permission to read Service Listings" },
+
+    // Commission Rule
+    { code: "WRITE_COMMISSION_RULES", name: "Write Commission Rules", description: "Permission to write Commission Rules" },
+    { code: "READ_COMMISSION_RULES", name: "Read Commission Rules", description: "Permission to read Commission Rules" },
 ];
 
 // Root Administrator User Data
