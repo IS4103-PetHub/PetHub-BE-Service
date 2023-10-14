@@ -23,7 +23,7 @@ class StripeService {
         return_url: "http://localhost:3000/payments" // TODO: discuss with FE what page to route to after payments
       });
 
-      if (!paymentIntentId) throw new CustomError("Stripe: Unable to process payment", 500);
+      if (!paymentIntent) throw new CustomError("Stripe: Unable to process payment", 500);
       // TODO: Maybe save card after payment --> Tag to customer ID
 
       return paymentIntent.id;
