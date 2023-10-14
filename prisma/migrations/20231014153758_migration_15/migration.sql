@@ -11,6 +11,9 @@ CREATE TABLE "PetLostAndFound" (
     "lastSeenLocation" TEXT NOT NULL,
     "attachmentKeys" TEXT[],
     "attachmentURLs" TEXT[],
+    "isResolved" BOOLEAN NOT NULL DEFAULT false,
+    "dateCreated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dateUpdated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "petId" INTEGER,
     "userId" INTEGER NOT NULL,
 

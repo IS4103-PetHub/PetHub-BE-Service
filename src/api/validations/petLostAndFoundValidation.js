@@ -43,7 +43,11 @@ exports.isValidCreateOrUpdatePetLostAndFoundPayload = (payload) => {
             .pattern(/^[0-9]+$/) // Ensure it's a string containing only digits
             .messages({
                 'string.pattern.base': 'petId must be a string containing only digits.'
-            })
+            }),
+        isResolved: Joi.string()
+            .trim()
+            .valid('true', 'false')
+            .optional()
     })
 
 

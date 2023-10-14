@@ -1,9 +1,9 @@
 const CustomError = require("../../errors/customError");
 const PetLostAndFoundError = require('../../errors/petLostAndFoundError')
-const prisma = require('../../../../prisma/prisma');
 const petOwnerService = require("../user/petOwnerService");
 const { PetLostRequestType } = require('@prisma/client')
 const s3ServiceInstance = require("../s3Service");
+const prisma = require("../../../../prisma/prisma");
 
 
 class PetLostAndFoundService {
@@ -12,7 +12,12 @@ class PetLostAndFoundService {
         try {
             const petLostAndFound = await prisma.petLostAndFound.findMany({
                 where: {
-                    requestType: requestType ? requestType : {}
+                    requestType: requestType ? requestType : {},
+                    petOwner: {
+                        user: {
+                            accountStatus: 'ACTIVE'
+                        }
+                    }
                 },
                 include: {
                     pet: true,
@@ -104,6 +109,7 @@ class PetLostAndFoundService {
                 lastSeenLocation: payload.lastSeenLocation,
                 attachmentURLs: payload.attachmentURLs,
                 attachmentKeys: payload.attachmentKeys,
+                dateUpdated: new Date()
             }
 
             if (payload.petId) {
@@ -113,6 +119,8 @@ class PetLostAndFoundService {
                     }
                 }
             }
+
+            if (payload.isResolved) lostAndFoundPayload.isResolved = payload.isResolved === "true"
 
             const lostAndFound = await prisma.petLostAndFound.update({
                 where: {petLostAndFoundId}, 

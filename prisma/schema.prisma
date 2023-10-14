@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Oct 13 2023 21:42:27 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sat Oct 14 2023 23:01:24 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -151,22 +151,6 @@ enum PetLostRequestType {
   FOUND_PET
 }
 
-model PetLostAndFound {
-  petLostAndFoundId Int                @id @default(autoincrement())
-  title             String
-  description       String
-  requestType       PetLostRequestType
-  lastSeenDate      DateTime
-  lastSeenLocation  String
-  attachmentKeys    String[]
-  attachmentURLs    String[]
-
-  petId    Int?
-  pet      Pet?     @relation(fields: [petId], references: [petId], onDelete: Cascade, onUpdate: Cascade)
-  userId   Int
-  petOwner PetOwner @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-}
-
 model CommissionRule {
   commissionRuleId Int           @id @default(autoincrement())
   name             String        @unique
@@ -247,6 +231,25 @@ model RefundRequest {
 
   petBusinessId Int
   petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId])
+}
+
+model PetLostAndFound {
+  petLostAndFoundId Int                @id @default(autoincrement())
+  title             String
+  description       String
+  requestType       PetLostRequestType
+  lastSeenDate      DateTime
+  lastSeenLocation  String
+  attachmentKeys    String[]
+  attachmentURLs    String[]
+  isResolved        Boolean            @default(false)
+  dateCreated       DateTime           @default(now())
+  dateUpdated       DateTime           @default(now())
+
+  petId    Int?
+  pet      Pet?     @relation(fields: [petId], references: [petId], onDelete: Cascade, onUpdate: Cascade)
+  userId   Int
+  petOwner PetOwner @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model ServiceListing {
