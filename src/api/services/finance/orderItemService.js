@@ -14,7 +14,15 @@ class OrderItemService {
         where: { orderItemId: orderItemId },
         include: {
           booking: true,
-          serviceListing: true,
+          serviceListing: {
+            include: {
+              petBusiness: {
+                select: {
+                  companyName: true,
+                },
+              },
+            },
+          },
           invoice: {
             select: {
               paymentId: true,
@@ -36,7 +44,15 @@ class OrderItemService {
       let orderItems = await prisma.orderItem.findMany({
         include: {
           booking: true,
-          serviceListing: true,
+          serviceListing: {
+            include: {
+              petBusiness: {
+                select: {
+                  companyName: true,
+                },
+              },
+            },
+          },
           invoice: {
             select: {
               paymentId: true,
@@ -63,7 +79,15 @@ class OrderItemService {
           orderItems: {
             include: {
               booking: true,
-              serviceListing: true,
+              serviceListing: {
+                include: {
+                  petBusiness: {
+                    select: {
+                      companyName: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
