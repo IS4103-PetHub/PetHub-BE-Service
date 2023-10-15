@@ -15,6 +15,11 @@ class OrderItemService {
         include: {
           booking: true,
           serviceListing: true,
+          invoice: {
+            select: {
+              paymentId: true,
+            },
+          },
         },
       });
 
@@ -32,6 +37,11 @@ class OrderItemService {
         include: {
           booking: true,
           serviceListing: true,
+          invoice: {
+            select: {
+              paymentId: true,
+            },
+          },
         },
       });
 
@@ -85,12 +95,25 @@ class OrderItemService {
           OrderItem: {
             include: {
               booking: true,
+              invoice: {
+                select: {
+                  paymentId: true,
+                },
+              },
             },
           },
         },
       });
 
-      let orderItems = serviceListings.map((serviceListing) => serviceListing.OrderItem).flat();
+      let orderItems = serviceListings.flatMap((serviceListing) =>
+        serviceListing.OrderItem.map((orderItem) => ({
+          ...orderItem,
+          serviceListing: {
+            ...serviceListing,
+            OrderItem: undefined, // manually disconnect OrderItem from serviceListing
+          },
+        }))
+      );
 
       if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray);
 
