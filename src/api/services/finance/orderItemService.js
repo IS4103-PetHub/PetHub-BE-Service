@@ -26,6 +26,7 @@ class OrderItemService {
           invoice: {
             select: {
               paymentId: true,
+              createdAt: true,
             },
           },
         },
@@ -56,6 +57,7 @@ class OrderItemService {
           invoice: {
             select: {
               paymentId: true,
+              createdAt: true,
             },
           },
         },
@@ -97,6 +99,7 @@ class OrderItemService {
         return invoice.orderItems.map((orderItem) => ({
           ...orderItem,
           paymentId: invoice.paymentId, // attach paymentId from invoice too
+          createdAt: invoice.createdAt, // attach createdAt from invoice too
         }));
       });
 
@@ -122,6 +125,7 @@ class OrderItemService {
               invoice: {
                 select: {
                   paymentId: true,
+                  createdAt: true,
                 },
               },
             },
