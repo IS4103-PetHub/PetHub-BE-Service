@@ -80,7 +80,6 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 1,
     requiresBooking: true,
-    defaultExpiryDays: 14,
   },
   {
     id: 2,
@@ -96,7 +95,6 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 4,
     requiresBooking: true,
-    defaultExpiryDays: 14,
   },
   {
     id: 3,
@@ -111,7 +109,6 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 1,
     requiresBooking: true,
-    defaultExpiryDays: 14,
   },
   {
     id: 4,
@@ -126,7 +123,6 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }, { addressId: 2 }],
     calendarGroupId: 3,
     requiresBooking: true,
-    defaultExpiryDays: 14,
   },
   {
     id: 5,
@@ -134,15 +130,13 @@ const serviceListings = [
     description: "Trustworthy pet sitting services for your beloved pets",
     petBusinessId: 4,
     category: "PET_BOARDING",
-    requiresBooking: true,
-    defaultExpiryDays: 30,
     lastPossibleDate: "2023-11-10T15:59:59.999Z",
     basePrice: 50.5,
     tagIds: [{ tagId: 1 }, { tagId: 2 }],
     duration: 60,
     addressIds: [{ addressId: 6 }],
     requiresBooking: false,
-    defaultExpiryDays: 14,
+    defaultExpiryDays: 30,
   },
   {
     id: 6,
@@ -150,7 +144,6 @@ const serviceListings = [
     description: "Find your purr-fect feline friend at our cat adoption event",
     petBusinessId: 5,
     category: "PET_RETAIL",
-    defaultExpiryDays: 30,
     lastPossibleDate: "2023-12-30T15:59:59.999Z",
     basePrice: 0,
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
@@ -166,7 +159,6 @@ const serviceListings = [
       "Adopt a Pet Today is your golden opportunity to embark on a heartwarming journey of discovering your perfect furry companion at our extraordinary adoption event. We proudly collaborate with local animal shelters, forging invaluable partnerships that allow us to present you with an irresistibly diverse selection of cats and dogs, each yearning for the love and warmth of a forever home.\n\nOur adoption process is not just simple; it's a straightforward path paved with compassion and care, making your journey to find a new pet as effortless as it is rewarding. Whether your heart desires the playful antics of a frisky kitten or the unwavering loyalty of a devoted canine companion, rest assured that our adoption center has a plethora of charming and charismatic pets eagerly waiting to make your acquaintance.\n\nOne of the most remarkable aspects of Adopt a Pet Today is our commitment to affordability. We firmly believe that love knows no price tag, and every pet deserves a chance to find a loving family. That's why our adoption fees are exceptionally reasonable, ensuring that you can open your heart and home to a deserving pet without breaking the bank.\n\nBut our dedication doesn't stop there. We go the extra mile to ensure that every pet who leaves our adoption center is equipped for a bright future. Before they become a part of your family, each of our pets undergoes essential medical care. They are spayed or neutered to help control the pet population and reduce the number of homeless animals. Our dedicated veterinary team administers vaccinations to keep your new companion in the pink of health. Additionally, we take the critical step of microchipping every pet, providing an extra layer of security to reunite lost pets with their loving owners.\n\nWhen you visit Adopt a Pet Today, you're not just finding a new best friend; you're giving a homeless pet a second chance at a happy, fulfilling life. It's a heartwarming journey filled with love, compassion, and boundless joy. Your decision to adopt a pet from our event is a powerful testament to your commitment to making the world a better place for animals in need.\n\nCome, be a part of this beautiful journey, and let us guide you toward your new best friend. Visit Adopt a Pet Today, where love knows no bounds, and where the extraordinary adventure of pet adoption begins.",
     petBusinessId: 5,
     category: "PET_RETAIL",
-    defaultExpiryDays: 30,
     basePrice: 0,
     tagIds: [{ tagId: 1 }, { tagId: 3 }, { tagId: 5 }],
     addressIds: [],
@@ -187,7 +179,6 @@ const serviceListings = [
     description: "Treat your pets to a day of grooming by VIP groomers!",
     petBusinessId: 1,
     category: "PET_GROOMING",
-    defaultExpiryDays: 30,
     basePrice: 120.0,
     tagIds: [{ tagId: 4 }, { tagId: 5 }],
     addressIds: [],
@@ -209,7 +200,6 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 3,
     requiresBooking: true,
-    defaultExpiryDays: 14,
   },
   {
     id: 10,
@@ -253,51 +243,11 @@ const serviceListings = [
     addressIds: [],
     duration: 90,
     requiresBooking: true,
-    defaultExpiryDays: 14,
   },
-  // These service listings (id 13-15) are tagged to petBusinessId [6, 7], who are non-active
-  // On the customer side, pet owners should not be able to see these listings as the PB is not an active user.
-  {
-    id: 13,
-    title: "Pet Boarding and Daycare",
-    description: "Give your pet a home away from home with our boarding and daycare services.",
-    petBusinessId: 5,
-    category: "PET_BOARDING",
-    defaultExpiryDays: 30,
-    basePrice: 35.0,
-    tagIds: [{ tagId: 2 }],
-    addressIds: [],
-    duration: 1440, // 24 hours
-    defaultExpiryDays: 14,
-  },
-  {
-    id: 14,
-    title: "Cat Grooming Special",
-    description: "Pamper your feline friend with our cat grooming services.",
-    petBusinessId: 6,
-    category: "PET_GROOMING",
-    defaultExpiryDays: 30,
-    basePrice: 60.0,
-    tagIds: [],
-    addressIds: [],
-    defaultExpiryDays: 14,
-  },
-  {
-    id: 15,
-    title: "Dog Walking Adventure",
-    description: "Let our experienced dog walkers take your furry friend on an exciting adventure!",
-    petBusinessId: 5,
-    category: "PET_RETAIL",
-    defaultExpiryDays: 30,
-    basePrice: 30.0,
-    tagIds: [{ tagId: 4 }],
-    addressIds: [],
-    defaultExpiryDays: 14,
-  },
-  // This service listing (id 16) will have a lastPossibleDate to be < currentDate
+  // This service listing (id 13) will have a lastPossibleDate to be < currentDate
   // On the customer side, pet owners should not be able to see these listings as the SL is already invalid.
   {
-    id: 16,
+    id: 13,
     title: "Pet Photography Session",
     description: "Capture beautiful moments with your pets in a professional photoshoot.",
     petBusinessId: 2,
@@ -306,7 +256,19 @@ const serviceListings = [
     basePrice: 75.0,
     tagIds: [{ tagId: 3 }],
     addressIds: [],
-    defaultExpiryDays: 14,
+  },
+  {
+    id: 14,
+    title: "John Dog suppliments",
+    description:
+      "Elevate your dogs health with Johns premium Dog Supplements We offer a wide range of quality supplements to keep your furry friend in top shape Choose from a variety of options to support your dogs wellbeing Give your dog the care they deserve with our topnotch products.",
+    petBusinessId: 1,
+    category: "PET_RETAIL",
+    basePrice: 15.0,
+    tagIds: [{ tagId: 2 }, { tagId: 4 }],
+    addressIds: [{ addressId: 1 }],
+    defaultExpiryDays: 30,
+    requiresBooking: false
   },
 ];
 
@@ -350,9 +312,6 @@ async function seedBusinessData(prisma) {
     const createObject = {
       title: data.title,
       description: data.description,
-      defaultExpiryDays: data.defaultExpiryDays,
-      lastPossibleDate: data.lastPossibleDate,
-      requiresBooking: data.requiresBooking,
       basePrice: data.basePrice,
       category: data.category,
       duration: data.duration,
@@ -384,7 +343,7 @@ async function seedBusinessData(prisma) {
         createObject.attachmentKeys = vetKey;
         createObject.attachmentURLs = vetUrl;
         break;
-      case 16:
+      case 13:
         createObject.attachmentKeys = sittingKey;
         createObject.attachmentURLs = sittingUrl;
         createObject.lastPossibleDate = pastDate;
@@ -422,10 +381,10 @@ async function remoteImageUrlToFile(url, filename) {
   }
 }
 
-// get random future date from today, will be randomized to be between 1-12 weeks from the current date
+// get random future date from today, will be randomized to be between 6-12 weeks from the current date
 function getRandomFutureDate() {
   const currentDate = new Date();
-  const daysToAdd = Math.floor(Math.random() * 77) + 7; // Random value between 7 and 84 (1 to 12 weeks)
+  const daysToAdd = Math.floor(Math.random() * 42) + 42; // Random value between 42 and 84 (6 to 12 weeks)
   currentDate.setDate(currentDate.getDate() + daysToAdd);
   return currentDate;
 }

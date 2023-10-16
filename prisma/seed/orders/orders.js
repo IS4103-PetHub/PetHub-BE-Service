@@ -3,28 +3,75 @@ const BookingService = require("../../../src/api/services/appointments/bookingSe
 const TransactionService = require("../../../src/api/services/finance/transactionService");
 const petOwnerService = require("../../../src/api/services/user/petOwnerService");
 const { v4: uuidv4 } = require("uuid");
+const CalendarGroupService = require("../../../src/api/services/appointments/calendarGroupService")
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
 const NUM_INVOICES = 5;
 const NUM_CART_ITEMS = 4;
 
-const JOHN_SERVICELISTING_IDS = [1, 2, 3, 4, 9, 10, 16];
-const SL_PRICES_MAP = {
-  1: 40,
-  2: 60,
-  3: 80,
-  4: 75,
-  9: 120,
-  10: 20,
-  16: 30,
-};
+const JOHNS_SERVICELISTINGS = [
+  {
+    id: 1,
+    duration: 60,
+    price: 40,
+    calendarGroup: 1,
+    requiresBooking: true,
+  },
+  {
+    id: 2,
+    duration: 60,
+    price: 60,
+    calendarGroup: 4,
+    requiresBooking: true,
+  },
+  {
+    id: 3,
+    duration: 60,
+    price: 80,
+    calendarGroup: 1,
+    requiresBooking: true,
+  },
+  {
+    id: 4,
+    duration: 60,
+    price: 75,
+    calendarGroup: 3,
+    requiresBooking: true,
+  },
+  {
+    id: 8,
+    duration: 60,
+    price: 120,
+    calendarGroup: 2,
+    requiresBooking: true,
+  },
+  {
+    id: 9,
+    duration: 60,
+    price: 20,
+    calendarGroup: 3,
+    requiresBooking: true,
+  },
+  {
+    id: 10,
+    duration: 180,
+    price: 30,
+    calendarGroup: 5,
+    requiresBooking: true,
+  },
+  {
+    id: 14,
+    price: 15,
+    requiresBooking: false,
+  },
+]
 
 // ============================== Helper functions ============================== //
 
 // Get a random service listing ID belong to john's company
 function getRandomSLIdFromJohn() {
-  const randomIndex = Math.floor(Math.random() * JOHN_SERVICELISTING_IDS.length);
-  return JOHN_SERVICELISTING_IDS[randomIndex];
+  const randomIndex = Math.floor(Math.random() * JOHNS_SERVICELISTINGS.length);
+  return JOHNS_SERVICELISTINGS[randomIndex].id;
 }
 
 // Get random quantity between 1 and 3 inclusive
@@ -35,7 +82,15 @@ function getRandomQuantity() {
 // Calculate the total price from a list of cart items
 function calculateTotalPrice(cartItems) {
   return cartItems.reduce((acc, item) => {
-    return acc + SL_PRICES_MAP[item.serviceListingId] * item.quantity;
+    const serviceListing = JOHNS_SERVICELISTINGS.find(
+      (listing) => listing.id === item.serviceListingId
+    );
+
+    if (serviceListing) {
+      return acc + serviceListing.price * item.quantity;
+    } else {
+      return acc; // Handle the case where a service listing is not found, should not happen
+    }
   }, 0);
 }
 
@@ -99,7 +154,7 @@ async function seedInvoicesAndOrders(prisma) {
   }
   console.log = originalLog; // Restore console.log after the loop
 
-  diversityOrderItemStatuses(prisma, orderItems.flat());
+  await diversityOrderItemStatuses(prisma, orderItems.flat());
 }
 
 async function diversityOrderItemStatuses(prisma, orderItems) {
@@ -110,15 +165,40 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
 
   // For 10 orderItems in the invoice with status = PENDING_BOOKING, create the booking [Redo booking seeding in the future]
   for (const item of pendingBookingItems) {
-    if ([4, 9, 10, 16].includes(item.serviceListingId)) {
-      await BookingService.createBooking(
-        9,
-        item.orderItemId,
-        1,
-        "2023-10-30T08:00:00.000Z",
-        "2023-10-30T09:00:00.000Z"
+    if ([4, 8, 9].includes(item.serviceListingId)) {
+
+      const serviceListing = JOHNS_SERVICELISTINGS.find(
+        (listing) => listing.id === item.serviceListingId
       );
-      break; // create a single booking only coz laze atm
+
+      // GET AVAILABLE TIME SLOTS FROM THE NEXT TWO WEEKS 
+      const currentDate = new Date();
+      const endDate = new Date(currentDate);
+      endDate.setDate(currentDate.getDate() + 14);
+      const availalbeTimeSlot = await CalendarGroupService.getAvailability(
+        serviceListing.calendarGroup,
+        currentDate,
+        endDate,
+        serviceListing.duration
+      )
+
+      // Use the random index to get the selected time slot
+      const randomIndex = Math.floor(Math.random() * availalbeTimeSlot.length);
+      const selectedTimeSlot = availalbeTimeSlot[randomIndex];
+
+      try {
+        await BookingService.createBooking(
+          9,
+          serviceListing.calendarGroup,
+          item.orderItemId,
+          selectedTimeSlot.startTime,
+          selectedTimeSlot.endTime
+        );
+      } catch (error) {
+        console.log("TIME SLOT", selectedTimeSlot)
+        console.log("ERROR WHEN CREATING BOOKINGS", error)
+      }
+      // break
     }
   }
 
@@ -132,14 +212,19 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
 
   for (const update of statusUpdates) {
     for (let i = update.start; i < update.end; i++) {
-      await prisma.orderItem.update({
-        where: {
-          orderItemId: pendingFulfillmentItems[i].orderItemId,
-        },
-        data: {
-          status: update.status,
-        },
-      });
+      try {
+        await prisma.orderItem.update({
+          where: {
+            orderItemId: pendingFulfillmentItems[i].orderItemId,
+          },
+          data: {
+            status: update.status,
+          },
+        });
+      } catch (error) {
+        console.log("ERROR SEEDING UPDATING STATUS", error)
+        console.log("pendingFulfillmentItems", pendingFulfillmentItems[i])
+      }
     }
   }
 }
