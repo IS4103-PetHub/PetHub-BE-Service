@@ -16,6 +16,8 @@ class OrderItemService {
           booking: true,
           serviceListing: {
             include: {
+              tags: true,
+              addresses: true,
               petBusiness: {
                 select: {
                   companyName: true,
@@ -47,6 +49,8 @@ class OrderItemService {
           booking: true,
           serviceListing: {
             include: {
+              tags: true,
+              addresses: true,
               petBusiness: {
                 select: {
                   companyName: true,
@@ -83,6 +87,8 @@ class OrderItemService {
               booking: true,
               serviceListing: {
                 include: {
+                  tags: true,
+                  addresses: true,
                   petBusiness: {
                     select: {
                       companyName: true,
@@ -119,6 +125,8 @@ class OrderItemService {
       const serviceListings = await prisma.serviceListing.findMany({
         where: { petBusinessId: petBusiness.userId },
         include: {
+          tags: true,
+          addresses: true,
           OrderItem: {
             include: {
               booking: true,
@@ -134,21 +142,21 @@ class OrderItemService {
       });
 
       let orderItems = serviceListings.flatMap((serviceListing) =>
-      serviceListing.OrderItem.map((orderItem) => {
-        // flatten the invoice object to match with other GETs so FE does not need to have multiple interfaces for OrderItem
-        const { invoice, ...rest } = orderItem;
-        const { paymentId, createdAt } = invoice || {};
-        return {
-          ...rest,
-          paymentId,
-          createdAt,
-          serviceListing: {
-            ...serviceListing,
-            OrderItem: undefined, // manually disconnect OrderItem from serviceListing
-          },
-        };
-      })
-    );
+        serviceListing.OrderItem.map((orderItem) => {
+          // flatten the invoice object to match with other GETs so FE does not need to have multiple interfaces for OrderItem
+          const { invoice, ...rest } = orderItem;
+          const { paymentId, createdAt } = invoice || {};
+          return {
+            ...rest,
+            paymentId,
+            createdAt,
+            serviceListing: {
+              ...serviceListing,
+              OrderItem: undefined, // manually disconnect OrderItem from serviceListing
+            },
+          };
+        })
+      );
 
       if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray);
 
