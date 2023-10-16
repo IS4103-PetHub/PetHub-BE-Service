@@ -3,7 +3,7 @@ const { PrismaClient } = require("@prisma/client");
 const { seedCommissionRule } = require("./finance/commissionRules.js");
 const { seedUser } = require("./user/user.js");
 const { seedBusinessData } = require("./serviceListing/serviceListing.js");
-const { seedCalendarGroup, seedBookings } = require("./calendarGroup/calendarGroup.js");
+const { seedCalendarGroup } = require("./calendarGroup/calendarGroup.js");
 const { seedInvoicesAndOrders } = require("./orders/orders.js");
 const prisma = new PrismaClient();
 
@@ -22,9 +22,8 @@ async function main() {
   console.log("Seeding invoices and order items...");
   await seedInvoicesAndOrders(prisma);
   console.log("Seeding bookings for the above calendar groups...");
-  // await seedBookings();
-  console.log("Main seeding completed!");
   await prisma.$disconnect(); // Disconnect from the database after seeding is done
+  console.log("Main seeding completed!");
 }
 
 main().catch((e) => {
