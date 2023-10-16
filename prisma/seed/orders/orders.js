@@ -198,7 +198,6 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
   }
 
   let pendingFulfillmentAndRequireBookings = [];
-  let processedItemIds = [];
 
   for (const item of pendingBookingItems) {
     if ([4, 8, 9].includes(item.serviceListingId)) {
@@ -229,7 +228,6 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
           selectedTimeSlot.endTime
         );
         pendingFulfillmentAndRequireBookings.push(item);
-        processedItemIds.push(item.orderItemId); // push so we can remove it later
       } catch (error) {
         console.log("TIME SLOT", selectedTimeSlot);
         console.log("ERROR WHEN CREATING BOOKINGS", error);
@@ -257,7 +255,6 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
             status: update.status,
           },
         });
-        processedItemIds.push(pendingFulfillmentItems[i].orderItemId);
         // Diversify statuses of those that are pending fulfillment and require booking
         await prisma.orderItem.update({
           where: {
@@ -267,7 +264,6 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
             status: update.status,
           },
         });
-        processedItemIds.push(pendingFulfillmentAndRequireBookings[i].orderItemId);
       } catch (error) {
         console.log("ERROR SEEDING UPDATING STATUS", error);
         console.log("pendingFulfillmentItems", pendingFulfillmentItems[i]);
