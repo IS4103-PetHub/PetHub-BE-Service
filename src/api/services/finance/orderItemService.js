@@ -104,8 +104,10 @@ class OrderItemService {
       let orderItems = invoices.flatMap((invoice) => {
         return invoice.orderItems.map((orderItem) => ({
           ...orderItem,
-          paymentId: invoice.paymentId, // attach paymentId from invoice too
-          createdAt: invoice.createdAt, // attach createdAt from invoice too
+          invoice: {
+            paymentId: invoice.paymentId, // attach paymentId from invoice too
+            createdAt: invoice.createdAt, // attach createdAt from invoice too
+          },
         }));
       });
 
@@ -143,13 +145,8 @@ class OrderItemService {
 
       let orderItems = serviceListings.flatMap((serviceListing) =>
         serviceListing.OrderItem.map((orderItem) => {
-          // flatten the invoice object to match with other GETs so FE does not need to have multiple interfaces for OrderItem
-          const { invoice, ...rest } = orderItem;
-          const { paymentId, createdAt } = invoice || {};
           return {
-            ...rest,
-            paymentId,
-            createdAt,
+            ...orderItem,
             serviceListing: {
               ...serviceListing,
               OrderItem: undefined, // manually disconnect OrderItem from serviceListing
