@@ -3,11 +3,11 @@ const BookingService = require("../../../src/api/services/appointments/bookingSe
 const TransactionService = require("../../../src/api/services/finance/transactionService");
 const petOwnerService = require("../../../src/api/services/user/petOwnerService");
 const { v4: uuidv4 } = require("uuid");
-const CalendarGroupService = require("../../../src/api/services/appointments/calendarGroupService")
+const CalendarGroupService = require("../../../src/api/services/appointments/calendarGroupService");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
-const NUM_INVOICES = 5;
-const NUM_CART_ITEMS = 4;
+const NUM_INVOICES = 10;
+const NUM_CART_ITEMS = 5;
 
 const JOHNS_SERVICELISTINGS = [
   {
@@ -64,7 +64,7 @@ const JOHNS_SERVICELISTINGS = [
     price: 15,
     requiresBooking: false,
   },
-]
+];
 
 // ============================== Helper functions ============================== //
 
@@ -82,9 +82,7 @@ function getRandomQuantity() {
 // Calculate the total price from a list of cart items
 function calculateTotalPrice(cartItems) {
   return cartItems.reduce((acc, item) => {
-    const serviceListing = JOHNS_SERVICELISTINGS.find(
-      (listing) => listing.id === item.serviceListingId
-    );
+    const serviceListing = JOHNS_SERVICELISTINGS.find((listing) => listing.id === item.serviceListingId);
 
     if (serviceListing) {
       return acc + serviceListing.price * item.quantity;
@@ -161,17 +159,15 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
   const pendingBookingItems = orderItems.filter((item) => item.status === "PENDING_BOOKING");
   const pendingFulfillmentItems = orderItems
     .filter((item) => item.status === "PENDING_FULFILLMENT")
-    .slice(0, 8);
+    .slice(0, 8); // These do not require booking
 
-  // For 10 orderItems in the invoice with status = PENDING_BOOKING, create the booking [Redo booking seeding in the future]
+  let pendingFulfillmentAndRequireBookings = [];
+
   for (const item of pendingBookingItems) {
     if ([4, 8, 9].includes(item.serviceListingId)) {
+      const serviceListing = JOHNS_SERVICELISTINGS.find((listing) => listing.id === item.serviceListingId);
 
-      const serviceListing = JOHNS_SERVICELISTINGS.find(
-        (listing) => listing.id === item.serviceListingId
-      );
-
-      // GET AVAILABLE TIME SLOTS FROM THE NEXT TWO WEEKS 
+      // GET AVAILABLE TIME SLOTS FROM THE NEXT TWO WEEKS
       const currentDate = new Date();
       const endDate = new Date(currentDate);
       endDate.setDate(currentDate.getDate() + 14);
@@ -180,11 +176,12 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
         currentDate,
         endDate,
         serviceListing.duration
-      )
+      );
 
       // Use the random index to get the selected time slot
       const randomIndex = Math.floor(Math.random() * availalbeTimeSlot.length);
       const selectedTimeSlot = availalbeTimeSlot[randomIndex];
+      if (!selectedTimeSlot) continue;
 
       try {
         await BookingService.createBooking(
@@ -194,25 +191,26 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
           selectedTimeSlot.startTime,
           selectedTimeSlot.endTime
         );
+        pendingFulfillmentAndRequireBookings.push(item);
       } catch (error) {
-        console.log("TIME SLOT", selectedTimeSlot)
-        console.log("ERROR WHEN CREATING BOOKINGS", error)
+        console.log("TIME SLOT", selectedTimeSlot);
+        console.log("ERROR WHEN CREATING BOOKINGS", error);
       }
       // break
     }
   }
 
-  // For 8 orderItems with the status = PENDING_FULFILLMENT, update the status to FULFILLED, PAID_OUT, REFUNDED, EXPIRED, 2 each
   const statusUpdates = [
-    { start: 0, end: 2, status: OrderItemStatus.FULFILLED },
-    { start: 2, end: 4, status: OrderItemStatus.PAID_OUT },
-    { start: 4, end: 5, status: OrderItemStatus.REFUNDED },
-    { start: 5, end: 6, status: OrderItemStatus.EXPIRED },
+    { start: 0, end: 1, status: OrderItemStatus.FULFILLED },
+    { start: 1, end: 2, status: OrderItemStatus.PAID_OUT },
+    { start: 2, end: 3, status: OrderItemStatus.REFUNDED },
+    { start: 4, end: 5, status: OrderItemStatus.EXPIRED },
   ];
 
   for (const update of statusUpdates) {
     for (let i = update.start; i < update.end; i++) {
       try {
+        // Diversify statuses of those that are pending fulfillment but do not required booking
         await prisma.orderItem.update({
           where: {
             orderItemId: pendingFulfillmentItems[i].orderItemId,
@@ -221,9 +219,18 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
             status: update.status,
           },
         });
+        // Diversify statuses of those that are pending fulfillment and require booking
+        await prisma.orderItem.update({
+          where: {
+            orderItemId: pendingFulfillmentAndRequireBookings[i].orderItemId,
+          },
+          data: {
+            status: update.status,
+          },
+        });
       } catch (error) {
-        console.log("ERROR SEEDING UPDATING STATUS", error)
-        console.log("pendingFulfillmentItems", pendingFulfillmentItems[i])
+        console.log("ERROR SEEDING UPDATING STATUS", error);
+        console.log("pendingFulfillmentItems", pendingFulfillmentItems[i]);
       }
     }
   }
