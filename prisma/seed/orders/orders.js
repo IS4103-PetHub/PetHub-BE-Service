@@ -155,13 +155,50 @@ async function seedInvoicesAndOrders(prisma) {
   await diversityOrderItemStatuses(prisma, orderItems.flat());
 }
 
+/*
+  YES THIS ENTIRE FUNCTION IS A MESS BUT
+*/
 async function diversityOrderItemStatuses(prisma, orderItems) {
-  const pendingBookingItems = orderItems.filter((item) => item.status === "PENDING_BOOKING");
-  const pendingFulfillmentItems = orderItems
+  let pendingBookingItems = orderItems.filter((item) => item.status === "PENDING_BOOKING");
+  let pendingFulfillmentItems = orderItems
     .filter((item) => item.status === "PENDING_FULFILLMENT")
-    .slice(0, 8); // These do not require booking
+    .slice(0, 12); // get 12 out that do not require booking
+
+  // Expire and refund one item each that requires booking
+  const expiredItem = pendingBookingItems.shift();
+  if (expiredItem) {
+    try {
+      await prisma.orderItem.update({
+        where: {
+          orderItemId: expiredItem.orderItemId,
+        },
+        data: {
+          status: OrderItemStatus.EXPIRED,
+        },
+      });
+    } catch (error) {
+      console.log("ERROR SETTING EXPIRED STATUS", error);
+    }
+  }
+  const refundedItem = pendingBookingItems.shift();
+
+  if (refundedItem) {
+    try {
+      await prisma.orderItem.update({
+        where: {
+          orderItemId: refundedItem.orderItemId,
+        },
+        data: {
+          status: OrderItemStatus.REFUNDED,
+        },
+      });
+    } catch (error) {
+      console.log("ERROR SETTING REFUNDED STATUS", error);
+    }
+  }
 
   let pendingFulfillmentAndRequireBookings = [];
+  let processedItemIds = [];
 
   for (const item of pendingBookingItems) {
     if ([4, 8, 9].includes(item.serviceListingId)) {
@@ -192,6 +229,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
           selectedTimeSlot.endTime
         );
         pendingFulfillmentAndRequireBookings.push(item);
+        processedItemIds.push(item.orderItemId); // push so we can remove it later
       } catch (error) {
         console.log("TIME SLOT", selectedTimeSlot);
         console.log("ERROR WHEN CREATING BOOKINGS", error);
@@ -201,10 +239,10 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
   }
 
   const statusUpdates = [
+    // { start: 0, end: 1, status: OrderItemStatus.PAID_OUT },
     { start: 0, end: 1, status: OrderItemStatus.FULFILLED },
-    { start: 1, end: 2, status: OrderItemStatus.PAID_OUT },
-    { start: 2, end: 3, status: OrderItemStatus.REFUNDED },
-    { start: 4, end: 5, status: OrderItemStatus.EXPIRED },
+    { start: 1, end: 2, status: OrderItemStatus.REFUNDED },
+    { start: 2, end: 3, status: OrderItemStatus.EXPIRED },
   ];
 
   for (const update of statusUpdates) {
@@ -219,6 +257,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
             status: update.status,
           },
         });
+        processedItemIds.push(pendingFulfillmentItems[i].orderItemId);
         // Diversify statuses of those that are pending fulfillment and require booking
         await prisma.orderItem.update({
           where: {
@@ -228,6 +267,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
             status: update.status,
           },
         });
+        processedItemIds.push(pendingFulfillmentAndRequireBookings[i].orderItemId);
       } catch (error) {
         console.log("ERROR SEEDING UPDATING STATUS", error);
         console.log("pendingFulfillmentItems", pendingFulfillmentItems[i]);
