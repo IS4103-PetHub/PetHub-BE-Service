@@ -12,6 +12,10 @@ model Invoice {
 
   miscCharge Float // to account for tax/stripe_charge etc
 
+  // For invoice PDF (consolidated)
+  attachmentKey    String
+  attachmentURL    String
+
   orderItems     OrderItem[]
   PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
@@ -35,6 +39,10 @@ model OrderItem {
   expiryDate     DateTime
   voucherCode    String // generated UUID to identify order
   status         OrderItemStatus @default(PENDING_FULFILLMENT)
+
+  // For invoice PDF (single row)
+  attachmentKey    String
+  attachmentURL    String
 
   // Must be associated to invoice
   invoiceId Int

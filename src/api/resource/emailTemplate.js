@@ -49,8 +49,6 @@ exports.petBusinessApplicationRejectionEmail = (name, link, remark) => {
       `;
 };
 
-
-
 exports.rescheduleOrRefundBookingEmail = (name, link, booking) => {
   return `
       Dear ${name},
@@ -91,7 +89,7 @@ exports.refundBookingEmail = (name, booking) => {
     Regards,
     Pethub
     `;
-}
+};
 
 exports.deleteServiceListingEmail = (name, postTitle) => {
   return `
@@ -129,11 +127,11 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
     - Tax (7%): $${invoice.miscCharge}
     - Total Amount: $${invoice.totalPrice}
 
-    You can view your order details and track the delivery status by clicking the following link: [View Order Details](${link})
+    You can view your order details and track the delivery status by clicking the following link: ${link}
 
     We appreciate your business and look forward to serving you again.
 
     Warm regards,
     The PetHub Team
 `;
-}
+};

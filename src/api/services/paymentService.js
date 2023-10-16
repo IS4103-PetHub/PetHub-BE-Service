@@ -32,10 +32,17 @@ class PaymentService {
       // 4) Once Payment service confirms payment, payment service must confirm the transaction with the paymentIntentId
       const confirmedInvoice = await transactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId)
 
-      // await emailService.sendEmail(
-      //   user.email,
-      //   `Thank You for Your Purchase, ${user.firstName}! Your PetHub Order is Confirmed`,
-      //   emailTemplate.checkoutSuccessEmail(user.firstName, invoice, "")) // TODO: create link
+      await emailService.sendEmail(
+        user.user.email,
+        `Thank You for Your Purchase, ${user.firstName}! Your PetHub Order is Confirmed`,
+        emailTemplate.checkoutSuccessEmail(
+          user.firstName,
+          confirmedInvoice,
+          `http://localhost:3002/customer/orders`
+        ),
+        "invoice.pdf",
+        invoice.attachmentURL
+      );
 
       return confirmedInvoice;
     } catch (error) {

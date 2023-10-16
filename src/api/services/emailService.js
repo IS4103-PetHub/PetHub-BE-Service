@@ -19,7 +19,7 @@ class EmailService {
         this.oAuth2Client.setCredentials({ refresh_token: this.REFRESH_TOKEN });
     }
 
-    async sendEmail(toEmail, title, body) {
+    async sendEmail(toEmail, title, body, fileName = null, attachmentPath = null) {
         try {
             const accessToken = await this.oAuth2Client.getAccessToken();
             const transporter = nodemailer.createTransport({
@@ -40,6 +40,16 @@ class EmailService {
                 subject: title,
                 text: body
             };
+
+            // If provided, attach the file to the email
+            if (attachmentPath && fileName) {
+                mailOptions.attachments = [
+                    {
+                        filename: fileName,
+                        path: attachmentPath
+                    }
+                ];
+            }
 
             await transporter.sendMail(mailOptions);
         } catch (error) {
