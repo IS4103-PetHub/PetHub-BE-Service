@@ -14,3 +14,9 @@ exports.validateStatusFilters = (filterString) => {
     // If all statuses are valid, return the array of statuses
     return true;
 }
+
+exports.validateNumberList = (inputString) => {
+    // Use a regular expression to match a string with numbers separated by commas
+    const pattern = /^\d+(,\d+)*$/;
+    return pattern.test(inputString);
+  };

@@ -120,7 +120,13 @@ class OrderItemService {
     }
   }
 
-  async getPetBusinessOrderItemsById(petBusinessId, statusFilterArray = undefined) {
+  async getPetBusinessOrderItemsById(
+    petBusinessId,
+    statusFilterArray = undefined,
+    startDate = undefined,
+    endDate = undefined,
+    serviceListingFilterArray = undefined
+  ) {
     try {
       const petBusiness = await petBusinessService.getUserById(petBusinessId);
 
@@ -155,18 +161,61 @@ class OrderItemService {
         })
       );
 
-      if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray);
+      const filters = {
+        statusFilterArray: statusFilterArray,
+        serviceListingFilterArray: serviceListingFilterArray,
+        startDate: startDate,
+        endDate: endDate
+      }
 
-      return orderItems;
+      const filteredOrderItems = this.filterOrderItems(orderItems, filters)
+
+
+      filteredOrderItems.sort((a, b) => {
+        const dateA = new Date(a.invoice.createdAt);
+        const dateB = new Date(b.invoice.createdAt);
+        return dateA - dateB;
+      });
+
+      return filteredOrderItems;
     } catch (error) {
       if (error instanceof CustomError) throw error;
       throw new OrderItemsError(error);
     }
   }
 
-  filterOrderItems(orderItems, statusFilterArray = Object.values(OrderItemStatus)) {
+  filterOrderItems(orderItems, filters) {
+    const {
+      statusFilterArray,
+      serviceListingFilterArray,
+      startDate,
+      endDate,
+    } = filters;
+  
     const statusFilter = new Set(statusFilterArray);
-    return orderItems.filter((orderItem) => statusFilter.has(orderItem.status));
+    const serviceListingFilter = new Set(serviceListingFilterArray);
+  
+    return orderItems.filter((orderItem) => {
+      const createdAt = new Date(orderItem.invoice.createdAt);
+      
+      // Apply status filter if provided
+      if (statusFilterArray && !statusFilter.has(orderItem.status)) {
+        return false;
+      }
+      
+      // Apply service listing filter if provided
+      if (serviceListingFilterArray && !serviceListingFilter.has(orderItem.serviceListingId.toString())) {
+        return false;
+      }
+      
+      // Apply date range filter if provided
+      if (startDate && endDate && (createdAt < new Date(startDate) || createdAt > new Date(endDate))) {
+        return false;
+      }
+      
+      // If all filters pass, keep the order item
+      return true;
+    });
   }
 }
 

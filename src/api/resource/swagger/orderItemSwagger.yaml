@@ -76,13 +76,31 @@ paths:
           description: ID of the pet business.
           required: true
           type: integer
-          default: 5 # Example default value
+          default: 1 # Example default value
         - name: statusFilter
           in: query
           description: comma deliminated filters e.g., ?statusFilter=PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED
           required: false
           type: string
           default: PENDING_BOOKING,PENDING_FULFILLMENT,FULFILLED,PAID_OUT,REFUNDED,EXPIRED
+        - name: startDate
+          in: query
+          description: start date to query from
+          required: false
+          type: string
+          default: '2023-10-01T00:00:00.000Z'
+        - name: endDate
+          in: query
+          description: end date to query from
+          required: false
+          type: string
+          default: '2023-10-31T23:59:59.999Z'
+        - name: serviceListingFilters
+          in: query
+          description: comma deliminated filters of the Serivce Listings IDs
+          required: false
+          type: string
+          default: '1,2'
       responses:
         200:
           description: List of order items
