@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sat Oct 14 2023 23:01:24 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Tue Oct 17 2023 14:04:05 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -67,6 +67,25 @@ model Booking {
   pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
   OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
   orderItemId Int       @unique
+}
+
+model Article {
+  articleId   Int         @id @default(autoincrement())
+  articleType ArticleType
+  title       String
+  content     String
+
+  createdByUserId Int
+  updatedByUserId Int?
+  dateCreated     DateTime  @default(now())
+  dateUpdated     DateTime?
+
+  //img
+  attachmentKeys String[]
+  attachmentUrls String[]
+
+  createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
+  updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
 }
 
 generator client {
@@ -138,6 +157,13 @@ enum RecurrencePattern {
   WEEKLY
 }
 
+enum ArticleType {
+  ANNOUNCEMENTS
+  TIPS_AND_TRICKS
+  EVENTS
+  OTHERS
+}
+
 enum Category {
   PET_GROOMING
   DINING
@@ -169,6 +195,10 @@ model Invoice {
 
   miscCharge Float // to account for tax/stripe_charge etc
 
+  // For invoice PDF (consolidated)
+  attachmentKey String
+  attachmentURL String
+
   orderItems     OrderItem[]
   PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
@@ -192,6 +222,10 @@ model OrderItem {
   expiryDate     DateTime
   voucherCode    String // generated UUID to identify order
   status         OrderItemStatus @default(PENDING_FULFILLMENT)
+
+  // For invoice PDF (single row)
+  attachmentKey String
+  attachmentURL String
 
   // Must be associated to invoice
   invoiceId Int
@@ -357,6 +391,8 @@ model InternalUser {
   lastName                        String
   adminRole                       AdminRole
   approvedPetBusinessApplications PetBusinessApplication[]
+  createdArticle                  Article[]                @relation("CreatedBy")
+  updatedArticle                  Article[]                @relation("UpdatedBy")
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique

@@ -10,43 +10,44 @@ const { getUserFromToken } = require("../../utils/nextAuth");
 exports.createServiceListing = async (req, res, next) => {
   try {
     const data = req.body;
+    // Required fields
     if (
       !data.title ||
       !data.petBusinessId ||
       !data.basePrice ||
       !data.category ||
-      !data.description
+      !data.description ||
+      !data.requiresBooking ||
+      !data.defaultExpiryDays
     ) {
-      return res.status(400).json({
-        message: "Incomplete form data. Please fill in all required fields.",
-      });
+      return res.status(400).json({ message: "Incomplete form data. Please fill in all required fields."});
     }
 
-    if (
-      !(await BaseValidations.isValidLength(
-        data.title,
-        limitations.SERVICE_LISTING_TITLE_LENGTH
-      ))
-    ) {
-      return res.status(400).json({
-        message: errorMessages.INVALID_SERVICE_TITLE,
-      });
+    if (!(await BaseValidations.isValidLength(data.title,limitations.SERVICE_LISTING_TITLE_LENGTH))) {
+      return res.status(400).json({message: errorMessages.INVALID_SERVICE_TITLE});
     }
 
-    if (!(await BaseValidations.isValidInteger(data.petBusinessId) ||
-      !(await BaseValidations.isValidInteger(data.calendarGroupId)) ||
-      !(await BaseValidations.isValidInteger(data.duration)))
-    ) {
-      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    if (!(await BaseValidations.isValidInteger(data.petBusinessId)) ||
+      ((data.calendarGroupId) && !(await BaseValidations.isValidInteger(data.calendarGroupId))) ||
+      ((data.duration) && !(await BaseValidations.isValidInteger(data.duration))) ||
+      !(await BaseValidations.isValidInteger(data.defaultExpiryDays))) {
+      return res.status(400).json({ message: errorMessages.INVALID_INTEGER });
     }
     data.petBusinessId = parseInt(data.petBusinessId, 10);
     data.calendarGroupId = parseInt(data.calendarGroupId, 10);
     data.duration = parseInt(data.duration, 10);
+    data.defaultExpiryDays = parseInt(data.defaultExpiryDays, 10);
+
+    if (!(await BaseValidations.isValidBooleanString(data.requiresBooking))) {
+      return res.status(400).json({ message: "Requires Booking field should be `true` or `false`" });
+    }
+    data.requiresBooking = (data.requiresBooking === 'true') // convert to bool
+    if (data.requiresBooking === true && !data.duration) {
+      return res.status(400).json({ message: "If bookings are required, duration should not be null" });
+    }
 
     if (!(await BaseValidations.isValidFloat(data.basePrice))) {
-      return res
-        .status(400)
-        .json({ message: errorMessages.INVALID_BASE_PRICE });
+      return res.status(400).json({ message: errorMessages.INVALID_BASE_PRICE });
     }
     data.basePrice = parseFloat(data.basePrice);
 
@@ -54,34 +55,36 @@ exports.createServiceListing = async (req, res, next) => {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
 
+    // Ensure that the date is a valid and future date
+    if (data.lastPossibleDate) {
+      data.lastPossibleDate = new Date(data.lastPossibleDate);
+      const currentDate = new Date();
+      if (data.lastPossibleDate < currentDate) {
+        return res.status(400).json({ message: errorMessages.INVALID_DATE });
+      }
+      data.lastPossibleDate = data.lastPossibleDate.toISOString()
+    }
+
     if (data.tagIds) {
       if (!(await BaseValidations.isValidNumericIDs(data.tagIds))) {
-        return res
-          .status(400)
-          .json({ message: "Please ensure that every tag ID is valid" });
+        return res.status(400).json({ message: "Please ensure that every tag ID is valid" });
       }
       data.tagIds = data.tagIds.map((id) => parseInt(id, 10));
     }
 
     if (data.addressIds) {
       if (!(await BaseValidations.isValidNumericIDs(data.addressIds))) {
-        return res
-          .status(400)
-          .json({ message: "Please ensure that every address ID is valid" });
+        return res.status(400).json({ message: "Please ensure that every address ID is valid" });
       }
       data.addressIds = data.addressIds.map((id) => parseInt(id, 10));
     }
 
     if (req.files) {
       data.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files, "service-listing");
-      data.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
-        data.attachmentKeys
-      );
+      data.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(data.attachmentKeys);
     }
 
-    const serviceListing = await ServiceListingService.createServiceListing(
-      data
-    );
+    const serviceListing = await ServiceListingService.createServiceListing(data);
     res.status(201).json(serviceListing);
   } catch (error) {
     next(error);
@@ -96,70 +99,89 @@ exports.updateServiceListing = async (req, res, next) => {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
     serviceListingId = parseInt(serviceListingId, 10);
-    updateData.calendarGroupId = parseInt(updateData.calendarGroupId, 10);
-    updateData.duration = parseInt(updateData.duration, 10);
 
-    if (
-      updateData.title &&
-      !(await BaseValidations.isValidLength(
-        updateData.title,
-        limitations.SERVICE_LISTING_TITLE_LENGTH
-      ))
+    if (updateData.title && !(await BaseValidations.isValidLength(updateData.title, limitations.SERVICE_LISTING_TITLE_LENGTH))
     ) {
-      return res.status(400).json({
-        message: errorMessages.INVALID_SERVICE_TITLE,
-      });
+      return res.status(400).json({ message: errorMessages.INVALID_SERVICE_TITLE });
     }
 
-    if (
-      updateData.basePrice &&
-      !(await BaseValidations.isValidFloat(updateData.basePrice))
-    ) {
-      return res
-        .status(400)
-        .json({ message: errorMessages.INVALID_BASE_PRICE });
+    if (updateData.basePrice && !(await BaseValidations.isValidFloat(updateData.basePrice))) {
+      return res.status(400).json({ message: errorMessages.INVALID_BASE_PRICE });
     }
     updateData.basePrice = parseFloat(updateData.basePrice);
 
-    if (
-      updateData.category &&
-      !(await ServiceListingValidations.isValidCategory(updateData.category))
-    ) {
+    if (updateData.category && !(await ServiceListingValidations.isValidCategory(updateData.category))) {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
+    }
+
+    // Date function has in built validation for data.dataOfBirth user input
+    if (updateData.lastPossibleDate) {
+      updateData.lastPossibleDate = new Date(updateData.lastPossibleDate).toISOString();
+    }
+
+    
+    if (updateData.calendarGroupId) {
+      if (!(await BaseValidations.isValidInteger(updateData.calendarGroupId))) {
+        return res.status(400).json({ message: errorMessages.INVALID_INTEGER });
+      }
+      updateData.calendarGroupId = parseInt(updateData.calendarGroupId, 10);
+    }
+
+    if (updateData.duration) {
+      if (!(await BaseValidations.isValidInteger(updateData.duration))) {
+        return res.status(400).json({ message: errorMessages.INVALID_INTEGER });
+      }
+      updateData.duration = parseInt(updateData.duration, 10);
+    }
+
+    if (updateData.requiresBooking) {
+      if (!(await BaseValidations.isValidBooleanString(updateData.requiresBooking))) {
+        return res.status(400).json({ message: "Requires Booking field should be `true` or `false`" });
+      }
+      updateData.requiresBooking = (updateData.requiresBooking === 'true') // convert to bool
+      if (updateData.requiresBooking === true && !updateData.duration) {
+        return res.status(400).json({ message: "If bookings are required, duration should not be null" });
+      }
+    }
+
+    if (updateData.defaultExpiryDays) {
+      if (!(await BaseValidations.isValidInteger(updateData.defaultExpiryDays))) {
+        return res.status(400).json({ message: errorMessages.INVALID_INTEGER });
+      }
+      updateData.defaultExpiryDays = parseInt(updateData.defaultExpiryDays, 10);
+    }
+
+    // Ensure that the date is a valid and future date
+    if (updateData.lastPossibleDate) {
+      updateData.lastPossibleDate = new Date(updateData.lastPossibleDate);
+      const currentDate = new Date();
+      if (updateData.lastPossibleDate < currentDate) {
+        return res.status(400).json({ message: errorMessages.INVALID_DATE });
+      }
+      updateData.lastPossibleDate = updateData.lastPossibleDate.toISOString()
     }
 
     if (updateData.tagIds) {
       if (!(await BaseValidations.isValidNumericIDs(updateData.tagIds))) {
-        return res
-          .status(400)
-          .json({ message: "Please ensure that every tag ID is valid" });
+        return res.status(400).json({ message: "Please ensure that every tag ID is valid" });
       }
       updateData.tagIds = updateData.tagIds.map((id) => parseInt(id, 10));
     }
 
     if (updateData.addressIds) {
       if (!(await BaseValidations.isValidNumericIDs(updateData.addressIds))) {
-        return res
-          .status(400)
-          .json({ message: "Please ensure that every address ID is valid" });
+        return res.status(400).json({ message: "Please ensure that every address ID is valid" });
       }
       updateData.addressIds = updateData.addressIds.map((id) => parseInt(id, 10));
     }
 
     if (req.files) {
       // delete existing files and update with new files
-      await ServiceListingService.deleteFilesOfAServiceListing(
-        serviceListingId
-      );
+      await ServiceListingService.deleteFilesOfAServiceListing(serviceListingId);
       updateData.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files, "service-listing");
-      updateData.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(
-        updateData.attachmentKeys
-      );
+      updateData.attachmentURLs = await s3ServiceInstance.getObjectSignedUrl(updateData.attachmentKeys);
     }
-    updatedListing = await ServiceListingService.updateServiceListing(
-      serviceListingId,
-      updateData
-    );
+    updatedListing = await ServiceListingService.updateServiceListing(serviceListingId, updateData);
 
     res.status(200).json(updatedListing);
   } catch (error) {
@@ -256,22 +278,6 @@ exports.getServiceListingByPBId = async (req, res, next) => {
 
     const serviceListings = await ServiceListingService.getServiceListingByPBId(
       Number(petBusinessId)
-    );
-    res.status(200).json(serviceListings);
-  } catch (error) {
-    next(error);
-  }
-};
-
-// to be depreciated, filtering logic done under /active
-// will remove after FE finishes integrating
-exports.getFilteredServiceListings = async (req, res, next) => {
-  try {
-    const categories = req.query.category ? Array.isArray(req.query.category) ? req.query.category : [req.query.category] : [];
-    const tags = req.query.tag ? Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag] : [];
-
-    const serviceListings = await ServiceListingService.filterServiceListing(
-      categories, tags
     );
     res.status(200).json(serviceListings);
   } catch (error) {
