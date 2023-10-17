@@ -67,7 +67,14 @@ class OrderItemService {
         },
       });
 
-      if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray);
+      const filters = {
+        statusFilterArray: statusFilterArray,
+        serviceListingFilterArray: undefined,
+        startDate: undefined,
+        endDate: undefined
+      }
+
+      if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, filters);
       return orderItems;
     } catch (error) {
       if (error instanceof CustomError) throw error;
@@ -111,7 +118,14 @@ class OrderItemService {
         }));
       });
 
-      if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, statusFilterArray);
+      const filters = {
+        statusFilterArray: statusFilterArray,
+        serviceListingFilterArray: undefined,
+        startDate: undefined,
+        endDate: undefined
+      }
+
+      if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, filters);
 
       return orderItems;
     } catch (error) {
