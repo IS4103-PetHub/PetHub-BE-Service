@@ -33,17 +33,17 @@ class ArticleService {
         }
     }
 
-    async createArticle(artcilePayload, internalUserId) {
+    async createArticle(articlePayload, internalUserId) {
         try {
             const internalUser = await InternalUserService.getUserById(internalUserId) // validate userid
 
             const newArticle = await prisma.article.create({
                 data: {
-                    articleType: artcilePayload.articleType,
-                    title: artcilePayload.title,
-                    content: artcilePayload.content,
-                    attachmentKeys: artcilePayload.attachmentKeys,
-                    attachmentUrls: artcilePayload.attachmentUrls,
+                    articleType: articlePayload.articleType,
+                    title: articlePayload.title,
+                    content: articlePayload.content,
+                    attachmentKeys: articlePayload.attachmentKeys,
+                    attachmentUrls: articlePayload.attachmentUrls,
                     createdBy: {
                         connect: {
                             userId: internalUserId
@@ -59,18 +59,18 @@ class ArticleService {
         }
     }
 
-    async updateArticle(artcilePayload, articleId, internalUserId) {
+    async updateArticle(articlePayload, articleId, internalUserId) {
         try {
             const internalUser = await InternalUserService.getUserById(internalUserId) // validate userid
 
             const updatedArticle = await prisma.article.update({
                 where: {articleId},
                 data: {
-                    articleType: artcilePayload.articleType,
-                    title: artcilePayload.title,
-                    content: artcilePayload.content,
-                    attachmentKeys: artcilePayload.attachmentKeys,
-                    attachmentUrls: artcilePayload.attachmentUrls,
+                    articleType: articlePayload.articleType,
+                    title: articlePayload.title,
+                    content: articlePayload.content,
+                    attachmentKeys: articlePayload.attachmentKeys,
+                    attachmentUrls: articlePayload.attachmentUrls,
                     dateUpdated: new Date(),
                     updatedBy: {
                         connect: {
@@ -97,7 +97,7 @@ class ArticleService {
         }
     }
 
-    async deleteFilesOfAArticle(articleId) {
+    async deleteFilesOfAnArticle(articleId) {
         try {
             const article = await prisma.article.findUnique({
                 where: {articleId}

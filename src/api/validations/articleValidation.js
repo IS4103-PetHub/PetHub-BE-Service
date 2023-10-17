@@ -12,11 +12,13 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
             .trim()
             .pattern(/^[a-zA-Z0-9\s.,:'?!]+$/, 'Title pattern')
             .min(1)
+            .max(100)
             .required()
             .messages({
                 'string.empty': 'Title must not be empty.',
                 'string.pattern.base': 'Title must have a valid format.',
-                'string.min': 'Title must contain at least one character.'
+                'string.min': 'Title must contain at least one character.',
+                'string.max': 'Title has a maximum of one hundred characters.'
             }),
         content: Joi.string()
             .trim()

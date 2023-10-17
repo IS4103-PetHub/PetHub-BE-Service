@@ -84,7 +84,7 @@ exports.updateArticle = async (req, res, next) => {
 
         if (req.files) {
 
-            await articleService.deleteFilesOfAArticle(
+            await articleService.deleteFilesOfAnArticle(
                 Number(articleId)
             )
 
