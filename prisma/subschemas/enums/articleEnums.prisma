@@ -1,0 +1,6 @@
+enum ArticleType {
+  ANNOUNCEMENTS
+  TIPS_AND_TRICKS
+  EVENTS
+  OTHERS
+}
