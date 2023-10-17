@@ -53,7 +53,7 @@ exports.createPetLostAndFound = async (req, res, next) => {
 
         const newPetLostAndFound = await petLostAndFoundService.createPetLostAndFound(petLostAndFoundPayload, Number(petOwnerId))
 
-        res.status(200).json(newPetLostAndFound)
+        res.status(201).json(newPetLostAndFound)
 
     } catch (error) {
         next(error)
@@ -89,7 +89,7 @@ exports.updatePetLostAndFound = async (req, res, next) => {
 
         const newPetLostAndFound = await petLostAndFoundService.updatePetLostAndFound(petLostAndFoundPayload, Number(lostAndFoundId))
 
-        res.status(201).json(newPetLostAndFound)
+        res.status(200).json(newPetLostAndFound)
 
     } catch (error) {
         next(error)
