@@ -7,21 +7,25 @@ exports.isValidCreateOrUpdatePetLostAndFoundPayload = (payload) => {
             .trim()
             .pattern(/^[a-zA-Z0-9\s.,]+$/, 'Title pattern')
             .min(1)
+            .max(64)
             .required()
             .messages({
                 'string.empty': 'Title must not be empty.',
                 'string.pattern.base': 'Title must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed).',
-                'string.min': 'Title must contain at least one character.'
+                'string.min': 'Title must contain at least one character.',
+                'string.max': 'Title has a maximum of sixty four characters.'
             }),
         description: Joi.string()
             .trim()
             .pattern(/^[a-zA-Z0-9\s.,]+$/, 'Description pattern')
             .min(1) 
+            .max(500)
             .required()
             .messages({
                 'string.empty': 'Description must not be empty.',
                 'string.pattern.base': 'Description must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed).',
-                'string.min': 'Description must contain at least one character.'
+                'string.min': 'Description must contain at least one character.',
+                'string.max': 'Description has a maximum of five hundred characters.'
             }),
         requestType: Joi.string()
             .trim()
