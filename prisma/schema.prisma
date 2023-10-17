@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sat Oct 14 2023 17:12:47 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Tue Oct 17 2023 14:04:05 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -69,6 +69,25 @@ model Booking {
   orderItemId Int       @unique
 }
 
+model Article {
+  articleId   Int         @id @default(autoincrement())
+  articleType ArticleType
+  title       String
+  content     String
+
+  createdByUserId Int
+  updatedByUserId Int?
+  dateCreated     DateTime  @default(now())
+  dateUpdated     DateTime?
+
+  //img
+  attachmentKeys String[]
+  attachmentUrls String[]
+
+  createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
+  updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -136,6 +155,13 @@ enum DayOfWeek {
 enum RecurrencePattern {
   DAILY
   WEEKLY
+}
+
+enum ArticleType {
+  ANNOUNCEMENTS
+  TIPS_AND_TRICKS
+  EVENTS
+  OTHERS
 }
 
 enum Category {
@@ -341,6 +367,8 @@ model InternalUser {
   lastName                        String
   adminRole                       AdminRole
   approvedPetBusinessApplications PetBusinessApplication[]
+  createdArticle                  Article[]                @relation("CreatedBy")
+  updatedArticle                  Article[]                @relation("UpdatedBy")
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
