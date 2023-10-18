@@ -25,7 +25,7 @@ class BookingService {
             }
 
             const bookingDuration = Math.abs((new Date(endTime) - new Date(startTime)) / 60000);
-            const availableSlots = await CalendarGroupService.getAvailability(Number(calendarGroupId), new Date(startTime), new Date(endTime), bookingDuration);
+            const availableSlots = await CalendarGroupService.getAvailability(Number(orderItem.orderItemId), new Date(startTime), new Date(endTime), bookingDuration);
             if (availableSlots.length === 0) throw new CustomError("Unable to create new booking, no available timeslots", 406);
 
             // Always choose the first available slot for simplicity.
@@ -235,10 +235,10 @@ class BookingService {
                 throw new CustomError("The order item expires before selected start time.", 400);
             }
 
-            const calendarGroupId = existingBooking.serviceListing.calendarGroupId
+            const orderItemId = existingBooking.OrderItem.orderItemId;
 
             const bookingDuration = Math.abs((new Date(newStartTime) - new Date(newEndTime)) / 60000);
-            const availableSlots = await CalendarGroupService.getAvailability(Number(calendarGroupId), new Date(newStartTime), new Date(newEndTime), bookingDuration);
+            const availableSlots = await CalendarGroupService.getAvailability(Number(orderItemId), new Date(newStartTime), new Date(newEndTime), bookingDuration);
             if (availableSlots.length === 0) throw new CustomError(`Unable to update booking (${bookingId}), no available timeslots`, 406);
 
             // Always choose the first available slot for simplicity.
