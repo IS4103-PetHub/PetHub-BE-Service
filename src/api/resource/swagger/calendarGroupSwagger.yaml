@@ -319,9 +319,9 @@ paths:
       tags:
         - CalendarGroup
 
-  /api/calendar-groups/available-timeslots/{calendarID}:
+  /api/calendar-groups/available-timeslots/{orderItemId}:
     get:
-      summary: Get available time slots for a given calendar ID.
+      summary: Get available time slots for a given OrderItem ID.
       description: |
         Retrieve a list of available time slots based on a calendar's configurations. The endpoint calculates sub-slots 
         of size equal to the desired `duration` provided in the query. For each sub-slot, it verifies if there are 
@@ -333,9 +333,9 @@ paths:
         15-minute sub-slots within an hour that has vacancies for the entire duration, you would get four individual 
         15-minute slots instead of a single 1-hour slot.
       parameters:
-        - name: calendarID
+        - name: orderItemId
           in: path
-          description: ID of the calendar to retrieve availability for.
+          description: ID of the OrderItem with the associated service listing and calendar if any to retrieve availability for.
           required: true
           type: integer
           default: 1 # Example default value
