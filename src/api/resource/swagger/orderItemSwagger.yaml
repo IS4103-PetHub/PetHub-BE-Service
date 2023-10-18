@@ -134,3 +134,36 @@ paths:
                 type: array
       tags:
         - Order Items
+
+  /api/order-items/complete-order/{orderItemId}:
+    post:
+      summary: Complete an order item.
+      description: Complete an order item by providing a voucher code.
+      parameters:
+        - name: orderItemId
+          in: path
+          description: ID of the order item.
+          required: true
+          type: integer
+          default: 1
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                voucherCode:
+                  type: string
+          required: true
+      responses:
+        200:
+          description: Order item completed successfully.
+        400:
+          description: Bad request. Invalid voucher code or order item ID.
+        404:
+          description: Order item not found.
+      tags:
+        - Order Items
+

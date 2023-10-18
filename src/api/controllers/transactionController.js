@@ -130,3 +130,19 @@ exports.getPetBusinessOrderItemsById = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.completeOrderItem = async (req, res, next) => {
+    try {
+        const orderItemId = req.params.orderItemId;
+        const userId = req.body.userId;
+        if (!(await baseValidations.isValidInteger(orderItemId)) || !(await baseValidations.isValidInteger(userId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+        const voucherCode = req.body.voucherCode;
+
+        const completedOrderItem = await orderItemService.completeOrderItem(Number(orderItemId), Number(userId), voucherCode)
+        res.status(200).json(completedOrderItem)
+    } catch (error) {
+        next(error)
+    }
+}

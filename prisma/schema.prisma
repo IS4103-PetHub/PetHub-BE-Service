@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Tue Oct 17 2023 21:27:26 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Wed Oct 18 2023 10:49:29 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -222,6 +222,7 @@ model OrderItem {
   expiryDate     DateTime
   voucherCode    String // generated UUID to identify order
   status         OrderItemStatus @default(PENDING_FULFILLMENT)
+  dateFulfilled  DateTime? // If orderItem is fulfilled, dateFulfilled will be updated
 
   // For invoice PDF (single row)
   attachmentKey String

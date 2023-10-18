@@ -28,7 +28,7 @@ exports.petBusinessApplicationApprovalEmail = (name, link) => {
     Thank you for using PetHub!
       
     Regards,
-    Pethub
+    The PetHub Team
     `;
 };
 
@@ -45,7 +45,7 @@ exports.petBusinessApplicationRejectionEmail = (name, link, remark) => {
       Thank you for using PetHub!
         
       Regards,
-      Pethub
+      The PetHub Team
       `;
 };
 
@@ -65,7 +65,7 @@ exports.rescheduleOrRefundBookingEmail = (name, link, booking) => {
       Thank you for using PetHub!
         
       Regards,
-      Pethub
+      The PetHub Team
       `;
 };
 
@@ -87,7 +87,7 @@ exports.refundBookingEmail = (name, booking) => {
     Thank you for using PetHub!
       
     Regards,
-    Pethub
+    The PetHub Team
     `;
 };
 
@@ -106,7 +106,7 @@ exports.deleteServiceListingEmail = (name, postTitle) => {
     Best regards,
       
     Regards,
-    Pethub
+    The PetHub Team
     `;
 };
 
@@ -134,4 +134,41 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
     Warm regards,
     The PetHub Team
 `;
+}
+
+exports.POVoucherFulfillmentEmail = (orderItem) => {
+  return `
+    Dear ${orderItem.invoice.PetOwner.firstName},
+
+    🐾 Exciting News for You and Your Furry Friend! 🐾 We're wagging our tails with delight to let you know that your order with ${orderItem.serviceListing.petBusiness.companyName} has been successfully fulfilled!
+
+    Order Details:
+    - Order Item ID: ${orderItem.orderItemId}
+    - Service Listing: ${orderItem.serviceListing.title}
+
+    If you have any questions or need further assistance, please don't hesitate to contact the service provider at ${orderItem.serviceListing.petBusiness.businessEmail}. Otherwise, you can always file a support ticket on PetHub - we're as pet-passionate as you are!
+
+    Thank you for choosing our platform. Your support means the world to us, and we can't wait to serve you and your furry companion(s) again in the future. 🐶🐱
+    
+    Paw-sitively,
+    The PetHub Team
+  `;
+};
+
+exports.PBVoucherFulfillmentEmail = (orderItem) => {
+  return `
+    Dear ${orderItem.serviceListing.petBusiness.companyName},
+
+    Congratulations, a customer has successfully fulfilled an order for your service!
+
+    Order Details:
+    - Customer ID: ${orderItem.invoice.petOwnerUserId}
+    - Order Item ID: ${orderItem.orderItemId}
+    - Service Listing: ${orderItem.serviceListing.title}
+    
+    The amount will be credited to your Stripe business account at the end of this payout cycle. If you have any questions or need further assistance, please don't hesitate to file a support ticket on PetHub.
+
+    Regards,
+    The PetHub Team
+  `;
 };
