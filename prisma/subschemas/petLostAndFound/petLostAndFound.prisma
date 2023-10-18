@@ -8,6 +8,7 @@ model PetLostAndFound {
     requestType       PetLostRequestType
     lastSeenDate      DateTime
     lastSeenLocation  String
+    contactNumber     String
     attachmentKeys    String[]
     attachmentURLs    String[]
     isResolved        Boolean            @default(false)

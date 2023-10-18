@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Oct 18 2023 10:49:29 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Oct 18 2023 23:41:00 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -275,6 +275,7 @@ model PetLostAndFound {
   requestType       PetLostRequestType
   lastSeenDate      DateTime
   lastSeenLocation  String
+  contactNumber     String
   attachmentKeys    String[]
   attachmentURLs    String[]
   isResolved        Boolean            @default(false)
