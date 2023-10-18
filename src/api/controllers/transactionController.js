@@ -28,7 +28,35 @@ exports.getAllOrderItems = async (req, res, next) => {
             statusFilterArray = statusFilters.split(',');
         }
 
-        const orderItems = await orderItemService.getAllOrderItems(statusFilterArray)
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+        if (startDate && endDate) {
+            if (!(baseValidations.dateTimeValidation(startDate) && baseValidations.dateTimeValidation(endDate))) 
+                return res.status(400).json({ message: "invalid start and end Date" })
+            if(new Date(startDate) > new Date(endDate)) 
+                return res.status(400).json({ message: "start date must be before end date" })
+        }
+
+        const serviceListingFilters = req.query.serviceListingFilters;
+        let serviceListingFilterArray = undefined;
+        if (serviceListingFilters) {
+            // validate 
+            if(!(orderItemValidations.validateNumberList(serviceListingFilters))) 
+                return res.status(400).json({ message: "invalid serviceListingFilter query" })
+            serviceListingFilterArray = serviceListingFilters.split(',');
+        }
+
+        const petBusinessFilter = req.query.petBusinessFilter;
+        if (petBusinessFilter && !(await baseValidations.isValidInteger(petBusinessFilter))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const orderItems = await orderItemService.getAllOrderItems(
+            statusFilterArray, 
+            startDate, 
+            endDate, 
+            serviceListingFilterArray,
+            Number(petBusinessFilter))
         res.status(200).json(orderItems)
     } catch (error) {
         next(error)
@@ -91,7 +119,12 @@ exports.getPetBusinessOrderItemsById = async (req, res, next) => {
             serviceListingFilterArray = serviceListingFilters.split(',');
         }
 
-        const orderItems = await orderItemService.getPetBusinessOrderItemsById(Number(petBusinessId), statusFilterArray, startDate, endDate, serviceListingFilterArray)
+        const orderItems = await orderItemService.getPetBusinessOrderItemsById(
+            Number(petBusinessId), 
+            statusFilterArray, 
+            startDate, 
+            endDate, 
+            serviceListingFilterArray)
         res.status(200).json(orderItems)
     } catch (error) {
         next(error)

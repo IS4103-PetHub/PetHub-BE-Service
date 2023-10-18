@@ -42,7 +42,12 @@ class OrderItemService {
     }
   }
 
-  async getAllOrderItems(statusFilterArray = undefined) {
+  async getAllOrderItems(
+    statusFilterArray = undefined,
+    startDate = undefined,
+    endDate = undefined,
+    serviceListingFilterArray = undefined,
+    petBusinessFilter = undefined) {
     try {
       let orderItems = await prisma.orderItem.findMany({
         include: {
@@ -68,10 +73,11 @@ class OrderItemService {
       });
 
       const filters = {
+        petBusinessFilter: petBusinessFilter,
         statusFilterArray: statusFilterArray,
-        serviceListingFilterArray: undefined,
-        startDate: undefined,
-        endDate: undefined
+        serviceListingFilterArray: serviceListingFilterArray,
+        startDate: startDate,
+        endDate: endDate,
       }
 
       if (statusFilterArray) orderItems = this.filterOrderItems(orderItems, filters);
@@ -119,6 +125,7 @@ class OrderItemService {
       });
 
       const filters = {
+        petBusinessFilter: undefined,
         statusFilterArray: statusFilterArray,
         serviceListingFilterArray: undefined,
         startDate: undefined,
@@ -176,6 +183,7 @@ class OrderItemService {
       );
 
       const filters = {
+        petBusinessFilter: undefined,
         statusFilterArray: statusFilterArray,
         serviceListingFilterArray: serviceListingFilterArray,
         startDate: startDate,
@@ -200,6 +208,7 @@ class OrderItemService {
 
   filterOrderItems(orderItems, filters) {
     const {
+      petBusinessFilter,
       statusFilterArray,
       serviceListingFilterArray,
       startDate,
@@ -211,6 +220,11 @@ class OrderItemService {
   
     return orderItems.filter((orderItem) => {
       const createdAt = new Date(orderItem.invoice.createdAt);
+
+      // Apply petBusiness filter if provided
+      if (petBusinessFilter && orderItem.serviceListing.petBusinessId != petBusinessFilter) {
+        return false;
+      }
       
       // Apply status filter if provided
       if (statusFilterArray && !statusFilter.has(orderItem.status)) {
