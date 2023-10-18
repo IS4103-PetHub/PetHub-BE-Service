@@ -164,11 +164,7 @@ class BookingService {
                             addresses: true
                         }
                     },
-                    OrderItem: {
-                        select: {
-                            voucherCode: true
-                        }
-                    },
+                    OrderItem: true,
                     pet: true
                 }
             });
