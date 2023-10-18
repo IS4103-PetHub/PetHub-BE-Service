@@ -4,6 +4,9 @@ import {ServiceListing} from "../serviceListing/serviceListing"
 import {CalendarGroup, Booking} from "../appointments/appointments"
 import { OrderItem, Invoice, RefundRequest } from "../finance/transactions"
 import { CommissionRule } from "../finance/commissions"
+import { PetLostAndFound } from "..\petLostAndFound\petLostAndFound"
+import { PetLostAndFound } from "..\..\schema"
+import { Article, Article } from "..\article\article"
 
 // Entities
 model User {
@@ -29,6 +32,8 @@ model InternalUser {
   lastName                        String
   adminRole                       AdminRole
   approvedPetBusinessApplications PetBusinessApplication[]
+  createdArticle Article[] @relation("CreatedBy")
+  updatedArticle Article[] @relation("UpdatedBy")
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
@@ -45,6 +50,7 @@ model PetOwner {
 
   pets              Pet[]
   favouriteListings ServiceListing[]
+    petLostAndFound PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
 }
@@ -111,6 +117,7 @@ model Pet {
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
   bookings Booking[]
+  petLostAndFound PetLostAndFound[]
 }
 
 model PetBusinessApplication {

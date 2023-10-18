@@ -16,9 +16,11 @@ const authRoutes = require("./auth");
 const petBusinessApplicationRoutes = require("./petBusinessApplicationRoutes");
 const calendarGroupRoutes = require('./calendarGroupRoutes')
 const bookingRoutes = require('./bookingRoutes')
+const petLostAndFoundRoutes = require('./petLostAndFoundRoutes')
 const commissionRuleRoutes = require('./commissionRulesRoutes')
 const paymentRoutes = require('./paymentRoutes')
 const orderItemRoutes = require('./orderItemRoutes')
+const articleRoutes = require('./articleRoutes')
 
 // Use route modules
 router.use("/users", userRoutes);
@@ -30,8 +32,10 @@ router.use("/", authRoutes);
 router.use("/pb-applications", petBusinessApplicationRoutes);
 router.use("/calendar-groups", calendarGroupRoutes);
 router.use("/bookings", bookingRoutes);
+router.use("/lost-and-found", petLostAndFoundRoutes)
 router.use("/payments", paymentRoutes);
 router.use("/commission-rules", commissionRuleRoutes);
 router.use("/order-items", orderItemRoutes);
+router.use("/articles", articleRoutes)
 
 module.exports = router;
