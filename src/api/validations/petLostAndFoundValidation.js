@@ -51,7 +51,15 @@ exports.isValidCreateOrUpdatePetLostAndFoundPayload = (payload) => {
         isResolved: Joi.string()
             .trim()
             .valid('true', 'false')
-            .optional()
+            .optional(),
+        contactNumber: Joi.string()
+            .trim()
+            .pattern(/^[0-9]{8}$/)
+            .required()
+            .messages({
+                'string.empty': 'Contact Number must not be empty.',
+                'string.pattern.base': 'Contact number must be a string containing exactly 8 digits.'
+            }),
     })
 
 

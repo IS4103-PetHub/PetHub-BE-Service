@@ -60,6 +60,7 @@ class PetLostAndFoundService {
                 lastSeenLocation: payload.lastSeenLocation,
                 attachmentURLs: payload.attachmentURLs,
                 attachmentKeys: payload.attachmentKeys,
+                contactNumber: payload.contactNumber,
                 petOwner: {
                     connect: {
                         userId: userId
@@ -109,6 +110,7 @@ class PetLostAndFoundService {
                 lastSeenLocation: payload.lastSeenLocation,
                 attachmentURLs: payload.attachmentURLs,
                 attachmentKeys: payload.attachmentKeys,
+                contactNumber: payload.contactNumber,
                 dateUpdated: new Date()
             }
 
