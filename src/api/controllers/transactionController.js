@@ -31,9 +31,9 @@ exports.getAllOrderItems = async (req, res, next) => {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
         if (startDate && endDate) {
-            if (!(baseValidations.dateTimeValidation(startDate) && baseValidations.dateTimeValidation(endDate))) 
+            if (!(baseValidations.dateTimeValidation(startDate) && baseValidations.dateTimeValidation(endDate)))
                 return res.status(400).json({ message: "invalid start and end Date" })
-            if(new Date(startDate) > new Date(endDate)) 
+            if (new Date(startDate) > new Date(endDate))
                 return res.status(400).json({ message: "start date must be before end date" })
         }
 
@@ -41,7 +41,7 @@ exports.getAllOrderItems = async (req, res, next) => {
         let serviceListingFilterArray = undefined;
         if (serviceListingFilters) {
             // validate 
-            if(!(orderItemValidations.validateNumberList(serviceListingFilters))) 
+            if (!(orderItemValidations.validateNumberList(serviceListingFilters)))
                 return res.status(400).json({ message: "invalid serviceListingFilter query" })
             serviceListingFilterArray = serviceListingFilters.split(',');
         }
@@ -52,9 +52,9 @@ exports.getAllOrderItems = async (req, res, next) => {
         }
 
         const orderItems = await orderItemService.getAllOrderItems(
-            statusFilterArray, 
-            startDate, 
-            endDate, 
+            statusFilterArray,
+            startDate,
+            endDate,
             serviceListingFilterArray,
             Number(petBusinessFilter))
         res.status(200).json(orderItems)
@@ -104,9 +104,9 @@ exports.getPetBusinessOrderItemsById = async (req, res, next) => {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
         if (startDate && endDate) {
-            if (!(baseValidations.dateTimeValidation(startDate) && baseValidations.dateTimeValidation(endDate))) 
+            if (!(baseValidations.dateTimeValidation(startDate) && baseValidations.dateTimeValidation(endDate)))
                 return res.status(400).json({ message: "invalid start and end Date" })
-            if(new Date(startDate) > new Date(endDate)) 
+            if (new Date(startDate) > new Date(endDate))
                 return res.status(400).json({ message: "start date must be before end date" })
         }
 
@@ -114,16 +114,16 @@ exports.getPetBusinessOrderItemsById = async (req, res, next) => {
         let serviceListingFilterArray = undefined;
         if (serviceListingFilters) {
             // validate 
-            if(!(orderItemValidations.validateNumberList(serviceListingFilters))) 
+            if (!(orderItemValidations.validateNumberList(serviceListingFilters)))
                 return res.status(400).json({ message: "invalid serviceListingFilter query" })
             serviceListingFilterArray = serviceListingFilters.split(',');
         }
 
         const orderItems = await orderItemService.getPetBusinessOrderItemsById(
-            Number(petBusinessId), 
-            statusFilterArray, 
-            startDate, 
-            endDate, 
+            Number(petBusinessId),
+            statusFilterArray,
+            startDate,
+            endDate,
             serviceListingFilterArray)
         res.status(200).json(orderItems)
     } catch (error) {
@@ -142,6 +142,24 @@ exports.completeOrderItem = async (req, res, next) => {
 
         const completedOrderItem = await orderItemService.completeOrderItem(Number(orderItemId), Number(userId), voucherCode)
         res.status(200).json(completedOrderItem)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.expireOrderItems = async (req, res, next) => {
+    try {
+
+        const beforeDate = req.query.beforeDate;
+        if (beforeDate) {
+            const validationResult = orderItemValidations.isValidExpireOrderItemPayload({ beforeDate: beforeDate });
+            if (!validationResult.isValid) {
+                return res.status(400).json({ error: validationResult.message });
+            }
+        }
+
+        const expiredOrderItems = await orderItemService.expireOrderItems(beforeDate)
+        res.status(200).json(expiredOrderItems)
     } catch (error) {
         next(error)
     }

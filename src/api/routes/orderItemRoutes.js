@@ -13,6 +13,8 @@ function registerOrderItemRoutes(controller) {
     router.get('/pet-owners/:petOwnerId', controller.getPetOwnerOrderItemsById);
     router.get('/pet-businesses/:petBusinessId', controller.getPetBusinessOrderItemsById);
     router.post('/complete-order/:orderItemId', controller.completeOrderItem);
+
+    router.patch('/expire', controller.expireOrderItems);
 }
 
 registerOrderItemRoutes(transactionController);

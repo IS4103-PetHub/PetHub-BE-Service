@@ -32,6 +32,10 @@ model ServiceListing {
   OrderItem       OrderItem[]
 }
 
+
+
+
+
 // m-n relation type between Tag and ServiceListing: implicit
 // https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#implicit-many-to-many-relations
 model Tag {
