@@ -174,6 +174,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
         },
         data: {
           status: OrderItemStatus.EXPIRED,
+          dateFulfilled: new Date(),
         },
       });
     } catch (error) {
@@ -253,6 +254,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
           },
           data: {
             status: update.status,
+            ...(update.status !== OrderItemStatus.EXPIRED ? { dateFulfilled: new Date() } : {}), // If fulfilled or refunded, pretend to have redeemed the voucher
           },
         });
         // Diversify statuses of those that are pending fulfillment and require booking
@@ -262,6 +264,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
           },
           data: {
             status: update.status,
+            ...(update.status !== OrderItemStatus.EXPIRED ? { dateFulfilled: new Date() } : {}), // If fulfilled or refunded, pretend to have redeemed the voucher
           },
         });
       } catch (error) {
