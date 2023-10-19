@@ -38,7 +38,8 @@ class PetLostAndFoundService {
                     userId: Number(userId)
                 },
                 include: {
-                    pet: true
+                    pet: true,
+                    petOwner: true
                 }
             })
             return petLostAndFound
