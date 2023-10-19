@@ -5,7 +5,8 @@ const prisma = require('../../../../prisma/prisma');
 const PetOwnerService = require('../user/petOwnerService')
 const OrderItemService = require('../finance/orderItemService')
 const { OrderItemStatus } = require('@prisma/client')
-
+const emailService = require("../emailService");
+const emailTemplate = require('../../resource/emailTemplate');
 class BookingService {
     async createBooking(petOwnerId, calendarGroupId, orderItemId, startTime, endTime, petId) {
         try {
@@ -193,10 +194,16 @@ class BookingService {
                 include: {
                     serviceListing: {
                         include: {
+                            petBusiness: {
+                                select: {
+                                    companyName: true
+                                }
+                            },
                             tags: true,
                             addresses: true
                         }
                     },
+                    OrderItem: true,
                     timeSlot: true,
                     pet: true
                 }
@@ -255,6 +262,19 @@ class BookingService {
                     lastUpdated: new Date()
                 }
             });
+
+            const petOwner = await PetOwnerService.getUserById(existingBooking.petOwnerId);
+
+            await emailService.sendEmail(
+                petOwner.user.email,
+                "Your booking has been rescheduled",
+                emailTemplate.bookingRescheduleEmail(
+                    petOwner.firstName,
+                    updatedBooking,
+                    existingBooking.serviceListing.title,
+                    "http://localhost:3002/customer/appointments"
+                )
+            )
 
             return updatedBooking;
         } catch (error) {
