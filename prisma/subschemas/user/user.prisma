@@ -27,13 +27,19 @@ model User {
   UserGroupMembership UserGroupMembership[]
 }
 
+model EmailVerification {
+  token      String   @unique
+  expiryDate DateTime
+  email      String   @unique
+}
+
 model InternalUser {
   firstName                       String
   lastName                        String
   adminRole                       AdminRole
   approvedPetBusinessApplications PetBusinessApplication[]
-  createdArticle Article[] @relation("CreatedBy")
-  updatedArticle Article[] @relation("UpdatedBy")
+  createdArticle                  Article[]                @relation("CreatedBy")
+  updatedArticle                  Article[]                @relation("UpdatedBy")
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
@@ -50,7 +56,7 @@ model PetOwner {
 
   pets              Pet[]
   favouriteListings ServiceListing[]
-    petLostAndFound PetLostAndFound[]
+  petLostAndFound   PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
 }
@@ -116,7 +122,7 @@ model Pet {
   petOwnerId Int
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
-  bookings Booking[]
+  bookings        Booking[]
   petLostAndFound PetLostAndFound[]
 }
 

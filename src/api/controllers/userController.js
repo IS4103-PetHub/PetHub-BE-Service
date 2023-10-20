@@ -241,3 +241,23 @@ exports.deactivateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.verifyUserEmail = async (req, res, next) => {
+  try {
+    const token = req.params.token;
+    await baseUserServiceInstance.handleVerifyEmail(token)
+    res.status(200).json({ message: "Email successfully verified"})
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.resendVerifyUserEmail = async (req, res, next) => {
+  try {
+    const email = req.params.email;
+    await baseUserServiceInstance.resendVerifyEmail(email);
+    res.status(200).json({ message: "Verify Email resent successfully"})
+  } catch (error) {
+    next(error)
+  }
+}

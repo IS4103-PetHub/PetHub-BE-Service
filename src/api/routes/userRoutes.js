@@ -21,6 +21,8 @@ function registerRoutes(controller, userType) {
   router.post(`/:userType/login`, controller.loginUser);
   router.patch(`/:id/activate-user`, controller.activateUser);
   router.patch(`/:id/deactivate-user`, controller.deactivateUser);
+  router.post(`/verify-email/:token`, controller.verifyUserEmail)
+  router.post(`/resend-verify-email/:email`, controller.resendVerifyUserEmail)
 }
 
 // Register routes for each user type

@@ -3,6 +3,9 @@ const prisma = require("../../../../prisma/prisma");
 const { AccountType, AccountStatus } = require("@prisma/client");
 const UserError = require("../../errors/userError");
 const CustomError = require("../../errors/customError");
+const UserHelper = require('../../helpers/usersHelper')
+const emailTemplate = require('../../resource/emailTemplate');
+const emailService = require("../emailService");
 
 // Shared selection fields
 const petOwnerSelectFields = {
@@ -36,7 +39,7 @@ class PetOwnerService extends BaseUserService {
           email: data.email,
           password: hashedPassword,
           accountType: AccountType.PET_OWNER,
-          accountStatus: AccountStatus.ACTIVE,
+          accountStatus: AccountStatus.PENDING_VERIFICATION,
           petOwner: {
             create: {
               firstName: data.firstName,
@@ -48,6 +51,11 @@ class PetOwnerService extends BaseUserService {
         },
       });
 
+      const token = UserHelper.generateUniqueToken();
+      const link = `http://localhost:3002/verify-email/?token=${token}`
+      const body = emailTemplate.AccountEmailVerificationEmail(user.firstName, link)
+      await this.createVerifyEmailRecord(token, user.email)
+      await emailService.sendEmail(user.email, "Verify Your Email Address for PetHub Registration", body)
       return this.removePassword(user);
     } catch (error) {
       console.error("Error during user creation:", error);

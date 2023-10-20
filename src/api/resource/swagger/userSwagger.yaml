@@ -1060,3 +1060,52 @@ paths:
         # Add other response codes and descriptions as needed
       tags:
         - Users
+
+  /api/users/verify-email/{token}:
+    post:
+      summary: Verify an account's email address.
+      description: Verify an account's email address.
+      parameters:
+        - name: token
+          in: path
+          description: "Email Verification Token"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Email successfully verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email successfully verified"
+      tags:
+        - Users
+
+  /api/users/resend-verify-email/{email}:
+    post:
+      summary: Resend email verification for a user account.
+      description: Resend email verification for a user account.
+      parameters:
+        - name: email
+          in: path
+          description: "User's Email Address"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Email verification resent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email verification resent successfully"
+      tags:
+        - Users
