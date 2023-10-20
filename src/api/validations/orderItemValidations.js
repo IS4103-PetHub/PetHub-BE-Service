@@ -36,3 +36,17 @@ exports.isValidExpireOrderItemPayload = (payload) => {
 
     return { isValid: true };
 };
+
+exports.isValidPayoutOrderItemPayload = (payload) => {
+    const schema = Joi.object({
+        payoutDate: baseValidation.dateTimeValidation('payoutDate').optional()
+    });
+
+    const { error } = schema.validate(payload, { convert: false });
+    if (error) {
+        console.log(error);
+        return { isValid: false, message: error.details[0].message };
+    }
+
+    return { isValid: true };
+};

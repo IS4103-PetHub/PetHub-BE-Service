@@ -1,4 +1,5 @@
 const orderItemService = require('../services/finance/orderItemService');
+const revenueService = require('../services/finance/revenueService')
 const constants = require("../../constants/common");
 const baseValidations = require('../validations/baseValidation')
 const errorMessages = constants.errorMessages;
@@ -149,7 +150,6 @@ exports.completeOrderItem = async (req, res, next) => {
 
 exports.expireOrderItems = async (req, res, next) => {
     try {
-
         const beforeDate = req.query.beforeDate;
         if (beforeDate) {
             const validationResult = orderItemValidations.isValidExpireOrderItemPayload({ beforeDate: beforeDate });
@@ -160,6 +160,23 @@ exports.expireOrderItems = async (req, res, next) => {
 
         const expiredOrderItems = await orderItemService.expireOrderItems(beforeDate)
         res.status(200).json(expiredOrderItems)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.payoutOrderItems = async (req, res, next) => {
+    try {
+        const payoutDate = req.query.payoutDate;
+        if (payoutDate) {
+            const validationResult = orderItemValidations.isValidPayoutOrderItemPayload({ payoutDate: payoutDate });
+            if (!validationResult.isValid) {
+                return res.status(400).json({ error: validationResult.message });
+            }
+        }
+
+        const paidoutOrderItems = await revenueService.payoutOrderItems(payoutDate)
+        res.status(200).json(paidoutOrderItems)
     } catch (error) {
         next(error)
     }

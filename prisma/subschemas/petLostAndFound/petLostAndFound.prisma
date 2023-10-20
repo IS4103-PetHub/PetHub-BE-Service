@@ -1,5 +1,5 @@
-import { PetLostRequestType } from "..\enums\petLostAndFoundEnums"
-import { Pet, PetOwner } from "..\user\user"
+import { PetLostRequestType } from "../enums/petLostAndFoundEnums"
+import { Pet, PetOwner } from "../user/user"
 
 model PetLostAndFound {
     petLostAndFoundId Int                @id @default(autoincrement())

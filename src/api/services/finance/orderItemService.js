@@ -14,7 +14,7 @@ class OrderItemService {
 
     async expireOrderItems(beforeDate = undefined) {
         try {
-            const expireDate = beforeDate ? beforeDate : new Date(); // Current date-time
+            const expireDate = beforeDate ? beforeDate : new Date();
             // Filter and update the order items
             const expiredOrderItems = await prisma.orderItem.updateMany({
                 where: {
@@ -32,8 +32,7 @@ class OrderItemService {
         } catch (error) {
             console.log(error)
             if (error instanceof CustomError) throw error;
-            throw new OrderItemsError(error); // Assuming OrderItemsError is a custom error class you've defined
-
+            throw new OrderItemsError(error);
         }
     }
 

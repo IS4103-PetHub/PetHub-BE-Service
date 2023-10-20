@@ -1,22 +1,21 @@
-import { ArticleType } from "..\enums\articleEnums"
-import { InternalUser } from "..\user\user"
-import { InternalUser } from "..\..\schema"
+import { ArticleType } from "../enums/articleEnums"
+import { InternalUser } from "../user/user"
 
 model Article {
-    articleId       Int       @id @default(autoincrement())
-    articleType     ArticleType
-    title           String
-    content         String
+    articleId   Int         @id @default(autoincrement())
+    articleType ArticleType
+    title       String
+    content     String
 
     createdByUserId Int
     updatedByUserId Int?
-    dateCreated     DateTime @default(now())
+    dateCreated     DateTime  @default(now())
     dateUpdated     DateTime?
 
     //img
-    attachmentKeys   String[]
-    attachmentUrls   String[]
+    attachmentKeys String[]
+    attachmentUrls String[]
 
-    createdBy       InternalUser @relation("CreatedBy", fields: [createdByUserId], references: [userId])
-    updatedBy       InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
+    createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
+    updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
 }

@@ -15,6 +15,7 @@ function registerOrderItemRoutes(controller) {
     router.post('/complete-order/:orderItemId', controller.completeOrderItem);
 
     router.patch('/expire', controller.expireOrderItems);
+    router.patch('/payout', controller.payoutOrderItems);
 }
 
 registerOrderItemRoutes(transactionController);

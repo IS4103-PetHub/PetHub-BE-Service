@@ -205,6 +205,25 @@ model Invoice {
   petOwnerUserId Int
 }
 
+// Note: Invoice must remain immutable as much as possible for accounting purposes
+model PayoutInvoice {
+  invoiceId        Int   @id @default(autoincrement())
+  totalAmount      Float // The total amount based on accumulated order item prices
+  commissionCharge Float // The total amount deducted for commission
+  paidOutAmount    Float // The total paid out amount at the time of transaction
+
+  createdAt DateTime @default(now())
+  paymentId String   @unique // to be obtained from Stripe transaction
+
+  // For invoice PDF (consolidated)
+  attachmentKey String?
+  attachmentURL String?
+
+  orderItems  OrderItem[]
+  userId      Int
+  petBusiness PetBusiness @relation(fields: [userId], references: [userId])
+}
+
 enum OrderItemStatus {
   PENDING_BOOKING // This OrderItem needs a booking, but user has not booked yet
   PENDING_FULFILLMENT // Ordered (booked, or not) but not yet fulfilled
@@ -240,7 +259,9 @@ model OrderItem {
   // (Optional) Bookings associated with the order item
   booking Booking?
 
-  RefundRequest RefundRequest?
+  RefundRequest          RefundRequest?
+  PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
+  payoutInvoiceInvoiceId Int?
 }
 
 enum RefundStatus {
@@ -445,6 +466,7 @@ model PetBusiness {
 
   commissionRuleId Int?
   commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
+  PayoutInvoice    PayoutInvoice[]
 }
 
 model ResetPassword {

@@ -2,7 +2,7 @@ import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplication
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
 import {CalendarGroup, Booking} from "../appointments/appointments"
-import { OrderItem, Invoice, RefundRequest } from "../finance/transactions"
+import { OrderItem, Invoice, RefundRequest, PayoutInvoice} from "../finance/transactions"
 import { CommissionRule } from "../finance/commissions"
 import { PetLostAndFound } from "../petLostAndFound/petLostAndFound"
 import { Article, Article } from "../article/article"
@@ -82,6 +82,7 @@ model PetBusiness {
 
   commissionRuleId Int?
   commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
+  PayoutInvoice    PayoutInvoice[]
 }
 
 model ResetPassword {

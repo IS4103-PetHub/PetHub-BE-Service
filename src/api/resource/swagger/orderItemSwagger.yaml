@@ -191,3 +191,32 @@ paths:
                 type: array
       tags:
         - Order Items
+
+  /api/order-items/payout:
+    patch:
+      summary: payout order items
+      description: |
+        pay out order items that are either 
+          1) OrderItemStatus.EXPIRED and expiryDate <= payout_date
+          OR 
+          2) PENDING_FULFILLMENTAND and dateFulfilled <= (payout_date - 7 days)
+
+        Where payout_date is set to payoutDate if provided in query parameter else, 
+        set to current date time.
+      parameters:
+        - name: payoutDate
+          in: query
+          description: payout_date to trigger the conditions in description.
+          required: true
+          type: string
+          format: date-time
+          default: "2023-11-01T15:59:59.999Z" # Example default value
+      responses:
+        200:
+          description: List of expored order items
+          content:
+            application/json:
+              schema:
+                type: array
+      tags:
+        - Order Items
