@@ -1,6 +1,6 @@
 const InternalUserService = require('../../../src/api/services/user/internalUserService');
-const { AccountStatus, AccountType } = require('@prisma/client');
-
+const { AccountStatus, AccountType, AdminRole } = require('@prisma/client');
+const bcrypt = require("bcryptjs"); // bcrypt for password hashing
 
 const permissions = [
     // USERS
@@ -76,7 +76,23 @@ async function seedRBAC(prisma) {
     }
 
     // Create Root Administrator user and associated InternalUser
-    const rootAdmin = await InternalUserService.createUser(rootAdminData);
+    const rootAdmin = await prisma.user.upsert({
+        where: {userId: 19},
+        update: {},
+        create: {
+            email: rootAdminData.email,
+            password: await bcrypt.hash(rootAdminData.password, 10),
+            accountType: AccountType.INTERNAL_USER,
+            accountStatus: AccountStatus.ACTIVE,
+            internalUser: {
+                create: {
+                    firstName: rootAdminData.firstName,
+                    lastName: rootAdminData.lastName,
+                    adminRole: AdminRole.ADMINISTRATOR,
+                }
+            }
+        }
+    });
     console.log("Root Administrator created:", rootAdmin);
 
     // Activate Root Administrator
