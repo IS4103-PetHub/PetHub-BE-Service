@@ -17,7 +17,7 @@ function registerCalendarGroupRoutes(controller) {
     router.get(`/pet-business/:petBusinessId`, controller.getAllCalendarGroupsByPetBusinessId);
 
     // Utility Routes
-    router.get('/available-timeslots/:calendarID', controller.getAvailability);
+    router.get('/available-timeslots/:orderItemId', controller.getAvailability);
 }
 
 registerCalendarGroupRoutes(calendarGroupController);

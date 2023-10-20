@@ -34,6 +34,10 @@ const permissions = [
     // Commission Rule
     { code: "WRITE_COMMISSION_RULES", name: "Write Commission Rules", description: "Permission to write Commission Rules" },
     { code: "READ_COMMISSION_RULES", name: "Read Commission Rules", description: "Permission to read Commission Rules" },
+
+    // Order Items
+    { code: "WRITE_ORDER_ITEMS", name: "Write Order Items", description: "Permission to write Order Items" },
+    { code: "READ_ORDER_ITEMS", name: "Read Order Items", description: "Permission to read Order Items" },
 ];
 
 // Root Administrator User Data

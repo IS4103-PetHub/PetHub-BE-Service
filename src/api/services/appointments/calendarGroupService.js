@@ -8,11 +8,19 @@ const { differenceInDays, addDays, format, parseISO } = require('date-fns');
 const emailTemplate = require('../../resource/emailTemplate');
 const PetBusinessService = require('../user/petBusinessService');
 const emailService = require('../emailService');
+const orderItemService = require('../finance/orderItemService');
 
 class CalendarGroupService {
 
-    async getAvailability(calendarGroupId, startTime, endTime, bookingDuration) {
-        // 1. Fetch all the timeslots
+    async getAvailability(orderItemId, startTime, endTime, bookingDuration) {
+
+        // 1. Check if the orderItem is valid
+        const orderItem = await orderItemService.getOrderItemById(orderItemId);
+
+        // 2. Check if the orderItem is for a service listing with a calendar group
+        if (!orderItem.serviceListing.calendarGroupId) throw new CustomError(`OrderItem with id (${orderItemId}) does not have a service listing with a calendar group tied to it`, 400);
+
+        // 3. Fetch all the timeslots
         const queryStartDate = new Date(startTime);
         queryStartDate.setHours(0, 0, 0, 0);
 
@@ -21,7 +29,7 @@ class CalendarGroupService {
 
         const timeSlots = await prisma.timeSlot.findMany({
             where: {
-                calendarGroupId: calendarGroupId,
+                calendarGroupId: orderItem.serviceListing.calendarGroupId,
                 startTime: { gte: queryStartDate },  // from startTime
                 endTime: { lte: queryEndDate }       // to endTime
             },
@@ -30,19 +38,19 @@ class CalendarGroupService {
 
         let availableSlots = [];
 
-        // 2. For each timeslot, get the available sub-slots
+        // 4. For each timeslot, get the available sub-slots
         for (let slot of timeSlots) {
-            const slotsForThisTimeSlot = this.getAvailabilityForTimeSlot(slot, bookingDuration, startTime, endTime);
+            const slotsForThisTimeSlot = this.getAvailabilityForTimeSlot(orderItem.expiryDate, slot, bookingDuration, startTime, endTime);
             availableSlots = [...availableSlots, ...slotsForThisTimeSlot];
         }
 
         return availableSlots;
     }
 
-    getAvailabilityForTimeSlot(timeSlot, bookingDuration, searchStartTime, searchEndTime) {
+    getAvailabilityForTimeSlot(orderExpiryDate, timeSlot, bookingDuration, searchStartTime, searchEndTime) {
         let availableSlots = [];
         let slotStart = new Date(Math.max(timeSlot.startTime, searchStartTime));
-        const slotEnd = new Date(Math.min(timeSlot.endTime, searchEndTime));
+        const slotEnd = new Date(Math.min(timeSlot.endTime, searchEndTime, orderExpiryDate)); // Factor in expiry date into min possible slot end time
 
         // Iterate within the timeslot
         while (slotStart <= slotEnd - bookingDuration * 60000) {
@@ -268,7 +276,7 @@ class CalendarGroupService {
                     },
                 });
 
-                const unsuccessfulMigration = await this.migrateBookings(Bookings, calendarGroupId)
+                const unsuccessfulMigration = await this.migrateBookings(Bookings)
                 for (const booking of unsuccessfulMigration) {
                     const petOwner = await PetOwnerService.getUserById(Number(booking.petOwnerId))
                     const emailTitle = "[Action Required] Reschedule Booking or Request for Refund"
@@ -291,12 +299,12 @@ class CalendarGroupService {
         }
     }
 
-    async migrateBookings(bookings, calendarGroupId) {
+    async migrateBookings(bookings) {
         const unsuccessfulMigration = [];
         for (const existingBooking of bookings) {
-            const { startTime, endTime, bookingId } = existingBooking;
+            const { startTime, endTime, bookingId, orderItemId } = existingBooking;
             const bookingDuration = Math.abs((new Date(startTime) - new Date(endTime)) / 60000);
-            const availableSlots = await this.getAvailability(Number(calendarGroupId), new Date(startTime), new Date(endTime), bookingDuration);
+            const availableSlots = await this.getAvailability(Number(orderItemId), new Date(startTime), new Date(endTime), bookingDuration);
 
             if (availableSlots.length === 0) {
                 unsuccessfulMigration.push(existingBooking);
