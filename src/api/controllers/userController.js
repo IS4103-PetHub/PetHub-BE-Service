@@ -59,7 +59,8 @@ exports.createUser = async (req, res, next) => {
     if (!service) return;
 
     const userPayload = req.body;
-    if (!(await UserValidations.isValidPassword(userPayload.password))) {
+    // only PO and PB needs password
+    if (service != InternalUserService && !(await UserValidations.isValidPassword(userPayload.password))) {
       return res.status(400).json({ message: "Invalid password format" });
     }
     // userPayload.password = await UserHelper.hashPassword(userPayload.password);

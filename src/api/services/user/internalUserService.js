@@ -3,6 +3,9 @@ const prisma = require('../../../../prisma/prisma');
 const { AccountType, AccountStatus } = require('@prisma/client');
 const UserError = require('../../errors/userError')
 const CustomError = require('../../errors/customError')
+const usersHelper = require('../../helpers/usersHelper');
+const emailTemplate = require(`../../resource/emailTemplate`);
+const emailService = require('../emailService');
 
 // Shared selection fields
 const internalUserSelectFields = {
@@ -29,7 +32,8 @@ class InternalUserService extends BaseUserService {
 
     async createUser(data) {
         try {
-            const hashedPassword = await this.hashPassword(data.password);
+            const password = usersHelper.generateUniqueToken()
+            const hashedPassword = await this.hashPassword(password);
             const user = await prisma.user.create({
                 data: {
                     email: data.email,
@@ -45,6 +49,9 @@ class InternalUserService extends BaseUserService {
                     },
                 },
             });
+
+            const body = emailTemplate.CreateNewInternalUser(data.firstName, data.email, password)
+            await emailService.sendEmail(data.email, "IMPORTANT: Your PetHub Account Has Been Created", body)
 
             return this.removePassword(user);
         } catch (error) {

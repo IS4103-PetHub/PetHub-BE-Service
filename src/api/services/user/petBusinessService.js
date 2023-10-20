@@ -70,15 +70,12 @@ class PetBusinessService extends BaseUserService {
               commissionRuleId: constants.DEFAULT_CR_ID,
             },
           },
-        },
-        include: {
-          petBusiness: true
         }
       });
 
       const token = UserHelper.generateUniqueToken();
       const link = `http://localhost:3002/verify-email/?token=${token}`
-      const body = emailTemplate.AccountEmailVerificationEmail(user.petBusiness.companyName, link)
+      const body = emailTemplate.AccountEmailVerificationEmail(data.companyName, link)
       await this.createVerifyEmailRecord(token, user.email)
       await emailService.sendEmail(user.email, "Verify Your Email Address for PetHub Registration", body)
       return this.removePassword(user);

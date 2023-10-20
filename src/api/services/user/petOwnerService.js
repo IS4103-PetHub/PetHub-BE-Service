@@ -53,7 +53,7 @@ class PetOwnerService extends BaseUserService {
 
       const token = UserHelper.generateUniqueToken();
       const link = `http://localhost:3002/verify-email/?token=${token}`
-      const body = emailTemplate.AccountEmailVerificationEmail(user.firstName, link)
+      const body = emailTemplate.AccountEmailVerificationEmail(data.firstName, link)
       await this.createVerifyEmailRecord(token, user.email)
       await emailService.sendEmail(user.email, "Verify Your Email Address for PetHub Registration", body)
       return this.removePassword(user);

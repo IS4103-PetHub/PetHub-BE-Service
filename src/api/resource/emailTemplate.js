@@ -200,3 +200,27 @@ exports.ConfirmationEmailVerificationEmail = (name) => {
     The PetHub Team
   `;
 }
+
+exports.CreateNewInternalUser = (name, email, password) => {
+  return `
+    Dear ${name},
+
+    We are excited to inform you that your PetHub account has been created. Here are your account details:
+    
+    Email: ${email}
+    Temporary Password: ${password}
+    
+    For security reasons, we recommend that you change your password immediately. To do this, follow these steps:
+    
+    1. Visit the PetHub login page: [PetHub Login](http://localhost:3001/login)
+    2. Use your email and the temporary password provided above to log in.
+    3. Once logged in, go to your account settings and change your password to something secure and memorable.
+    
+    If you have any questions or need assistance, please don't hesitate to contact our support team.
+    
+    Thank you for choosing PetHub.
+    
+    Regards,
+    The PetHub Team
+  `;
+} 
