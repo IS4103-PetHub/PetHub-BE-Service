@@ -129,9 +129,9 @@ exports.getAvailability = async (req, res, next) => {
 
         // TODO: identify user to see if user has permissions to check calendar group
 
-        const calendarID = req.params.calendarID; // must be valid number
+        const orderItemId = req.params.orderItemId; // must be valid number
 
-        if (!(await baseValidations.isValidInteger(calendarID))) {
+        if (!(await baseValidations.isValidInteger(orderItemId))) {
             return res.status(400).json({ message: errorMessages.INVALID_ID });
         }
 
@@ -146,7 +146,7 @@ exports.getAvailability = async (req, res, next) => {
         }
 
         const { startTime, endTime, duration } = payload; // Extract values from payload
-        const availableSlots = await calendarGroupService.getAvailability(Number(calendarID), new Date(startTime), new Date(endTime), Number(duration));
+        const availableSlots = await calendarGroupService.getAvailability(Number(orderItemId), new Date(startTime), new Date(endTime), Number(duration));
 
         return res.status(200).json(availableSlots);
     } catch (error) {

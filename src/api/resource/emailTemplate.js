@@ -134,7 +134,7 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
     Warm regards,
     The PetHub Team
 `;
-}
+};
 
 exports.POVoucherFulfillmentEmail = (orderItem) => {
   return `
@@ -171,4 +171,24 @@ exports.PBVoucherFulfillmentEmail = (orderItem) => {
     Regards,
     The PetHub Team
   `;
+};
+
+exports.bookingRescheduleEmail = (name, booking, serviceListingTitle, link) => {
+  return `
+      Dear ${name},
+      
+      Your appointment has been successfully rescheduled. If this action was not performed by you, this means that the service provider has rescheduled your appointment on your behalf. If this is not intended, please contact PetHub support. 
+
+      New Booking Details:
+      Booking ID: ${booking.bookingId}
+      Service: ${serviceListingTitle}
+      Date and Time: ${booking.startTime.toLocaleString()} - ${booking.endTime.toLocaleString()}
+        
+      Proceed to this link to view your outstanding appointments: ${link}.
+  
+      Thank you for using PetHub!
+        
+      Regards,
+      The PetHub Team
+      `;
 };
