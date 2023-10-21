@@ -1,6 +1,8 @@
 const fetch = require("node-fetch");
 const s3ServiceInstance = require("../../../src/api/services/s3Service");
+const { getRandomFutureDate, getRandomPastDate } = require("../../../src/utils/date");
 
+const CURRENT_DATE = new Date();
 const tags = [
   {
     id: 1,
@@ -316,7 +318,8 @@ async function seedBusinessData(prisma) {
       category: data.category,
       duration: data.duration,
       requiresBooking: data.requiresBooking,
-      lastPossibleDate: getRandomFutureDate(),
+      dateCreated: getRandomPastDate(CURRENT_DATE),
+      lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 6-12 weeks from the current date
       defaultExpiryDays: data.defaultExpiryDays,
       tags: {
         connect: data.tagIds,
@@ -379,14 +382,6 @@ async function remoteImageUrlToFile(url, filename) {
     console.error("Error converting remote image to File:", error);
     throw error;
   }
-}
-
-// get random future date from today, will be randomized to be between 6-12 weeks from the current date
-function getRandomFutureDate() {
-  const currentDate = new Date();
-  const daysToAdd = Math.floor(Math.random() * 42) + 42; // Random value between 42 and 84 (6 to 12 weeks)
-  currentDate.setDate(currentDate.getDate() + daysToAdd);
-  return currentDate;
 }
 
 module.exports = { serviceListings, tags, seedBusinessData };

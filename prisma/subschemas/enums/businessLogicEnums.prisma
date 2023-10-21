@@ -5,3 +5,10 @@ enum Category {
   PET_RETAIL
   PET_BOARDING
 }
+
+enum FeaturedListingCategoryEnum {
+  HOTTEST_LISTINGS
+  ALMOST_GONE
+  MOST_PROMISING_NEW_LISTINGS
+  ALL_TIME_FAVS
+}

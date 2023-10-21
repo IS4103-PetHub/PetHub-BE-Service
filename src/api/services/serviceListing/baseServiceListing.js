@@ -5,6 +5,7 @@ const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
+const { getExpiringListingsInATimePeriod, getMostPromisingNewListings } = require("./featuredServiceListing");
 
 
 exports.createServiceListing = async (data) => {
@@ -245,6 +246,14 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
 
 exports.getServiceListingById = async (serviceListingId, showCommissionRule = false) => {
   try {
+    const currentDate = new Date();
+    const endDate = new Date(currentDate);
+    const startDate = new Date(currentDate);
+    startDate.setDate(currentDate.getDate() - 7);
+    const hottestListings = await getMostPromisingNewListings(startDate, endDate, 10);
+  
+    console.log(hottestListings);
+
     const serviceListing = await prisma.serviceListing.findUnique({
       where: { serviceListingId },
       include: {
@@ -342,7 +351,6 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
       }
     }
 
-    // TODO: Will uncomment after presentation is over to prevent accidental deletion
     await this.deleteFilesOfAServiceListing(serviceListingId);
     await prisma.serviceListing.delete({
       where: { serviceListingId },
