@@ -27,9 +27,9 @@ model ServiceListing {
   favouritedUsers PetOwner[]
 
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
-  Booking         Booking[]
-  OrderItem       OrderItem[]
+  calendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  booking         Booking[]
+  orderItem       OrderItem[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit

@@ -13,7 +13,7 @@ model CalendarGroup {
 
     petBusinessId  Int // CalendarGroup ISA Weak Entity of PetBusiness 
     petBusiness    PetBusiness      @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
-    ServiceListing ServiceListing[]
+    serviceListing ServiceListing[]
 
     @@unique([petBusinessId, name])
 }
@@ -27,7 +27,7 @@ model ScheduleSettings {
     timePeriods       TimePeriod[]
 
     calendarGroupId Int // ScheduleSettings ISA Weak Entity of CalendarGroup 
-    CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
+    calendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
 }
 
 model TimePeriod {
@@ -37,7 +37,7 @@ model TimePeriod {
     vacancies    Int
 
     scheduleSettingId Int // TimePeriods ISA Weak Entity of ScheduleSettings 
-    ScheduleSettings  ScheduleSettings @relation(fields: [scheduleSettingId], references: [scheduleSettingId], onDelete: Cascade)
+    scheduleSettings  ScheduleSettings @relation(fields: [scheduleSettingId], references: [scheduleSettingId], onDelete: Cascade)
 }
 
 model TimeSlot {
@@ -47,9 +47,9 @@ model TimeSlot {
     vacancies  Int
 
     calendarGroupId Int
-    CalendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
+    calendarGroup   CalendarGroup @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade)
 
-    Booking Booking[]
+    booking Booking[]
 }
 
 model Booking {
@@ -69,6 +69,6 @@ model Booking {
 
     petId       Int?
     pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
-    OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+    orderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
     orderItemId Int       @unique
 }

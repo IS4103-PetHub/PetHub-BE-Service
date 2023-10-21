@@ -19,7 +19,7 @@ model Permission {
     code                String                @unique
     name                String
     description         String
-    UserGroupPermission UserGroupPermission[]
+    userGroupPermission UserGroupPermission[]
 }
 
 model UserGroupMembership {
