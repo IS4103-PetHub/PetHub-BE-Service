@@ -24,7 +24,7 @@ model User {
   internalUser        InternalUser?
   petOwner            PetOwner?
   petBusiness         PetBusiness?
-  userGroupMembership UserGroupMembership[]
+  UserGroupMembership UserGroupMembership[]
 }
 
 model InternalUser {
@@ -52,7 +52,7 @@ model PetOwner {
   favouriteListings ServiceListing[]
     petLostAndFound PetLostAndFound[]
   invoices          Invoice[]
-  refundRequest     RefundRequest[]
+  RefundRequest     RefundRequest[]
 }
 
 model PetBusiness {
@@ -72,8 +72,8 @@ model PetBusiness {
 
   user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId        Int             @id @unique
-  calendarGroup CalendarGroup[]
-  refundRequest RefundRequest[]
+  CalendarGroup CalendarGroup[]
+  RefundRequest RefundRequest[]
 
   commissionRuleId Int?
   commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
@@ -93,9 +93,9 @@ model Address {
   postalCode               String
   // Prisma doesn't seem to support uni-directional relationships: https://github.com/prisma/prisma/issues/3045
   petBusinessId            Int?
-  petBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
+  PetBusiness              PetBusiness?            @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade)
   petBusinessApplicationId Int?
-  petBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
+  PetBusinessApplication   PetBusinessApplication? @relation(fields: [petBusinessApplicationId], references: [petBusinessApplicationId])
 
   serviceListings ServiceListing[]
 }

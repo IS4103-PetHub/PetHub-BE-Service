@@ -17,7 +17,7 @@ model Invoice {
   attachmentURL    String
 
   orderItems     OrderItem[]
-  petOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
+  PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
 }
 
@@ -56,7 +56,7 @@ model OrderItem {
   // (Optional) Bookings associated with the order item
   booking Booking?
 
-  refundRequest RefundRequest?
+  RefundRequest RefundRequest?
 }
 
 enum RefundStatus {
