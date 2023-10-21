@@ -74,7 +74,8 @@ class BookingService {
 
             if (!booking) throw new CustomError(`Booking with id (${bookingId}) not found`, 404);
 
-            return booking;
+            // Uncapitalize the O in OrderItems... Not doing it in schema for now to prevent breaking changes
+            return { ...booking, orderItem: booking.OrderItem, OrderItem: undefined };
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new BookingError(error);
@@ -170,7 +171,8 @@ class BookingService {
                 }
             });
 
-            return bookings;
+            // Uncapitalize the O in OrderItems... Not doing it in schema for now to prevent breaking changes
+            return bookings.map(booking => ({ ...booking, orderItem: booking.OrderItem, OrderItem: undefined }));
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new BookingError(error);
@@ -225,7 +227,8 @@ class BookingService {
                 }
                 bookings[i].petOwner = flattenedPetOwner;
             }
-            return bookings;
+            // Uncapitalize the O in OrderItems... Not doing it in schema for now to prevent breaking changes
+            return bookings.map(booking => ({ ...booking, orderItem: booking.OrderItem, OrderItem: undefined }));
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new BookingError(error);

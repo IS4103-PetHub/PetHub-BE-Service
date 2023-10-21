@@ -78,7 +78,8 @@ exports.createServiceListing = async (data) => {
         CalendarGroup: true, // This will include CalendarGroup only if it was added conditionally
       },
     });
-    return serviceListing;
+    // Uncapitalize the C in CalendarGroup... Not changing in schema for now as it will result in breaking changes everywhere
+    return { ...serviceListing, calendarGroup: serviceListing.CalendarGroup, CalendarGroup: undefined };
   } catch (error) {
     console.error("Error during service listing creation:", error);
     if (error instanceof CustomError) throw error;
@@ -153,7 +154,8 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       },
     });
 
-    return updatedListing;
+    // Uncapitalize the C in CalendarGroup... Not changing in schema for now as it will result in breaking changes everywhere
+    return { ...updatedListing, calendarGroup: updatedListing.CalendarGroup, CalendarGroup: undefined };
   } catch (error) {
     console.error("Error during service listing creation:", error);
     if (error instanceof CustomError) throw error;
@@ -262,7 +264,8 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
     if (!serviceListing) {
       throw new CustomError("Service listing not found", 404);
     }
-    return serviceListing;
+    // Uncapitalize the C in CalendarGroup... Not changing in schema for now as it will result in breaking changes everywhere
+    return { ...serviceListing, calendarGroup: serviceListing.CalendarGroup, CalendarGroup: undefined };
   } catch (error) {
     console.error("Error fetching service listing by ID:", error);
     if (error instanceof CustomError) {
@@ -283,7 +286,8 @@ exports.getServiceListingByCategory = async (categoryInput) => {
         CalendarGroup: true
       },
     });
-    return serviceListings;
+    // Uncapitalize the C in CalendarGroup... Not changing in schema for now as it will result in breaking changes everywhere
+    return serviceListings.map(listing => ({ ...listing, calendarGroup: listing.CalendarGroup, CalendarGroup: undefined }));
   } catch (error) {
     console.error("Error fetching service listings by category:", error);
     throw new ServiceListingError(error);
@@ -307,7 +311,8 @@ exports.getServiceListingByTag = async (id) => {
         CalendarGroup: true
       },
     });
-    return serviceListings;
+    // Uncapitalize the C in CalendarGroup... Not changing in schema for now as it will result in breaking changes everywhere
+    return serviceListings.map(listing => ({ ...listing, calendarGroup: listing.CalendarGroup, CalendarGroup: undefined }));
   } catch (error) {
     console.error("Error fetching all service listings:", error);
     throw new ServiceListingError(error);
