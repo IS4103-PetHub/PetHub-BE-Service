@@ -277,7 +277,7 @@ class BaseUserService {
       const body = emailTemplate.ConfirmationEmailVerificationEmail(
         user.accountType == 'PET_OWNER' ? user.petOwner.firstName : user.petBusiness.companyName
       )
-      await emailService.sendEmail(user.email, "PetHub Account successfully activated", body)
+      await emailService.sendEmail(user.email, "PetHub Account Successfully Activated", body)
 
       return this.removePassword(updatedUser);
     } catch(error) {
