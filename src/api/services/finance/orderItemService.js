@@ -160,7 +160,7 @@ class OrderItemService {
         include: {
           tags: true,
           addresses: true,
-          OrderItem: {
+          orderItem: {
             include: {
               booking: true,
               invoice: {
@@ -175,12 +175,12 @@ class OrderItemService {
       });
 
       let orderItems = serviceListings.flatMap((serviceListing) =>
-        serviceListing.OrderItem.map((orderItem) => {
+        serviceListing.orderItem.map((orderItem) => {
           return {
             ...orderItem,
             serviceListing: {
               ...serviceListing,
-              OrderItem: undefined, // manually disconnect OrderItem from serviceListing
+              orderItem: undefined, // manually disconnect OrderItem from serviceListing
             },
           };
         })
@@ -227,7 +227,7 @@ class OrderItemService {
           },
           invoice: {
             include: {
-              PetOwner: {
+              petOwner: {
                 include: {
                   user: {
                     select: {
@@ -244,7 +244,7 @@ class OrderItemService {
       if (!orderItem) throw new CustomError("Order item not found", 404);
 
       // Verify that user is the one who purchased this orderItem
-      if (orderItem.invoice.PetOwner.user.userId != userId) {
+      if (orderItem.invoice.petOwner.user.userId != userId) {
         throw new CustomError("User error - UserId does not match user who purchased this Order Item", 400);
       }
 
@@ -270,8 +270,8 @@ class OrderItemService {
       // Send email to PO and PB that order has been fulfilled
       // For PB, email is sent to the PB's businessEmail
       await emailService.sendEmail(
-        orderItem.invoice.PetOwner.user.email,
-        `${orderItem.invoice.PetOwner.firstName}, Your PetHub Order Has Been Fulfilled!`,
+        orderItem.invoice.petOwner.user.email,
+        `${orderItem.invoice.petOwner.firstName}, Your PetHub Order Has Been Fulfilled!`,
         emailTemplate.POVoucherFulfillmentEmail(orderItem));
 
       await emailService.sendEmail(

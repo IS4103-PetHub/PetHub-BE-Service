@@ -68,7 +68,7 @@ class BookingService {
                     timeSlot: true,
                     pet: true,
                     serviceListing: true,
-                    OrderItem: true,
+                    orderItem: true,
                 }
             });
 
@@ -165,7 +165,7 @@ class BookingService {
                             addresses: true
                         }
                     },
-                    OrderItem: true,
+                    orderItem: true,
                     pet: true
                 }
             });
@@ -203,7 +203,7 @@ class BookingService {
                             addresses: true
                         }
                     },
-                    OrderItem: true,
+                    orderItem: true,
                     timeSlot: true,
                     pet: true
                 }
@@ -236,14 +236,14 @@ class BookingService {
         try {
             const existingBooking = await this.getBookingById(bookingId)
 
-            if (existingBooking.OrderItem.status !== OrderItemStatus.PENDING_FULFILLMENT) {
+            if (existingBooking.orderItem.status !== OrderItemStatus.PENDING_FULFILLMENT) {
                 throw new CustomError("Unable to create new booking: order item is either expired or has already been fulfilled", 400)
             }
-            if (existingBooking.OrderItem.expiryDate <= newStartTime) {
+            if (existingBooking.orderItem.expiryDate <= newStartTime) {
                 throw new CustomError("The order item expires before selected start time.", 400);
             }
 
-            const orderItemId = existingBooking.OrderItem.orderItemId;
+            const orderItemId = existingBooking.orderItem.orderItemId;
 
             const bookingDuration = Math.abs((new Date(newStartTime) - new Date(newEndTime)) / 60000);
             const availableSlots = await CalendarGroupService.getAvailability(Number(orderItemId), new Date(newStartTime), new Date(newEndTime), bookingDuration);

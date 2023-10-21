@@ -268,7 +268,7 @@ const serviceListings = [
     tagIds: [{ tagId: 2 }, { tagId: 4 }],
     addressIds: [{ addressId: 1 }],
     defaultExpiryDays: 30,
-    requiresBooking: false
+    requiresBooking: false,
   },
 ];
 
@@ -354,7 +354,7 @@ async function seedBusinessData(prisma) {
 
     // Check if data.calendarGroupId exists before adding it to createObject
     if (data.calendarGroupId) {
-      createObject.CalendarGroup = {
+      createObject.calendarGroup = {
         connect: { calendarGroupId: data.calendarGroupId },
       };
     }
