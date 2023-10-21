@@ -33,6 +33,15 @@ class OrderItemService {
             select: {
               paymentId: true,
               createdAt: true,
+              PetOwner: {
+                include: {
+                  user: {
+                    select: {
+                      email: true
+                    }
+                  }
+                }
+              }
             },
           },
         },
@@ -71,6 +80,15 @@ class OrderItemService {
             select: {
               paymentId: true,
               createdAt: true,
+              PetOwner: {
+                include: {
+                  user: {
+                    select: {
+                      email: true
+                    }
+                  }
+                }
+              }
             },
           },
         },
@@ -115,6 +133,15 @@ class OrderItemService {
               },
             },
           },
+          PetOwner: {
+            include: {
+              user: {
+                select: {
+                  email: true
+                }
+              }
+            }
+          }
         },
       });
 
@@ -124,6 +151,7 @@ class OrderItemService {
           invoice: {
             paymentId: invoice.paymentId, // attach paymentId from invoice too
             createdAt: invoice.createdAt, // attach createdAt from invoice too
+            PetOwner: invoice.PetOwner,
           },
         }));
       });
@@ -167,6 +195,15 @@ class OrderItemService {
                 select: {
                   paymentId: true,
                   createdAt: true,
+                  PetOwner: {
+                    include: {
+                      user: {
+                        select: {
+                          email: true
+                        }
+                      }
+                    }
+                  }
                 },
               },
             },
