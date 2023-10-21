@@ -33,7 +33,7 @@ class CalendarGroupService {
                 startTime: { gte: queryStartDate },  // from startTime
                 endTime: { lte: queryEndDate }       // to endTime
             },
-            include: { booking: true }
+            include: { Booking: true }
         });
 
         let availableSlots = [];
@@ -57,7 +57,7 @@ class CalendarGroupService {
             let proposedEnd = new Date(slotStart.getTime() + bookingDuration * 60000);
 
             // Count overlapping bookings
-            const overlappingBookings = timeSlot.booking.filter(booking => slotStart < new Date(booking.endTime) && proposedEnd > new Date(booking.startTime)).length;
+            const overlappingBookings = timeSlot.Booking.filter(booking => slotStart < new Date(booking.endTime) && proposedEnd > new Date(booking.startTime)).length;
             const availableVacancies = timeSlot.vacancies - overlappingBookings;
 
             if (availableVacancies > 0) {
@@ -79,7 +79,7 @@ class CalendarGroupService {
             const calendarGroups = await prisma.calendarGroup.findMany({
                 include: {
                     timeslots: includeTimeSlot ? {
-                        include: { booking: includeBooking }
+                        include: { Booking: includeBooking }
                     } : false,
                     scheduleSettings: true
                 }
@@ -109,7 +109,7 @@ class CalendarGroupService {
             let includeField = {
                 timeslots: includeTimeSlot ? {
                     include: {
-                        booking: includeBooking ? {
+                        Booking: includeBooking ? {
                             include: { serviceListing: true }
                         } : false
                     }
@@ -203,7 +203,7 @@ class CalendarGroupService {
         try {
             // Fetch the calendar group with all related bookings.
             const calendarGroup = await this.getCalendarGroupById(calendarGroupId, true, true, false);
-            const Bookings = calendarGroup.timeslots.flatMap(timeslot => timeslot.booking);
+            const Bookings = calendarGroup.timeslots.flatMap(timeslot => timeslot.Booking);
 
             // Deleting the entire calendar group.
             await prisma.calendarGroup.delete({
@@ -250,7 +250,7 @@ class CalendarGroupService {
 
             if (calendarGroupData.scheduleSettings) {
                 // Get all existing bookings to be migrated or processed later
-                const Bookings = calendarGroup.timeslots.flatMap(timeslot => timeslot.booking);
+                const Bookings = calendarGroup.timeslots.flatMap(timeslot => timeslot.Booking);
 
                 // Create new scheduledSettings (including TimePeriods), and timeSlots
                 const scheduleSettingsData = await this.mapToScheduleSettings(calendarGroupData.scheduleSettings);

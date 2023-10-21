@@ -138,7 +138,7 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
 
 exports.POVoucherFulfillmentEmail = (orderItem) => {
   return `
-    Dear ${orderItem.invoice.petOwner.firstName},
+    Dear ${orderItem.invoice.PetOwner.firstName},
 
     🐾 Exciting News for You and Your Furry Friend! 🐾 We're wagging our tails with delight to let you know that your order with ${orderItem.serviceListing.petBusiness.companyName} has been successfully fulfilled!
 

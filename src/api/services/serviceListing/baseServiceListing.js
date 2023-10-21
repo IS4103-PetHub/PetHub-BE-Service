@@ -75,7 +75,7 @@ exports.createServiceListing = async (data) => {
       include: {
         tags: true,
         addresses: true,
-        calendarGroup: true, // This will include CalendarGroup only if it was added conditionally
+        CalendarGroup: true, // This will include CalendarGroup only if it was added conditionally
       },
     });
     return serviceListing;
@@ -149,7 +149,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
       include: {
         tags: true,
         addresses: true,
-        calendarGroup: true
+        CalendarGroup: true
       },
     });
 
@@ -256,7 +256,7 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
             commissionRule: showCommissionRule
           },
         },
-        calendarGroup: true
+        CalendarGroup: true
       },
     });
     if (!serviceListing) {
@@ -280,7 +280,7 @@ exports.getServiceListingByCategory = async (categoryInput) => {
       include: {
         tags: true,
         addresses: true,
-        calendarGroup: true
+        CalendarGroup: true
       },
     });
     return serviceListings;
@@ -304,7 +304,7 @@ exports.getServiceListingByTag = async (id) => {
       include: {
         tags: true,
         addresses: true,
-        calendarGroup: true
+        CalendarGroup: true
       },
     });
     return serviceListings;
