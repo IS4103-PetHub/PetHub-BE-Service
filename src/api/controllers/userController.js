@@ -59,7 +59,8 @@ exports.createUser = async (req, res, next) => {
     if (!service) return;
 
     const userPayload = req.body;
-    if (!(await UserValidations.isValidPassword(userPayload.password))) {
+    // only PO and PB needs password
+    if (service != InternalUserService && !(await UserValidations.isValidPassword(userPayload.password))) {
       return res.status(400).json({ message: "Invalid password format" });
     }
     // userPayload.password = await UserHelper.hashPassword(userPayload.password);
@@ -241,3 +242,23 @@ exports.deactivateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.verifyUserEmail = async (req, res, next) => {
+  try {
+    const token = req.params.token;
+    await baseUserServiceInstance.handleVerifyEmail(token)
+    res.status(200).json({ message: "Email successfully verified"})
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.resendVerifyUserEmail = async (req, res, next) => {
+  try {
+    const email = req.params.email;
+    await baseUserServiceInstance.resendVerifyEmail(email);
+    res.status(200).json({ message: "Verify Email resent successfully"})
+  } catch (error) {
+    next(error)
+  }
+}

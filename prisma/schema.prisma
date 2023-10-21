@@ -102,6 +102,7 @@ enum AccountStatus {
   ACTIVE
   INACTIVE
   PENDING
+  PENDING_VERIFICATION
 }
 
 enum AccountType {
@@ -402,6 +403,12 @@ model User {
   petOwner            PetOwner?
   petBusiness         PetBusiness?
   UserGroupMembership UserGroupMembership[]
+}
+
+model EmailVerification {
+  token      String   @unique
+  expiryDate DateTime
+  email      String   @unique
 }
 
 model InternalUser {

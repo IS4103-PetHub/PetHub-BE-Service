@@ -192,3 +192,55 @@ exports.bookingRescheduleEmail = (name, booking, serviceListingTitle, link) => {
       The PetHub Team
       `;
 };
+
+exports.AccountEmailVerificationEmail = (name, link) => {
+  return `
+    Dear ${name},
+
+    Thanks for getting started with PetHub! We need a little more information to complete your registration, including confirmation of your email address. Click below to confirm your email address: ${link}
+
+    If you have problems, please paste the above URL into your web browser.
+
+    Regards,
+    The PetHub Team  
+  `
+}
+
+exports.ConfirmationEmailVerificationEmail = (name) => {
+  return `
+    Dear ${name},
+
+    Congratulations! Your email address has been successfully verified, and your PetHub account is now activated. You are now ready to enjoy all the features and benefits of PetHub.
+
+    If you have any questions or need assistance, feel free to reach out to our support team. We're here to help!
+
+    Thank you for choosing PetHub.
+
+    Regards,
+    The PetHub Team
+  `;
+}
+
+exports.CreateNewInternalUser = (name, email, password) => {
+  return `
+    Dear ${name},
+
+    We are excited to inform you that your PetHub account has been created. Here are your account details:
+    
+    Email: ${email}
+    Temporary Password: ${password}
+    
+    For security reasons, we recommend that you change your password immediately. To do this, follow these steps:
+    
+    1. Visit the PetHub login page: [PetHub Login](http://localhost:3001/login)
+    2. Use your email and the temporary password provided above to log in.
+    3. Once logged in, go to your account settings and change your password to something secure and memorable.
+    
+    If you have any questions or need assistance, please don't hesitate to contact our support team.
+    
+    Thank you for choosing PetHub.
+    
+    Regards,
+    The PetHub Team
+  `;
+} 
