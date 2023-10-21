@@ -23,6 +23,7 @@ router.get("/category/:category?", serviceListingController.getServiceListingByC
 router.get("/tag/:tagId?", serviceListingController.getServiceListingByTag);
 router.get("/pet-businesses/:id?", serviceListingController.getServiceListingByPBId);
 router.get("/:id", serviceListingController.getServiceListingById);
+router.get("/get-recommended-listings/:id", serviceListingController.getRecommendedListings);
 
 // DELETE [Add logic to check for existing connections when order management is completed]
 router.delete('/:id', serviceListingController.deleteServiceListing);

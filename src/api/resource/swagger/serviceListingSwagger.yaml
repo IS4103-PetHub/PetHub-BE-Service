@@ -411,6 +411,30 @@ paths:
                   $ref: '#/definitions/ServiceListingResponse'
       tags:
         - Service Listing
+  
+  /api/service-listings/get-recommended-listings/{petOwnerId}:
+    get:
+      summary: Get recommended service listings
+      description: Retrieve recommended service listings for a pet owner based on pets, past orders, and popular listings.
+      parameters:
+        - in: path
+          name: petOwnerId
+          description: The ID of the pet owner for whom to retrieve recommended service listings.
+          required: true
+          schema:
+            type: integer
+          example: 9
+      responses:
+        200:
+          description: An array of service listings based on pets, past orders, and popular listings to recommend to the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceListingResponse'
+      tags:
+        - Service Listing
 
   /api/service-listings/active:
     get:
@@ -481,6 +505,7 @@ paths:
                   $ref: '#/definitions/ServiceListingResponse'
       tags:
         - Service Listing
+        
   /api/service-listings/pet-businesses/{id}:
     get:
       summary: Get all service listings by pet business ID

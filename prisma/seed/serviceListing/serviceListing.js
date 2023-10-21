@@ -218,10 +218,111 @@ const serviceListings = [
     requiresBooking: true,
     defaultExpiryDays: 14,
   },
-  // This service listings (id 11-12) have requiresBooking: true but no CG
-  // On the customer side, pet owners should not be able to see these listings as this SL is invalid.
   {
     id: 11,
+    title: "Terrapin Care by Sarah",
+    description: "Experienced terrapin care services by Sarah. Your terrapins will be in safe hands.",
+    petBusinessId: 2,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 15.0,
+    requiresBooking: false,
+  },
+  {
+    id: 12,
+    title: "Bird Grooming with Mary",
+    description: "Professional bird grooming services by Mary. Keep your birds happy and healthy.",
+    petBusinessId: 3,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 45,
+    basePrice: 25.0,
+    requiresBooking: false,
+  },
+  {
+    id: 13,
+    title: "Rabbit Boarding by Alex",
+    description: "Trust your rabbits with Alex for a comfortable and secure boarding experience.",
+    petBusinessId: 4,
+    category: "PET_BOARDING",
+    defaultExpiryDays: 30,
+    basePrice: 18.0,
+    requiresBooking: false,
+  },
+  {
+    id: 14,
+    title: "Cat Adoption Center",
+    description: "Find loving homes for cats at our adoption center. Adopt a furry friend today!",
+    petBusinessId: 5,
+    category: "PET_RETAIL",
+    defaultExpiryDays: 30,
+    basePrice: 0.0, 
+    requiresBooking: false, 
+  },
+  {
+    id: 15,
+    title: "Reptile Care Services",
+    description: "Comprehensive care services for reptiles. Ensure your reptiles are healthy and happy.",
+    petBusinessId: 2,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 20.0,
+    requiresBooking: false,
+  },
+  {
+    id: 16,
+    title: "Pet Sitting for All",
+    description: "Your trusted pet sitting service. We care for dogs, cats, birds, and more!",
+    petBusinessId: 3,
+    category: "PET_BOARDING",
+    defaultExpiryDays: 30,
+    basePrice: 30.0,
+    requiresBooking: false,
+  },
+  {
+    id: 17,
+    title: "Small Mammal Boarding",
+    description: "Boarding services for small mammals like hamsters, guinea pigs, and more.",
+    petBusinessId: 4,
+    category: "PET_BOARDING",
+    defaultExpiryDays: 30,
+    basePrice: 15.0,
+    requiresBooking: false,
+  },
+  {
+    id: 18,
+    title: "Fish Tank Maintenance",
+    description: "Professional fish tank maintenance services to keep your aquatic pets healthy.",
+    petBusinessId: 5,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 35.0,
+    requiresBooking: false,
+  },
+  {
+    id: 19,
+    title: "Exotic Pet Care",
+    description: "Specialized care services for exotic pets. We handle unique and rare animals with care.",
+    petBusinessId: 1,
+    category: "PET_RETAIL",
+    defaultExpiryDays: 30,
+    basePrice: 25.0,
+    requiresBooking: false,
+  },
+  {
+    id: 20,
+    title: "Pet Spa and Grooming",
+    description: "Treat your pets to a day of pampering and grooming at our pet spa. They deserve it!",
+    petBusinessId: 2,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 40.0,
+    requiresBooking: false,
+  },
+  
+  // This service listings (id 21-22) have requiresBooking: true but no CG
+  // On the customer side, pet owners should not be able to see these listings as this SL is invalid.
+  {
+    id: 21,
     title: "Normal grooming fun times",
     description: "Treat your pets to a day of grooming by regular groomers!",
     petBusinessId: 2,
@@ -234,7 +335,7 @@ const serviceListings = [
     defaultExpiryDays: 14,
   },
   {
-    id: 12,
+    id: 22,
     title: "Puppy Training Class",
     description: "Join our fun and interactive puppy training class!",
     petBusinessId: 3,
@@ -246,10 +347,10 @@ const serviceListings = [
     duration: 90,
     requiresBooking: true,
   },
-  // This service listing (id 13) will have a lastPossibleDate to be < currentDate
+  // This service listing (id 23) will have a lastPossibleDate to be < currentDate
   // On the customer side, pet owners should not be able to see these listings as the SL is already invalid.
   {
-    id: 13,
+    id: 23,
     title: "Pet Photography Session",
     description: "Capture beautiful moments with your pets in a professional photoshoot.",
     petBusinessId: 2,
@@ -260,7 +361,7 @@ const serviceListings = [
     addressIds: [],
   },
   {
-    id: 14,
+    id: 24,
     title: "John Dog suppliments",
     description:
       "Elevate your dogs health with Johns premium Dog Supplements We offer a wide range of quality supplements to keep your furry friend in top shape Choose from a variety of options to support your dogs wellbeing Give your dog the care they deserve with our topnotch products.",
@@ -346,7 +447,7 @@ async function seedBusinessData(prisma) {
         createObject.attachmentKeys = vetKey;
         createObject.attachmentURLs = vetUrl;
         break;
-      case 13:
+      case 23:
         createObject.attachmentKeys = sittingKey;
         createObject.attachmentURLs = sittingUrl;
         createObject.lastPossibleDate = pastDate;

@@ -285,6 +285,25 @@ exports.getServiceListingByPBId = async (req, res, next) => {
   }
 };
 
+exports.getRecommendedListings = async (req, res, next) => {
+  try {
+    const petOwnerId = req.params.id;
+    if (!petOwnerId) { 
+      return res.status(400).json({ message: "Pet Owner ID cannot be empty" }); 
+    }
+    
+    if (!(await BaseValidations.isValidInteger(petOwnerId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
+
+    const recommendedListings = await ServiceListingService.getRecommendedListings(Number(petOwnerId));
+
+    res.status(200).json(recommendedListings);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteServiceListing = async (req, res, next) => {
   try {
     const serviceListingId = req.params.id;
