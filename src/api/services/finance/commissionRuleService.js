@@ -2,7 +2,7 @@ const prisma = require('../../../../prisma/prisma');
 const CommissionRuleError = require("../../errors/commissionRuleError");
 const CustomError = require('../../errors/customError')
 const petBusinessService = require('../../services/user/petBusinessService')
-const constants = require("../../../constants/common");
+const constants = require("../../../constants/transactions");
 
 class CommissionRulenService {
 

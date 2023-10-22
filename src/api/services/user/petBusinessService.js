@@ -5,10 +5,10 @@ const UserError = require("../../errors/userError");
 const CustomError = require("../../errors/customError");
 const validations = require("../../validations");
 const AddressService = require("./addressService");
-const constants = require("../../../constants/common");
 const UserHelper = require('../../helpers/usersHelper')
 const emailTemplate = require('../../resource/emailTemplate');
 const emailService = require("../emailService");
+const constants = require("../../../constants/transactions");
 
 // Shared selection fields
 const petBusinessSelectFields = {

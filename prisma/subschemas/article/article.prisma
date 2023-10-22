@@ -1,6 +1,5 @@
-import { ArticleType } from "..\enums\articleEnums"
-import { InternalUser } from "..\user\user"
-import { InternalUser } from "..\..\schema"
+import { ArticleType } from "../enums/articleEnums"
+import { InternalUser } from "../user/user"
 
 model Article {
     articleId   Int         @id @default(autoincrement())

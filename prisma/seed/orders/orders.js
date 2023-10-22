@@ -213,6 +213,7 @@ async function diversityOrderItemStatuses(prisma, orderItems) {
       endDate.setDate(currentDate.getDate() + 14);
       const availalbeTimeSlot = await CalendarGroupService.getAvailability(
         item.orderItemId,
+        null,
         currentDate,
         endDate,
         serviceListing.duration
