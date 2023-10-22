@@ -6,7 +6,10 @@ const prisma = require('../../../../prisma/prisma');
 const petBusinessService = require('../../services/user/petBusinessService')
 const CustomError = require('../../errors/customError')
 const OrderItemsError = require('../../errors/orderItemError')
-const { OrderItemStatus } = require('@prisma/client')
+const { OrderItemStatus } = require('@prisma/client');
+const reportService = require("../reports/reportService");
+const EmailService = require('../../services/emailService')
+const emailTemplate = require('../../resource/emailTemplate');
 
 class RevenueService {
     async getEligiblePayoutOI(inputPayoutDate = undefined) {
@@ -159,9 +162,22 @@ class RevenueService {
                 const petBusiness = await petBusinessService.getUserById(payoutInvoice.userId)
                 const processedPayoutInvoice = await this.processPayout(petBusiness, payoutInvoice)
                 const createdPayoutInvoice = await this.createPayoutInvoice(processedPayoutInvoice, petBusiness.userId)
+                const { attachmentKey, attachmentURL } = await reportService.generatePayoutInvoice(
+                    createdPayoutInvoice,
+                    createdPayoutInvoice.orderItems
+                );
+                const payoutInvoiceWithPDF = await prisma.payoutInvoice.update({
+                    where: { invoiceId: createdPayoutInvoice.invoiceId },
+                    data: {
+                        attachmentKey: attachmentKey,
+                        attachmentURL, attachmentURL
+                    }
+                })
 
-                completedPayoutInvoices.push(createdPayoutInvoice)
-                // generate email 
+                completedPayoutInvoices.push(payoutInvoiceWithPDF)
+                // generate email
+                const body = emailTemplate.payoutPBEmail(petBusiness.companyName, attachmentURL)
+                await EmailService.sendEmail(petBusiness.user.email, "Monthly Payout from PetHub", body)
             }
 
             return completedPayoutInvoices;
