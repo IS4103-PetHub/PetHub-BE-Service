@@ -317,7 +317,7 @@ exports.getServiceListingByPBId = async (id) => {
 // 1. Pets --> recommend listings that include the PO's pets' petTypes in the title or description
 // 2. Past Orders --> based on the most recent purchase, recommend SLs from the same category
 // 3. Popular Listings --> If user do not have pets or past orders, recommend popular listings within the past week
-// To prevent slow rendering speed, slice the list to only include 5 results
+// To prevent slow rendering speed, slice the list to only include 6 results
 exports.getRecommendedListings = async (petOwnerId) => {
   try {
     // Get the pet owner by ID
@@ -463,13 +463,13 @@ exports.getRecommendedListings = async (petOwnerId) => {
     // Emsure listings are valid
     let validRecommendedListings = filterValidListingsForPetOwners(recommendedListings, [], [], null);
 
-    // If still no valid recommended listing, just get 5 random valid listings
+    // If still no valid recommended listing, just get 6 random valid listings
     if (validRecommendedListings.length == 0) {
-      validRecommendedListings = await this.getAllServiceListingsAvailableForPetOwners([], [], 5)
+      validRecommendedListings = await this.getAllServiceListingsAvailableForPetOwners([], [], 6)
     }
 
-    // Return the first 5 recommendations
-    return validRecommendedListings.slice(0, 5);
+    // Return the first 6 recommendations
+    return validRecommendedListings.slice(0, 6);
 
   } catch (error) {
     console.error("Error getting recommended listings:", error);
