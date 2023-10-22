@@ -108,7 +108,7 @@ function createCheckoutPayload(numCartItems) {
   return {
     paymentMethodId: "pm_card_visa",
     totalPrice: calculateTotalPrice(cartItems),
-    userId: (Math.floor(Math.random() * (18 - 9 + 1)) + 9), // seed orders with different PO ID
+    userId: 9, 
     cartItems: cartItems,
   };
 }
