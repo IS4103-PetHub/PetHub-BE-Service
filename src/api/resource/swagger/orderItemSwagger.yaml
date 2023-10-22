@@ -199,7 +199,7 @@ paths:
         pay out order items that are either 
           1) OrderItemStatus.EXPIRED and expiryDate <= payout_date
           OR 
-          2) PENDING_FULFILLMENTAND and dateFulfilled <= (payout_date - 7 days)
+          2) PENDING_FULFILLMENT and dateFulfilled <= (payout_date - 7 days)
 
         Where payout_date is set to payoutDate if provided in query parameter else, 
         set to current date time.
