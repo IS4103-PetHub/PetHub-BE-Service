@@ -9,18 +9,41 @@ const emailTemplate = require('../../resource/emailTemplate');
 const PetBusinessService = require('../user/petBusinessService');
 const emailService = require('../emailService');
 const orderItemService = require('../finance/orderItemService');
+const serviceListingService = require('../serviceListing/baseServiceListing');
 
 class CalendarGroupService {
 
-    async getAvailability(orderItemId, startTime, endTime, bookingDuration) {
+    async getAvailability(orderItemId, serviceListingId, startTime, endTime, bookingDuration) {
 
-        // 1. Check if the orderItem is valid
-        const orderItem = await orderItemService.getOrderItemById(orderItemId);
+        let expiryDate;
+        let calendarGroupId;
 
-        // 2. Check if the orderItem is for a service listing with a calendar group
-        if (!orderItem.serviceListing.calendarGroupId) throw new CustomError(`OrderItem with id (${orderItemId}) does not have a service listing with a calendar group tied to it`, 400);
+        if (orderItemId) {
+            // 1. Check if the orderItem is valid
+            const orderItem = await orderItemService.getOrderItemById(orderItemId);
 
-        // 3. Fetch all the timeslots
+            // 2. Check if the orderItem is for a service listing with a calendar group
+            if (!orderItem.serviceListing.calendarGroupId) throw new CustomError(`OrderItem with id (${orderItemId}) does not have a service listing with a calendar group tied to it`, 400);
+        
+            // 3. Extract details we need
+            expiryDate = orderItem.expiryDate;
+            calendarGroupId = orderItem.serviceListing.calendarGroupId;
+
+        } else {
+            // If serviceListingId is provided instead of orderItemId (PO wants to view timeslots without having made an order)
+
+            // 1. Check if the service listing is valid
+            const serviceListing = await serviceListingService.getServiceListingById(serviceListingId);
+
+            // 2. Check if the service listing is tied to a calendar group
+            if (!serviceListing.calendarGroupId) throw new CustomError(`ServiceListing with id (${serviceListingId}) does not have a calendar group tied to it`, 400);
+
+            // 3. Extract details we need
+            expiryDate = serviceListing.lastPossibleDate; // This may be falsy, but we will handle it in getAvailabilityForTimeSlot
+            calendarGroupId = serviceListing.calendarGroupId;
+        }
+
+        // 4. Fetch all the timeslots
         const queryStartDate = new Date(startTime);
         queryStartDate.setHours(0, 0, 0, 0);
 
@@ -29,7 +52,7 @@ class CalendarGroupService {
 
         const timeSlots = await prisma.timeSlot.findMany({
             where: {
-                calendarGroupId: orderItem.serviceListing.calendarGroupId,
+                calendarGroupId: calendarGroupId,
                 startTime: { gte: queryStartDate },  // from startTime
                 endTime: { lte: queryEndDate }       // to endTime
             },
@@ -38,19 +61,20 @@ class CalendarGroupService {
 
         let availableSlots = [];
 
-        // 4. For each timeslot, get the available sub-slots
+        // 5. For each timeslot, get the available sub-slots
         for (let slot of timeSlots) {
-            const slotsForThisTimeSlot = this.getAvailabilityForTimeSlot(orderItem.expiryDate, slot, bookingDuration, startTime, endTime);
+            const slotsForThisTimeSlot = this.getAvailabilityForTimeSlot(expiryDate, slot, bookingDuration, startTime, endTime);
             availableSlots = [...availableSlots, ...slotsForThisTimeSlot];
         }
 
         return availableSlots;
     }
 
-    getAvailabilityForTimeSlot(orderExpiryDate, timeSlot, bookingDuration, searchStartTime, searchEndTime) {
+    getAvailabilityForTimeSlot(expiryDate, timeSlot, bookingDuration, searchStartTime, searchEndTime) {
         let availableSlots = [];
         let slotStart = new Date(Math.max(timeSlot.startTime, searchStartTime));
-        const slotEnd = new Date(Math.min(timeSlot.endTime, searchEndTime, orderExpiryDate)); // Factor in expiry date into min possible slot end time
+        // Factor in expiry date into min possible slot end time, if expiryDate is falsy, disregard from Math.min
+        const slotEnd = new Date(Math.min(timeSlot.endTime, searchEndTime, (expiryDate || Infinity))); 
 
         // Iterate within the timeslot
         while (slotStart <= slotEnd - bookingDuration * 60000) {
@@ -304,7 +328,7 @@ class CalendarGroupService {
         for (const existingBooking of bookings) {
             const { startTime, endTime, bookingId, orderItemId } = existingBooking;
             const bookingDuration = Math.abs((new Date(startTime) - new Date(endTime)) / 60000);
-            const availableSlots = await this.getAvailability(Number(orderItemId), new Date(startTime), new Date(endTime), bookingDuration);
+            const availableSlots = await this.getAvailability(Number(orderItemId), null, new Date(startTime), new Date(endTime), bookingDuration);
 
             if (availableSlots.length === 0) {
                 unsuccessfulMigration.push(existingBooking);
