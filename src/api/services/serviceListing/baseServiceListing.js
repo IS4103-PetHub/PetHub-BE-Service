@@ -334,6 +334,9 @@ exports.getRecommendedListings = async (petOwnerId) => {
         },
       },
     });
+    if (!petOwner) {
+      throw new CustomError("Pet Owner not found, or id is not tagged to a valid Pet Owner!", 404);
+    }
     const recommendedListings = [];
 
     // Check if the pet owner has pets and recommend listings that include the PO's pets' petTypes in the title or description
