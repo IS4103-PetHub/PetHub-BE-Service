@@ -218,6 +218,7 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
       },
     });
     const filteredListings = filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
+    filteredListings.sort((a, b) => b.dateCreated - a.dateCreated);
     return filteredListings
 
   } catch (error) {
@@ -423,7 +424,6 @@ exports.getRecommendedListings = async (petOwnerId) => {
             NOT: { serviceListingId: { in: recommendedListings.map((listing) => listing.serviceListingId) } },
           },
         });
-
         // Add category listings to recommendations
         recommendedListings.push(...categoryListings);
       }
@@ -522,8 +522,6 @@ const filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
     (categories.length === 0 || categories.includes(listing.category)) &&
     (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag))
   ));
-
-  validListings.sort((a, b) => b.dateCreated - a.dateCreated);
 
   if (limit !== null && limit > 0) {
     return validListings.slice(0, limit);
