@@ -319,7 +319,7 @@ paths:
       tags:
         - CalendarGroup
 
-  /api/calendar-groups/available-timeslots/{orderItemId}:
+  /api/calendar-groups/available-timeslots:
     get:
       summary: Get available time slots for a given OrderItem ID.
       description: |
@@ -334,11 +334,20 @@ paths:
         15-minute slots instead of a single 1-hour slot.
       parameters:
         - name: orderItemId
-          in: path
-          description: ID of the OrderItem with the associated service listing and calendar if any to retrieve availability for.
-          required: true
+          in: query
+          description: |
+            ID of the OrderItem with the associated service listing and calendar if any to retrieve availability for.
+            This takes the expiryDate tied with the OrderItem as the upper limit.
+          required: false
           type: integer
-          default: 1 # Example default value
+        - name: serviceListingId
+          in: query
+          description: |
+            ID of the ServiceListing to retrieve availability for. This is required if no OrderItem ID is provided.
+            If OrderItemID is provided, this value is ignored.
+            This takes the lastPossibleDate as the upper limit if any, otherwise there is no upper limit.
+          required: false
+          type: integer
         - name: startTime
           in: query
           description: Start time for the availability search.
