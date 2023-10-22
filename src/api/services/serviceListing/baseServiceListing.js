@@ -461,7 +461,12 @@ exports.getRecommendedListings = async (petOwnerId) => {
     }
 
     // Emsure listings are valid
-    const validRecommendedListings = filterValidListingsForPetOwners(recommendedListings, [], [], null);
+    let validRecommendedListings = filterValidListingsForPetOwners(recommendedListings, [], [], null);
+
+    // If still no valid recommended listing, just get 5 random valid listings
+    if (validRecommendedListings.length == 0) {
+      validRecommendedListings = await this.getAllServiceListingsAvailableForPetOwners([], [], 5)
+    }
 
     // Return the first 5 recommendations
     return validRecommendedListings.slice(0, 5);
