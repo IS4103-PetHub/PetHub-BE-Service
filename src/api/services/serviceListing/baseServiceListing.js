@@ -5,6 +5,7 @@ const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
+const { getHottestListingsInATimePeriod, getMostPromisingNewListings } = require("./featuredServiceListing");
 
 
 exports.createServiceListing = async (data) => {
@@ -216,27 +217,10 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
         },
       },
     });
-
-    // Filter according to query params, if any
-    let filteredListings = serviceListings.filter((listing) =>
-    (categories.length === 0 || categories.includes(listing.category)) &&
-    (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag)))
-    );
+    const filteredListings = filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
     filteredListings.sort((a, b) => b.dateCreated - a.dateCreated);
-    if (limit !== null && limit > 0) {
-      return filteredListings.slice(0, limit);
-    }
+    return filteredListings
 
-    // Filter based on the INVALID condition:
-    // INVALID if: SL requires booking and (CG == null OR duration == null)
-    filteredListings = filteredListings.filter((listing) => {
-      if (listing.requiresBooking) {
-        return listing.calendarGroupId !== null && listing.duration !== null;
-      }
-      return true;
-    });
-
-    return filteredListings;
   } catch (error) {
     console.error("Error fetching all active service listings:", error);
     throw new ServiceListingError(error);
@@ -330,6 +314,172 @@ exports.getServiceListingByPBId = async (id) => {
   }
 };
 
+// This method will give recommended listings based on a PO. It recommends based off:
+// 1. Pets --> recommend listings that include the PO's pets' petTypes in the title or description
+// 2. Past Orders --> based on the most recent purchase, recommend SLs from the same category
+// 3. Popular Listings --> If user do not have pets or past orders, recommend popular listings within the past week
+// To prevent slow rendering speed, slice the list to only include 6 results
+exports.getRecommendedListings = async (petOwnerId) => {
+  try {
+    // Get the pet owner by ID
+    const petOwner = await prisma.petOwner.findUnique({
+      where: { userId: petOwnerId },
+      include: {
+        pets: true,
+        invoices: {
+          include: {
+            orderItems: {
+              select: { serviceListingId: true },
+            },
+          },
+        },
+      },
+    });
+    if (!petOwner) {
+      throw new CustomError("Pet Owner not found, or id is not tagged to a valid Pet Owner!", 404);
+    }
+    const recommendedListings = [];
+
+    // Check if the pet owner has pets and recommend listings that include the PO's pets' petTypes in the title or description
+    if (petOwner.pets.length > 0) {
+      const petTypes = petOwner.pets.map((pet) => pet.petType);
+
+      // Search for service listings with the petType in title or description
+      const petTypeListings = await prisma.serviceListing.findMany({
+        include: {
+          tags: true,
+          addresses: true,
+          petBusiness: {
+            select: {
+              companyName: true,
+              user: {
+                select: {
+                  accountStatus: true,
+                },
+              },
+            },
+          },
+        },
+        where: {
+          OR: petTypes.map((type) => ({
+            OR: [
+              {
+                title: {
+                  contains: type,
+                  mode: "insensitive",
+                },
+              },
+              {
+                description: {
+                  contains: type,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          })),
+        },
+      });
+      recommendedListings.push(...petTypeListings);
+    }
+
+    // based on the most recent purchase, recommend SLs from the same category
+    let mostRecentPurchase = null;
+    for (const invoice of petOwner.invoices) {
+      if (!mostRecentPurchase || invoice.dateCreated > mostRecentPurchase.dateCreated) {
+        mostRecentPurchase = invoice;
+      }
+    }
+
+    if (mostRecentPurchase) {
+      // Get the first order item from the most recent purchase
+      const orderItem = mostRecentPurchase.orderItems[0]; 
+
+      if (orderItem) {
+        const serviceListingId = orderItem.serviceListingId;
+
+        // Get the service listing and its category
+        const serviceListing = await prisma.serviceListing.findUnique({
+          where: { serviceListingId },
+        });
+        const category = serviceListing.category;
+
+        // Search for service listings in the same category
+        const categoryListings = await prisma.serviceListing.findMany({
+          include: {
+            tags: true,
+            addresses: true,
+            petBusiness: {
+              select: {
+                companyName: true,
+                user: {
+                  select: {
+                    accountStatus: true,
+                  },
+                },
+              },
+            },
+          },
+          where: {
+            category: category,
+            NOT: { serviceListingId: { in: recommendedListings.map((listing) => listing.serviceListingId) } },
+          },
+        });
+        // Add category listings to recommendations
+        recommendedListings.push(...categoryListings);
+      }
+    }
+
+    // If user do not have pets or past orders, recommend popular listings within the past week
+    if (recommendedListings.length < 5) {
+      const currentDate = new Date();
+      const endDate = new Date(currentDate);
+      const startDate = new Date(currentDate);
+      startDate.setDate(currentDate.getDate() - 7);
+      const hottestListingsIds = await getHottestListingsInATimePeriod(startDate, endDate, 5);
+      const hottestListings = await prisma.serviceListing.findMany({
+        include: {
+          tags: true,
+          addresses: true,
+          petBusiness: {
+            select: {
+              companyName: true,
+              user: {
+                select: {
+                  accountStatus: true,
+                },
+              },
+            },
+          },
+        },
+        where: {
+          serviceListingId: {
+            in: hottestListingsIds,
+          },
+        },
+      });
+      recommendedListings.push(...hottestListings);
+    }
+
+    // Emsure listings are valid
+    let validRecommendedListings = filterValidListingsForPetOwners(recommendedListings, [], [], null);
+
+    // If still no valid recommended listing, just get 6 random valid listings
+    if (validRecommendedListings.length == 0) {
+      validRecommendedListings = await this.getAllServiceListingsAvailableForPetOwners([], [], 6)
+    }
+
+    // Return the first 6 recommendations
+    return validRecommendedListings.slice(0, 6);
+
+  } catch (error) {
+    console.error("Error getting recommended listings:", error);
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new ServiceListingError(error);
+  }
+};
+
 exports.deleteServiceListing = async (serviceListingId, callee) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
   // Current logic: Disasicaite a particular service listing from existing connections (tag, PB) and delete
@@ -342,7 +492,6 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
       }
     }
 
-    // TODO: Will uncomment after presentation is over to prevent accidental deletion
     await this.deleteFilesOfAServiceListing(serviceListingId);
     await prisma.serviceListing.delete({
       where: { serviceListingId },
@@ -354,6 +503,31 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
     }
     throw new ServiceListingError(error);
   }
+};
+
+// UTILITY METHODS
+
+const filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
+  const currentDate = new Date();
+  
+  const filteredListings = listings.filter((listing) =>
+    listing.petBusiness.user.accountStatus === 'ACTIVE' &&
+    listing.lastPossibleDate >= currentDate &&
+    (!listing.requiresBooking || (listing.calendarGroupId !== null && listing.duration !== null))
+  );
+
+  // Filter based on the INVALID condition:
+  // INVALID if: SL requires booking and (CG == null OR duration == null)
+  const validListings = filteredListings.filter((listing) =>
+    (categories.length === 0 || categories.includes(listing.category)) &&
+    (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag))
+  ));
+
+  if (limit !== null && limit > 0) {
+    return validListings.slice(0, limit);
+  }
+
+  return validListings;
 };
 
 exports.sendDeleteServiceListingEmail = async (petBusinessName, email, postTitle) => {
@@ -386,4 +560,3 @@ exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
     throw new ServiceListingError(error);
   }
 };
-

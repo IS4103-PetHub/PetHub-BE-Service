@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Oct 19 2023 17:39:45 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Sat Oct 21 2023 21:17:59 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -173,6 +173,13 @@ enum Category {
   PET_BOARDING
 }
 
+enum FeaturedListingCategoryEnum {
+  HOTTEST_LISTINGS
+  ALMOST_GONE
+  MOST_PROMISING_NEW_LISTINGS
+  ALL_TIME_FAVS
+}
+
 enum PetLostRequestType {
   LOST_PET
   FOUND_PET
@@ -327,11 +334,12 @@ model ServiceListing {
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags            Tag[]
-  addresses       Address[]
-  petBusiness     PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId   Int
-  favouritedUsers PetOwner[]
+  tags             Tag[]
+  addresses        Address[]
+  petBusiness      PetBusiness          @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId    Int
+  favouritedUsers  PetOwner[]
+  featuredListings FeaturedListingSet[]
 
   calendarGroupId Int?
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
@@ -349,6 +357,14 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+}
+
+model FeaturedListingSet {
+  id                  Int                         @id @default(autoincrement())
+  category            FeaturedListingCategoryEnum
+  validityPeriodStart DateTime?
+  validityPeriodEnd   DateTime?
+  serviceListings     ServiceListing[]
 }
 
 // models for Role Based Access Control (RBAC)

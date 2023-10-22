@@ -1,4 +1,4 @@
-import {Category} from "../enums/businessLogicEnums"
+import {Category, FeaturedListingCategoryEnum} from "../enums/businessLogicEnums"
 import {PetBusiness, Address, PetOwner} from "../user/user"
 import {CalendarGroup, Booking} from "../appointments/appointments"
 import {OrderItem, Invoice} from "../finance/transactions"
@@ -20,11 +20,12 @@ model ServiceListing {
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags            Tag[]
-  addresses       Address[]
-  petBusiness     PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId   Int
-  favouritedUsers PetOwner[]
+  tags             Tag[]
+  addresses        Address[]
+  petBusiness      PetBusiness          @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId    Int
+  favouritedUsers  PetOwner[]
+  featuredListings FeaturedListingSet[]
 
   calendarGroupId Int?
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
@@ -42,4 +43,12 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+}
+
+model FeaturedListingSet {
+  id                  Int                         @id @default(autoincrement())
+  category            FeaturedListingCategoryEnum
+  validityPeriodStart DateTime?
+  validityPeriodEnd   DateTime?
+  serviceListings     ServiceListing[]
 }

@@ -4,10 +4,12 @@ const TransactionService = require("../../../src/api/services/finance/transactio
 const petOwnerService = require("../../../src/api/services/user/petOwnerService");
 const { v4: uuidv4 } = require("uuid");
 const CalendarGroupService = require("../../../src/api/services/appointments/calendarGroupService");
+const { getRandomPastDate } = require("../../../src/utils/date");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
 const NUM_INVOICES = 10;
 const NUM_CART_ITEMS = 5;
+const CURRENT_DATE = new Date();
 
 const JOHNS_SERVICELISTINGS = [
   {
@@ -106,7 +108,7 @@ function createCheckoutPayload(numCartItems) {
   return {
     paymentMethodId: "pm_card_visa",
     totalPrice: calculateTotalPrice(cartItems),
-    userId: 9,
+    userId: 9, 
     cartItems: cartItems,
   };
 }
@@ -119,6 +121,7 @@ async function simulateCheckout(data) {
   const user = await petOwnerService.getUserById(data.userId);
   const { invoice, orderItems } = await TransactionService.buildTransaction(data.cartItems);
   const paymentIntentId = uuidv4();
+  invoice.createdAt = getRandomPastDate(CURRENT_DATE)
   return await TransactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId); // returns invoice obj
 }
 
