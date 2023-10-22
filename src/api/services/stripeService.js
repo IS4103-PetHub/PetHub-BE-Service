@@ -11,11 +11,10 @@ class StripeService {
   }
 
   // SERVICE FUNCTIONS
-
   async processPayment(paymentMethodId, amount, email, currency = 'SGD') {
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: amount * DEC_PLACE,
+        amount: this.dollarToCents(amount),
         currency: currency,
         payment_method: paymentMethodId,
         confirm: true,
@@ -37,7 +36,7 @@ class StripeService {
     try {
       const refund = await this.stripe.refunds.create({
         payment_intent: paymentIntentId,
-        amount: amount * DEC_PLACE,
+        amount: this.dollarToCents(amount),
       });
       return refund;
     } catch (error) {
@@ -47,10 +46,23 @@ class StripeService {
 
   // UTILITY FUNCTIONS
 
+  dollarToCents(amount = 0.00) {
+    // First, round the amount to the nearest 2 decimal places (i.e., to the nearest cent)
+    const roundedAmount = Math.round(amount * DEC_PLACE) / DEC_PLACE;
+
+    // Now, convert dollars to cents by multiplying by 100
+    // Since we've already rounded to the nearest cent, this should always give a whole number
+    return Math.round(roundedAmount * DEC_PLACE);
+  }
+
+  centsToDollar(cents = 0) {
+    return cents / DEC_PLACE
+  }
+
   async checkBalance() {
     try {
       const balance = await stripe.balance.retrieve();
-      console.log(balance / DEC_PLACE);
+      console.log(this.centsToDollar(balance));
     } catch (error) {
       console.error('Error checking balance:', error);
     }

@@ -3,7 +3,7 @@ const PDFDocument = require("pdfkit");
 const PetOwnerService = require("../user/petOwnerService");
 const CustomError = require("../../errors/customError");
 const ReportError = require("../../errors/reportError");
-const constants = require("../../../constants/common");
+const constants = require("../../../constants/transactions");
 const s3ServiceInstance = require("../s3Service.js");
 const {
   invoiceGeneratePethubInfo,
@@ -17,7 +17,7 @@ const {
 const { pet } = require("../../../../prisma/prisma");
 
 class ReportService {
-  constructor() {}
+  constructor() { }
 
   async generateInvoice(invoice, orderItems, singleItem = false) {
     try {

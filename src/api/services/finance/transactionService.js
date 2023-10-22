@@ -6,7 +6,7 @@ const TransactionError = require("../../errors/transactionError");
 const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const prisma = require("../../../../prisma/prisma");
-const constants = require("../../../constants/common");
+const constants = require("../../../constants/transactions");
 
 // 1) Payment service builds transaction which returns invoice and orderItems
 // 2) Once Payment service confirms payment, payment service must confirm the transaction with the payment ID

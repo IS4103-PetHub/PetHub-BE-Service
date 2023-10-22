@@ -18,25 +18,25 @@ paths:
           description: start date to query from
           required: false
           type: string
-          default: '2023-10-01T00:00:00.000Z'
+          default: "2023-10-01T00:00:00.000Z"
         - name: endDate
           in: query
           description: end date to query from
           required: false
           type: string
-          default: '2023-10-31T23:59:59.999Z'
+          default: "2023-10-31T23:59:59.999Z"
         - name: serviceListingFilters
           in: query
           description: comma deliminated filters of the Serivce Listings IDs
           required: false
           type: string
-          default: '1,2'
+          default: "1,2"
         - name: petBusinessFilter
           in: query
           description: pet business ID to filter by
           required: false
           type: string
-          default: '1'
+          default: "1"
       responses:
         200:
           description: List of order items
@@ -112,19 +112,19 @@ paths:
           description: start date to query from
           required: false
           type: string
-          default: '2023-10-01T00:00:00.000Z'
+          default: "2023-10-01T00:00:00.000Z"
         - name: endDate
           in: query
           description: end date to query from
           required: false
           type: string
-          default: '2023-10-31T23:59:59.999Z'
+          default: "2023-10-31T23:59:59.999Z"
         - name: serviceListingFilters
           in: query
           description: comma deliminated filters of the Serivce Listings IDs
           required: false
           type: string
-          default: '1,2'
+          default: "1,2"
       responses:
         200:
           description: List of order items
@@ -146,7 +146,7 @@ paths:
           required: true
           type: integer
           default: 1
-      requestBody: 
+      requestBody:
         content:
           application/json:
             schema:
@@ -167,3 +167,56 @@ paths:
       tags:
         - Order Items
 
+  /api/order-items/expire:
+    patch:
+      summary: expire order items
+      description: |
+        expire order items that are either (PENDING_BOOKING or PENDING_FULFILLMENT) AND
+         orderItem.expiryDate <= expireDate where expireDate is set to beforeDate if provided
+         in query parameter else, set to current date time
+      parameters:
+        - name: beforeDate
+          in: query
+          description: order items before specified date time will be expired.
+          required: true
+          type: string
+          format: date-time
+          default: "2023-11-01T15:59:59.999Z" # Example default value
+      responses:
+        200:
+          description: List of expored order items
+          content:
+            application/json:
+              schema:
+                type: array
+      tags:
+        - Order Items
+
+  /api/order-items/payout:
+    patch:
+      summary: payout order items
+      description: |
+        pay out order items that are either 
+          1) OrderItemStatus.EXPIRED and expiryDate <= payout_date
+          OR 
+          2) PENDING_FULFILLMENT and dateFulfilled <= (payout_date - 7 days)
+
+        Where payout_date is set to payoutDate if provided in query parameter else, 
+        set to current date time.
+      parameters:
+        - name: payoutDate
+          in: query
+          description: payout_date to trigger the conditions in description.
+          required: true
+          type: string
+          format: date-time
+          default: "2023-11-01T15:59:59.999Z" # Example default value
+      responses:
+        200:
+          description: List of expored order items
+          content:
+            application/json:
+              schema:
+                type: array
+      tags:
+        - Order Items

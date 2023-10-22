@@ -13,12 +13,31 @@ model Invoice {
   miscCharge Float // to account for tax/stripe_charge etc
 
   // For invoice PDF (consolidated)
-  attachmentKey    String
-  attachmentURL    String
+  attachmentKey String
+  attachmentURL String
 
   orderItems     OrderItem[]
   PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
+}
+
+// Note: Invoice must remain immutable as much as possible for accounting purposes
+model PayoutInvoice {
+  invoiceId        Int   @id @default(autoincrement())
+  totalAmount      Float // The total amount based on accumulated order item prices
+  commissionCharge Float // The total amount deducted for commission
+  paidOutAmount    Float // The total paid out amount at the time of transaction
+
+  createdAt DateTime @default(now())
+  paymentId String   @unique // to be obtained from Stripe transaction
+
+  // For invoice PDF (consolidated)
+  attachmentKey String?
+  attachmentURL String?
+
+  orderItems  OrderItem[]
+  userId      Int
+  petBusiness PetBusiness @relation(fields: [userId], references: [userId])
 }
 
 enum OrderItemStatus {
@@ -36,14 +55,14 @@ model OrderItem {
   itemName       String // Name of the order item at the time of transaction
   itemPrice      Float // Item Price of the individual item at the time of transaction
   commissionRate Float // The commission rate at the time of transaction
-  expiryDate     DateTime 
+  expiryDate     DateTime
   voucherCode    String // generated UUID to identify order
   status         OrderItemStatus @default(PENDING_FULFILLMENT)
   dateFulfilled  DateTime? // If orderItem is fulfilled, dateFulfilled will be updated
 
   // For invoice PDF (single row)
-  attachmentKey    String
-  attachmentURL    String
+  attachmentKey String
+  attachmentURL String
 
   // Must be associated to invoice
   invoiceId Int
@@ -56,7 +75,9 @@ model OrderItem {
   // (Optional) Bookings associated with the order item
   booking Booking?
 
-  RefundRequest RefundRequest?
+  RefundRequest          RefundRequest?
+  PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
+  payoutInvoiceInvoiceId Int?
 }
 
 enum RefundStatus {
