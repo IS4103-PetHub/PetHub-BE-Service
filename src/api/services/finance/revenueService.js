@@ -177,7 +177,7 @@ class RevenueService {
                 completedPayoutInvoices.push(payoutInvoiceWithPDF)
                 // generate email
                 const body = emailTemplate.payoutPBEmail(petBusiness.companyName, attachmentURL)
-                await EmailService.sendEmail(petBusiness.user.email, "Monthly Payout from PetHub", body)
+                await EmailService.sendEmail(petBusiness.user.email, "Monthly Payout from PetHub", body, "payoutInvoice.pdf", attachmentURL)
             }
 
             return completedPayoutInvoices;

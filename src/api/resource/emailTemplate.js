@@ -245,16 +245,14 @@ exports.CreateNewInternalUser = (name, email, password) => {
   `;
 } 
 
-exports.payoutPBEmail = (name, link) => {
+exports.payoutPBEmail = (name) => {
   return `Dear ${name},
 
   We hope this message finds you well.
   
   We are pleased to inform you that the monthly payout for your services has been successfully processed. Your hard work and dedication to providing top-notch services to our users are greatly appreciated.
   
-  To view the detailed payout statement and invoice for this month, please click the link below:
-  
-  [View Invoice](${link})
+  To view the detailed payout statement and invoice for this month, please download the attached PDF.
   
   This PDF invoice provides a breakdown of the services provided, payments received, and any applicable fees or deductions. You can download or print the invoice for your records.
   
