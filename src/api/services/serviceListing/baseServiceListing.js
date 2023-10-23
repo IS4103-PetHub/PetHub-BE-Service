@@ -240,7 +240,8 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
             commissionRule: showCommissionRule
           },
         },
-        CalendarGroup: true
+        CalendarGroup: true,
+        reviews: true
       },
     });
     if (!serviceListing) {

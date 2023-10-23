@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sat Oct 21 2023 21:17:59 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Mon Oct 23 2023 22:06:35 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -269,6 +269,8 @@ model OrderItem {
   RefundRequest          RefundRequest?
   PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
   payoutInvoiceInvoiceId Int?
+
+  review Review?
 }
 
 enum RefundStatus {
@@ -345,6 +347,10 @@ model ServiceListing {
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
+
+  // review and ratings
+  reviews       Review[]
+  overallRating Float    @default(0)
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -365,6 +371,23 @@ model FeaturedListingSet {
   validityPeriodStart DateTime?
   validityPeriodEnd   DateTime?
   serviceListings     ServiceListing[]
+}
+
+model Review {
+  reviewId         Int            @id @default(autoincrement())
+  title            String
+  comment          String
+  reply            String?
+  rating           Int
+  isHidden         Boolean        @default(false) // to hide inaccurate reviews
+  dateCreated      DateTime       @default(now())
+  lastUpdated      DateTime?
+  attachmentKeys   String[]
+  attachmentURLs   String[]
+  orderItemId      Int            @unique
+  orderItem        OrderItem      @relation(fields: [orderItemId], references: [orderItemId])
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
 }
 
 // models for Role Based Access Control (RBAC)

@@ -161,6 +161,7 @@ class PetLostAndFoundService {
 
       async deletePetLostAndFound(petLostAndFoundId) {
         try {
+            await this.deleteFilesOfAPetLostAndFound(petLostAndFoundId)
             await prisma.petLostAndFound.delete({
                 where: { petLostAndFoundId }
             })

@@ -2,6 +2,7 @@ import {PetOwner, PetBusiness} from "../user/user"
 import {ServiceListing} from "../serviceListing/serviceListing"
 import {Booking} from "../appointments/appointments"
 import { OrderItemStatus } from "../../schema"
+import { Review } from "..\serviceListing\serviceListing"
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
@@ -78,6 +79,8 @@ model OrderItem {
   RefundRequest          RefundRequest?
   PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
   payoutInvoiceInvoiceId Int?
+
+  review                 Review?
 }
 
 enum RefundStatus {

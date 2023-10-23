@@ -2,6 +2,8 @@ import {Category, FeaturedListingCategoryEnum} from "../enums/businessLogicEnums
 import {PetBusiness, Address, PetOwner} from "../user/user"
 import {CalendarGroup, Booking} from "../appointments/appointments"
 import {OrderItem, Invoice} from "../finance/transactions"
+import { OrderItem } from "..\finance\transactions"
+import { ServiceListing } from "..\..\schema"
 
 model ServiceListing {
   serviceListingId  Int       @id @default(autoincrement())
@@ -31,6 +33,10 @@ model ServiceListing {
   CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
+
+  // review and ratings
+  reviews Review[]
+  overallRating Float @default(0)
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -51,4 +57,21 @@ model FeaturedListingSet {
   validityPeriodStart DateTime?
   validityPeriodEnd   DateTime?
   serviceListings     ServiceListing[]
+}
+
+model Review {
+  reviewId Int             @id @default(autoincrement())
+  title                    String
+  comment                  String
+  reply                    String?
+  rating                   Int
+  isHidden                 Boolean @default(false) // to hide inaccurate reviews
+  dateCreated              DateTime @default(now())
+  lastUpdated              DateTime?
+  attachmentKeys           String[]
+  attachmentURLs           String[]
+  orderItemId              Int @unique
+  orderItem                OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+  serviceListingId         Int
+  serviceListing           ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
 }

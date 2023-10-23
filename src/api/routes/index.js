@@ -21,6 +21,7 @@ const commissionRuleRoutes = require('./commissionRulesRoutes')
 const paymentRoutes = require('./paymentRoutes')
 const orderItemRoutes = require('./orderItemRoutes')
 const articleRoutes = require('./articleRoutes')
+const reviewRoutes = require('./reviewRoutes')
 
 // Use route modules
 router.use("/users", userRoutes);
@@ -36,6 +37,7 @@ router.use("/lost-and-found", petLostAndFoundRoutes)
 router.use("/payments", paymentRoutes);
 router.use("/commission-rules", commissionRuleRoutes);
 router.use("/order-items", orderItemRoutes);
-router.use("/articles", articleRoutes)
+router.use("/articles", articleRoutes);
+router.use("/reviews", reviewRoutes);
 
 module.exports = router;
