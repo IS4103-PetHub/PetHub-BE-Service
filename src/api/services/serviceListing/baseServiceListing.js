@@ -236,7 +236,16 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
         addresses: true,
         petBusiness: {
           include: {
-            user: true,
+            user: {
+              select: {
+                userId: true,
+                email: true,
+                accountType: true,
+                accountStatus: true,
+                dateCreated: true,
+                lastUpdated: true,
+              },
+            },
             commissionRule: showCommissionRule
           },
         },
