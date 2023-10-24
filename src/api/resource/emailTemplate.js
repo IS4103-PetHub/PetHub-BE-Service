@@ -156,6 +156,7 @@ exports.POVoucherFulfillmentEmail = (orderItem) => {
 };
 
 exports.PBVoucherFulfillmentEmail = (orderItem) => {
+  const floatPrice = parseFloat(orderItem.itemPrice).toFixed(2);
   return `
     Dear ${orderItem.serviceListing.petBusiness.companyName},
 
@@ -165,8 +166,11 @@ exports.PBVoucherFulfillmentEmail = (orderItem) => {
     - Customer ID: ${orderItem.invoice.petOwnerUserId}
     - Order Item ID: ${orderItem.orderItemId}
     - Service Listing: ${orderItem.serviceListing.title}
+    - Amount: $${floatPrice}
     
-    The amount will be credited to your Stripe business account at the end of this payout cycle. If you have any questions or need further assistance, please don't hesitate to file a support ticket on PetHub.
+    The amount, after platform and payment fees, will be credited to your Stripe business account at the end of this month, if it fulfills the payout criteria. You can learn more about our payout cycle and criterias at under the Frequently Asked Questions (FAQ) section of the PetHub Business Website home page.
+    
+    If you have any questions or need further assistance, please don't hesitate to file a support ticket on PetHub.
 
     Regards,
     The PetHub Team
