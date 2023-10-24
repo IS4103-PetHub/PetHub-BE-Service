@@ -248,3 +248,22 @@ exports.CreateNewInternalUser = (name, email, password) => {
     The PetHub Team
   `;
 } 
+
+exports.payoutPBEmail = (name) => {
+  return `Dear ${name},
+
+  We hope this message finds you well.
+  
+  We are pleased to inform you that the monthly payout for your services has been successfully processed. Your hard work and dedication to providing top-notch services to our users are greatly appreciated.
+  
+  To view the detailed payout statement and invoice for this month, please download the attached PDF.
+  
+  This PDF invoice provides a breakdown of the services provided, payments received, and any applicable fees or deductions. You can download or print the invoice for your records.
+  
+  If you have any questions or require further details regarding your payout, please don't hesitate to contact our support team. We are here to assist you with any inquiries you may have.
+  
+  Thank you for being a valuable member of our platform, and we look forward to continuing our successful partnership.
+  
+  Regards,
+  The PetHub Team`;
+}
