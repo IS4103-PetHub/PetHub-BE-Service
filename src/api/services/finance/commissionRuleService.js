@@ -21,7 +21,17 @@ class CommissionRulenService {
         try {
             const commissionRule = await prisma.commissionRule.findUnique({
                 where: { commissionRuleId: commissionRuleId },
-                include: { petBusinesses: true }
+                include: {
+                    petBusinesses: {
+                        include: {
+                            user: {
+                                select: {
+                                    email: true
+                                }
+                            }
+                        }
+                    }
+                }
             });
 
             if (!commissionRule) throw new CustomError('Commission rule not found', 404);
@@ -46,6 +56,7 @@ class CommissionRulenService {
             // Fetch and return the created user group along with its permissions
             return await this.getCommissionRuleById(newCommissionRule.commissionRuleId);
         } catch (error) {
+            console.log(error)
             if (error instanceof CustomError) throw error
             throw new CommissionRuleError(error);
         }

@@ -202,7 +202,7 @@ const nonActivePetBusinesses = [
     email: "groomer1@example.com",
     password: commonPassword,
     companyName: "Groomer1",
-    uen: "12345678E",
+    uen: "12345678F",
     contactNumber: "91627863",
     commissionRuleId: 1,
     petBusinessApplication: {
@@ -219,7 +219,7 @@ const nonActivePetBusinesses = [
     email: "groomer2@example.com",
     password: commonPassword,
     companyName: "Groomer2",
-    uen: "12345678E",
+    uen: "12345678G",
     contactNumber: "87168812",
     commissionRuleId: 1,
     petBusinessApplication: {
@@ -239,7 +239,7 @@ const nonActivePetBusinesses = [
     email: "groomer3@example.com",
     password: commonPassword,
     companyName: "Groomer3",
-    uen: "12345678E",
+    uen: "12345678H",
     contactNumber: "83192732",
     commissionRuleId: 1,
   },
@@ -297,7 +297,7 @@ const petOwners = [
     password: commonPassword,
     firstName: "Han",
     lastName: "Kim",
-    contactNumber: "76543210",
+    contactNumber: "86543210",
     dateOfBirth: new Date("1995-11-12"),
   },
   {
@@ -306,7 +306,7 @@ const petOwners = [
     password: commonPassword,
     firstName: "Jung",
     lastName: "Park",
-    contactNumber: "65432109",
+    contactNumber: "95432109",
     dateOfBirth: new Date("1986-09-02"),
   },
   {
@@ -315,7 +315,7 @@ const petOwners = [
     password: commonPassword,
     firstName: "Ming",
     lastName: "Wong",
-    contactNumber: "54321098",
+    contactNumber: "94321098",
     dateOfBirth: new Date("1990-07-14"),
   },
   {
@@ -324,7 +324,7 @@ const petOwners = [
     password: commonPassword,
     firstName: "Linh",
     lastName: "Nguyen",
-    contactNumber: "43210987",
+    contactNumber: "93210987",
     dateOfBirth: new Date("1994-02-27"),
   },
   {
@@ -333,7 +333,7 @@ const petOwners = [
     password: commonPassword,
     firstName: "Linda",
     lastName: "Lim",
-    contactNumber: "43210987",
+    contactNumber: "83689987",
     dateOfBirth: new Date("1994-02-27"),
   }
 ];
