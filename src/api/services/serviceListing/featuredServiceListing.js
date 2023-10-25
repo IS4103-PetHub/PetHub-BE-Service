@@ -54,7 +54,7 @@ exports.getHottestListingsInATimePeriod = async (startDate, endDate, n) => {
   }
 };
 
-// This method will get the service listings that are expiring between the start and endDate
+// This method will get the service listings that are expiring between the currentDate and endDate
 exports.getExpiringListingsInATimePeriod = async (currentDate, endDate) => {
   try {
     const expiringListings = await prisma.serviceListing.findMany({
@@ -125,7 +125,7 @@ exports.getTopFavoritedListings = async (n) => {
   }
 };
 
-// This method will get the top n service listings that have been created between startDate and endDate, that already have users favouriting it, or purchasing it
+// This method will get the top n service listings that have been created between startDate and endDate, that already have users favouriting or purchasing it
 exports.getRisingNewListings = async (startDate, endDate, n) => {
     try {
       // Query favorited listings of pet owners and apply date filtering
