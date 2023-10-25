@@ -4,6 +4,9 @@ import {CalendarGroup, Booking} from "../appointments/appointments"
 import {OrderItem, Invoice} from "../finance/transactions"
 import { OrderItem } from "..\finance\transactions"
 import { ServiceListing } from "..\..\schema"
+import { PetOwner } from "..\user\user"
+import { PetOwner } from "..\..\schema"
+import { ReviewReportReason } from "..\enums\reviewEnums"
 
 model ServiceListing {
   serviceListingId  Int       @id @default(autoincrement())
@@ -65,7 +68,6 @@ model Review {
   comment                  String
   reply                    String?
   rating                   Int
-  isHidden                 Boolean @default(false) // to hide inaccurate reviews
   dateCreated              DateTime @default(now())
   lastUpdated              DateTime?
   attachmentKeys           String[]
@@ -74,4 +76,15 @@ model Review {
   orderItem                OrderItem @relation(fields: [orderItemId], references: [orderItemId])
   serviceListingId         Int
   serviceListing           ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  reportedBy               ReportReview[]
+  likedBy                  PetOwner[]
+}
+
+model ReportReview {
+  reportReviewId          Int @id @default(autoincrement())
+  petOwnerId              Int 
+  reportedBy              PetOwner @relation(fields: [petOwnerId], references: [userId])
+  reportReason            ReviewReportReason
+  reviewId                Int
+  review                  Review @relation(fields: [reviewId], references: [reviewId])
 }

@@ -250,7 +250,19 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
           },
         },
         CalendarGroup: true,
-        reviews: true
+        reviews: {
+          include: {
+            orderItem: {
+              include: {
+                invoice: {
+                  include: {
+                    PetOwner: true
+                  }
+                }
+              }
+            }
+          }
+        }
       },
     });
     if (!serviceListing) {

@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Mon Oct 23 2023 22:06:35 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Wed Oct 25 2023 22:54:13 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -183,6 +183,16 @@ enum FeaturedListingCategoryEnum {
 enum PetLostRequestType {
   LOST_PET
   FOUND_PET
+}
+
+enum ReviewReportReason {
+  RUDE_ABUSIVE
+  PORNOGRAPHIC
+  SPAM
+  EXPOSING_PERSONAL_INFORMATION
+  UNAUTHORIZED_ADVERTISEMENT
+  INACCURATE_MISLEADING
+  OTHERS
 }
 
 model CommissionRule {
@@ -379,7 +389,6 @@ model Review {
   comment          String
   reply            String?
   rating           Int
-  isHidden         Boolean        @default(false) // to hide inaccurate reviews
   dateCreated      DateTime       @default(now())
   lastUpdated      DateTime?
   attachmentKeys   String[]
@@ -388,6 +397,17 @@ model Review {
   orderItem        OrderItem      @relation(fields: [orderItemId], references: [orderItemId])
   serviceListingId Int
   serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  reportedBy       ReportReview[]
+  likedBy          PetOwner[]
+}
+
+model ReportReview {
+  reportReviewId Int                @id @default(autoincrement())
+  petOwnerId     Int
+  reportedBy     PetOwner           @relation(fields: [petOwnerId], references: [userId])
+  reportReason   ReviewReportReason
+  reviewId       Int
+  review         Review             @relation(fields: [reviewId], references: [reviewId])
 }
 
 // models for Role Based Access Control (RBAC)
@@ -481,6 +501,8 @@ model PetOwner {
   petLostAndFound   PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
+  reportRevivew     ReportReview[]
+  likedReview       Review[]
 }
 
 model PetBusiness {

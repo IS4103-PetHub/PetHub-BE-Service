@@ -108,8 +108,8 @@ class ReviewService {
         try {
 
             const reviewToDelete = await this.getReviewById(reviewId)
-            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId) {
-                throw new CustomError("Review can only be deleted by orderItem Owner", 400)
+            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId && callee.accountType != "INTERNAL_USER") {
+                throw new CustomError("Review can only be deleted by orderItem Owner or Administrator", 400)
             }
             const dateCreated = new Date(reviewToDelete.dateCreated)
             if (dateCreated > new Date().setDate(dateCreated + 15)) {
@@ -150,51 +150,17 @@ class ReviewService {
                         include: {
                             invoice: true
                         }
-                    }
+                    },
+                    reportedBy: {
+                        include: {
+                            reportedBy: true
+                        }
+                    },
+                    likedBy: true
                 }
             });
             if (!review) throw new CustomError("Review Record not found", 404)
             return review
-        } catch (error) {
-            if (error instanceof CustomError) throw error;
-            throw new ReviewError(error)
-        }
-    }
-
-    async hideReview(reviewId, callee) {
-        try {
-            if (callee.accountType != "INTERNAL_USER") {
-                throw new CustomError("Only admin can hide a review", 400)
-            }
-            const reviewToHide = await this.getReviewById(reviewId)
-            const updatedReview = await prisma.review.update({
-                where: { reviewId: reviewId },
-                data: {
-                    isHidden: true
-                }
-            })
-            return updatedReview
-        } catch (error) {
-            if (error instanceof CustomError) throw error;
-            throw new ReviewError(error)
-        }
-    }
-
-    async showReview(reviewId, callee) {
-        try {
-
-            if (callee.accountType != "INTERNAL_USER") {
-                throw new CustomError("Only admin can hide a review", 400)
-            }
-
-            const reviewToHide = await this.getReviewById(reviewId)
-            const updatedReview = await prisma.review.update({
-                where: { reviewId: reviewId },
-                data: {
-                    isHidden: false
-                }
-            })
-            return updatedReview
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error)
@@ -217,6 +183,117 @@ class ReviewService {
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error)
+        }
+    }
+
+    async likedReview(reviewId, callee) {
+        try {
+            const likedReview = await this.getReviewById(reviewId)
+            const updatedReview = await prisma.review.update({
+                where: { reviewId: reviewId },
+                data: {
+                    likedBy: {
+                        connect: {
+                            userId: callee.userId
+                        }
+                    }
+                }
+            })
+            const updatedReviewWithLikedBy = await prisma.review.findUnique({
+                where: { reviewId: reviewId },
+                include: {
+                    likedBy: true,
+                },
+            });
+
+            return updatedReviewWithLikedBy;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ReviewError(error)
+        }
+    }
+
+    async unlikedReview(reviewId, callee) {
+        try {
+            const unlikedReview = await this.getReviewById(reviewId);
+            const updatedReview = await prisma.review.update({
+                where: { reviewId: reviewId },
+                data: {
+                    likedBy: {
+                        disconnect: {
+                            userId: callee.userId,
+                        },
+                    },
+                },
+            });
+            const updatedReviewWithLikedBy = await prisma.review.findUnique({
+                where: { reviewId: reviewId },
+                include: {
+                    likedBy: true,
+                },
+            });
+
+            return updatedReviewWithLikedBy;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ReviewError(error);
+        }
+    }
+
+    async reportReview(reviewId, callee, reportReason) {
+        try {
+            const existingReport = await prisma.reportReview.findFirst({
+                where: {
+                    reviewId: reviewId,
+                    petOwnerId: callee.userId,
+                },
+            });
+
+            if (existingReport) {
+                throw new CustomError("You've already reported this review.", 400);
+            }
+
+            // Create a new report in the ReportReview table
+            const newReport = await prisma.reportReview.create({
+                data: {
+                    reviewId: reviewId,
+                    petOwnerId: callee.userId,
+                    reportReason: reportReason,
+                },
+            });
+
+            return newReport;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ReviewError(error);
+        }
+    }
+
+    async resolveReview(reviewId, callee) {
+        try {
+
+            if (callee.accountType != "INTERNAL_USER") {
+                throw new CustomError("You don't have permission to resolve review.", 400);
+            }
+            const existingReport = await prisma.reportReview.findFirst({
+                where: {
+                    reviewId: reviewId
+                },
+            });
+
+            if (!existingReport) {
+                throw new CustomError("Review Report not found.", 400);
+            }
+
+            await prisma.reportReview.deleteMany({
+                where: {
+                    reviewId: reviewId,
+                },
+            });
+
+        } catch(error) {
+            if (error instanceof CustomError) throw error;
+            throw new ReviewError(error);
         }
     }
 

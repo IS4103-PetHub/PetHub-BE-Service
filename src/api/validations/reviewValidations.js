@@ -60,3 +60,18 @@ exports.isReviewReplyPayload = (payload) => {
     }
     return { isValid: true };
 }
+
+exports.isValidReportReason = (payload) => {
+    const validReportReasons = [
+        'RUDE_ABUSIVE',
+        'PORNOGRAPHIC',
+        'SPAM',
+        'EXPOSING_PERSONAL_INFORMATION',
+        'UNAUTHORIZED_ADVERTISEMENT',
+        'INACCURATE_MISLEADING',
+        'OTHERS',
+      ];
+    console.log("PAYLOAD", payload)
+
+    return validReportReasons.includes(payload)
+}

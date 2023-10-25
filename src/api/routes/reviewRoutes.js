@@ -13,21 +13,28 @@ const upload = multer({ storage: storage });
 function registerReviewRoutes(controller) {
 
     router.get(`/:id`, controller.getReviewById)
+    // router.get(`/`, controller.getAllReviews)
     // CREATE NEW REIVEW
     router.post(`/`, upload.array('file'), controller.createReview)
 
     // PO update details of review
     router.patch(`/:id`, upload.array('file'), controller.updateReview)
 
-    // ADMIN hide and show review
-    router.patch(`/hide-review/:id`, controller.hideReview)
-    router.patch(`/show-review/:id`, controller.showReview)
-
     // PB reply to a review
     router.patch(`/reply-review/:id`, controller.replyReview)
 
-    // PO delete review
+    // PO/admin delete review
     router.delete(`/:id`, controller.deleteReview)
+
+    // PO like and unlike review
+    router.post(`/liked-review/:id`, controller.likedReview)
+    router.post(`/unliked-review/:id`, controller.unlikedReview)
+
+    // PO report review
+    router.post(`/report-review/:id`, controller.reportReview)
+
+    // Admin resolve review
+    router.post(`/resolve-review/:id`, controller.resolveReview)
 }
 
 registerReviewRoutes(reviewController);

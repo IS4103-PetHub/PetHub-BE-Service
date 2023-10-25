@@ -6,6 +6,7 @@ import { OrderItem, Invoice, RefundRequest, PayoutInvoice} from "../finance/tran
 import { CommissionRule } from "../finance/commissions"
 import { PetLostAndFound } from "../petLostAndFound/petLostAndFound"
 import { Article, Article } from "../article/article"
+import { ReportReview, Review } from "..\serviceListing\serviceListing"
 
 // Entities
 model User {
@@ -58,6 +59,8 @@ model PetOwner {
   petLostAndFound   PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
+  reportRevivew     ReportReview[]
+  likedReview       Review[]
 }
 
 model PetBusiness {
