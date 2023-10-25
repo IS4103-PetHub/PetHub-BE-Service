@@ -167,3 +167,17 @@ exports.replyReview = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.getReviewById = async (req, res, next) => {
+    try {
+        const reviewId = req.params.id;
+        if (!await baseValidations.isValidInteger(reviewId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
+        }
+
+        const review = await reviewService.getReviewById(Number(reviewId))
+        res.status(200).json(review)
+    } catch(error) {
+        next(error)
+    }
+}

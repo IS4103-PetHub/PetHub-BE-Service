@@ -11,6 +11,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 function registerReviewRoutes(controller) {
+
+    router.get(`/:id`, controller.getReviewById)
     // CREATE NEW REIVEW
     router.post(`/`, upload.array('file'), controller.createReview)
 
