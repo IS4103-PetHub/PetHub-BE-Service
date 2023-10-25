@@ -436,6 +436,82 @@ paths:
       tags:
         - Service Listing
 
+  /api/service-listings/get-featured-listings:
+    get:
+      summary: Get featured service listings
+      description: Retrieve featured service listings for a specific time period.
+      parameters:
+        - in: query
+          name: startDate
+          description: The start date of the featured listings period (optional).
+          schema:
+            type: string
+            format: date
+            example: '2023-10-15'
+        - in: query
+          name: endDate
+          description: The end date of the featured listings period (optional).
+          schema:
+            type: string
+            format: date
+            example: '2023-10-21'
+      responses:
+        200:
+          description: An object containing featured service listings for different categories.
+          content:
+            application/json:
+              example: 
+                HOTTEST_LISTINGS:
+                  id: 5
+                  category: HOTTEST_LISTINGS
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  serviceListings:
+                    - serviceListingId: 1
+                      title: Professional Pet Grooming
+                      description: Professional Pet Grooming offers top-quality pet grooming services for your beloved furry friend.
+                      basePrice: 40
+                    - serviceListingId: 2
+                      title: Dog Training Session
+                      description: Dog Training Session provides expert dog training to teach your pet new tricks.
+                      basePrice: 60
+                ALMOST_GONE:
+                  id: 6
+                  category: ALMOST_GONE
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  serviceListings: []
+                ALL_TIME_FAVS:
+                  id: 7
+                  category: ALL_TIME_FAVS
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  serviceListings:
+                    - serviceListingId: 2
+                      title: Dog Training Session
+                      description: Dog Training Session provides expert dog training to teach your pet new tricks.
+                      basePrice: 60
+                    - serviceListingId: 3
+                      title: Normal grooming waterslide experience
+                      description: Treat your pets to a day of grooming by regular groomers!
+                      basePrice: 80
+                RISING_LISTINGS:
+                  id: 8
+                  category: RISING_LISTINGS
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  serviceListings:
+                    - serviceListingId: 4
+                      title: Routine Pet Health Checkup
+                      description: Ensure your pet's well-being with our thorough health checkup.
+                      basePrice: 75
+                    - serviceListingId: 5
+                      title: Reliable Pet Sitting Service
+                      description: Trustworthy pet sitting services for your beloved pets.
+                      basePrice: 50.5
+      tags:
+        - Service Listing
+  
   /api/service-listings/active:
     get:
       summary: Get all service listings available for pet owners. Fill in query params to filter accordingly.

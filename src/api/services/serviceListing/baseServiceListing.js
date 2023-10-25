@@ -1,11 +1,12 @@
 const prisma = require("../../../../prisma/prisma");
+const { getPreviousWeekDatesFromToday } = require("../../../utils/date");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
 const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
-const { getHottestListingsInATimePeriod, getMostPromisingNewListings } = require("./featuredServiceListing");
+const { getHottestListingsInATimePeriod, createFeaturedListingSetForTimePeriod } = require("./featuredServiceListing");
 
 
 exports.createServiceListing = async (data) => {
@@ -217,7 +218,7 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
         },
       },
     });
-    const filteredListings = filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
+    const filteredListings = exports.filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
     filteredListings.sort((a, b) => b.dateCreated - a.dateCreated);
     return filteredListings
 
@@ -461,7 +462,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
     }
 
     // Emsure listings are valid
-    let validRecommendedListings = filterValidListingsForPetOwners(recommendedListings, [], [], null);
+    let validRecommendedListings = exports.filterValidListingsForPetOwners(recommendedListings, [], [], null);
 
     // If still no valid recommended listing, just get 6 random valid listings
     if (validRecommendedListings.length == 0) {
@@ -479,6 +480,45 @@ exports.getRecommendedListings = async (petOwnerId) => {
     throw new ServiceListingError(error);
   }
 };
+
+// This method will get the featured listings this week. 
+// EG if today is wednesday (day 3), it will get the featured listing sets from this week, AKA Sunday (day 0) to Saturday (Day 6) 
+// The featured listing sets for each time period should be created by a weekly cronjob, set to trigger at Sunday midnight every week. When this 
+// However, if it is not created when this method is called, this method will create and return the featured listing sets for this week 
+exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6) => {
+  const currentDate = new Date(); 
+  
+  // If startDate or endDate is not provided, use the previous week's dates
+  if (!startDate || !endDate) {
+    const { lastWeekStart, lastWeekEnd } = getPreviousWeekDatesFromToday();
+    startDate = lastWeekStart;
+    endDate = lastWeekEnd;
+  }
+  
+  // Find existing featured listing sets
+  const existingSets = await prisma.featuredListingSet.findMany({
+    where: {
+      validityPeriodStart: { gte: startDate },
+      validityPeriodEnd: { lte: endDate },
+    },
+    include: {
+      serviceListings: true, 
+    },
+  });
+
+  // If existing sets are found, return them as a map
+  if (existingSets.length > 0) {
+    const existingSetsMap = {};
+    existingSets.forEach((set) => {
+      existingSetsMap[set.category] = set; // Use the category as the key
+    });
+    return existingSetsMap;
+  }
+
+  // If no existing sets are found, create new sets
+  const createdSetsMap = await createFeaturedListingSetForTimePeriod(currentDate, startDate, endDate, numListings);
+  return createdSetsMap;
+}
 
 exports.deleteServiceListing = async (serviceListingId, callee) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
@@ -507,7 +547,7 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
 
 // UTILITY METHODS
 
-const filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
+exports.filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
   const currentDate = new Date();
   
   const filteredListings = listings.filter((listing) =>
