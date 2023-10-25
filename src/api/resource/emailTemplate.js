@@ -156,6 +156,7 @@ exports.POVoucherFulfillmentEmail = (orderItem) => {
 };
 
 exports.PBVoucherFulfillmentEmail = (orderItem) => {
+  const floatPrice = parseFloat(orderItem.itemPrice).toFixed(2);
   return `
     Dear ${orderItem.serviceListing.petBusiness.companyName},
 
@@ -165,8 +166,11 @@ exports.PBVoucherFulfillmentEmail = (orderItem) => {
     - Customer ID: ${orderItem.invoice.petOwnerUserId}
     - Order Item ID: ${orderItem.orderItemId}
     - Service Listing: ${orderItem.serviceListing.title}
+    - Amount: $${floatPrice}
     
-    The amount will be credited to your Stripe business account at the end of this payout cycle. If you have any questions or need further assistance, please don't hesitate to file a support ticket on PetHub.
+    The amount, after platform and payment fees, will be credited to your Stripe business account at the end of this month, if it fulfills the payout criteria. You can learn more about our payout cycle and criterias at under the Frequently Asked Questions (FAQ) section of the PetHub Business Website home page.
+    
+    If you have any questions or need further assistance, please don't hesitate to file a support ticket on PetHub.
 
     Regards,
     The PetHub Team
@@ -244,3 +248,22 @@ exports.CreateNewInternalUser = (name, email, password) => {
     The PetHub Team
   `;
 } 
+
+exports.payoutPBEmail = (name) => {
+  return `Dear ${name},
+
+  We hope this message finds you well.
+  
+  We are pleased to inform you that the monthly payout for your services has been successfully processed. Your hard work and dedication to providing top-notch services to our users are greatly appreciated.
+  
+  To view the detailed payout statement and invoice for this month, please download the attached PDF.
+  
+  This PDF invoice provides a breakdown of the services provided, payments received, and any applicable fees or deductions. You can download or print the invoice for your records.
+  
+  If you have any questions or require further details regarding your payout, please don't hesitate to contact our support team. We are here to assist you with any inquiries you may have.
+  
+  Thank you for being a valuable member of our platform, and we look forward to continuing our successful partnership.
+  
+  Regards,
+  The PetHub Team`;
+}

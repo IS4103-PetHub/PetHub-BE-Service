@@ -38,6 +38,16 @@ function generateTableRow(doc, y, item, itemName, voucherCode, itemPrice) {
     .text(itemPrice, 445, y, { width: 90, align: "right" });
 }
 
+function generatePayoutTableRow(doc, y, item, itemName, quantity, itemPrice, totalPrice) {
+  doc
+  .fontSize(8)
+  .text(item, PAGE_MARGIN, y)
+  .text(itemName, 130, y)
+  .text(quantity, 300, y,)
+  .text(itemPrice, 355, y, { width: 90, align: "right" })
+  .text(totalPrice, 445, y, { width: 90, align: "right" });
+}
+
 function generateTableHeader(doc, baseYValue, removeVoucherCode = false) {
   doc.font("Helvetica-Bold");
   generateTableRow(doc, baseYValue, "Item", "Title", removeVoucherCode ? "" : "Voucher Code", "Price");
@@ -45,6 +55,12 @@ function generateTableHeader(doc, baseYValue, removeVoucherCode = false) {
   doc.font("Helvetica");
 }
 
+function generatePayoutTableHeader(doc, baseYValue) {
+  doc.font("Helvetica-Bold");
+  generatePayoutTableRow(doc, baseYValue, "Item", "Title", "Quantity", "Item Price", "Total Price");
+  generateHr(doc, baseYValue + 20);
+  doc.font("Helvetica");
+}
 /* =============================================== Header functions ============================================ */
 
 function generatePethubInfo(doc, paymentId) {
@@ -58,6 +74,25 @@ function generatePethubInfo(doc, paymentId) {
     .text("25 Grove Street")
     .text("Blueberry Tower 2")
     .text("Singapore 59123")
+    .moveDown();
+}
+
+function generatePetBusinessHeaderInfo(doc, paymentId, data) {
+  doc.fontSize(20).font("Helvetica-Bold").text("PetHub Pte Ltd").moveDown();
+  doc.fillColor("#000000").fontSize(10).text("Payment ID:").font("Helvetica").text(paymentId).moveDown();
+  doc
+    .font("Helvetica-Bold")
+    .text("Payee:")
+    .font("Helvetica")
+    .text(`${data.petBusiness.companyName}`)
+    .text(`${data.petBusiness.uen}`)
+    .text(`${data.petBusiness.websiteURL}`)
+    .text(`${data.petBusiness.businessAddresses[0].addressName}`)
+    .text(`${data.petBusiness.businessAddresses[0].line1}`)
+    .text(data.petBusiness.businessAddresses[0].line2 
+      ? `${data.petBusiness.businessAddresses[0].line2}`
+      : ``)
+    .text(`Singapore ${data.petBusiness.businessAddresses[0].postalCode}`)
     .moveDown();
 }
 
@@ -98,6 +133,34 @@ function generateCustomerInfo(doc, data) {
     .text(`${data.petOwner.firstName} ${data.petOwner.lastName}`, colThreeXValue, baseYValue)
     .text(data.petOwner.user.email, colThreeXValue, baseYValue + lineBreakYValue)
     .text("+65 " + data.petOwner.contactNumber, colThreeXValue, baseYValue + 2 * lineBreakYValue)
+    .moveDown();
+
+  generateHr(doc, 310, true);
+}
+
+function generatePetBusinessInfo(doc, data) {
+  doc.fillColor("#000000").font("Helvetica-Bold").fontSize(12).text("Detail Summary", 50, 220);
+
+  generateHr(doc, 245, true);
+
+  const baseYValue = 260;
+  const lineBreakYValue = 15;
+  const colOneXValue = PAGE_MARGIN;
+  const colTwoXValue = 150;
+  const colThreeXValue = 300;
+
+  doc
+    .font("Helvetica")
+    .fontSize(10)
+    .text("Payout Date:", colOneXValue, baseYValue)
+    .text(formatDate(new Date()), colTwoXValue, baseYValue)
+    .text("Payout Amount:", colOneXValue, baseYValue + lineBreakYValue)
+    .text(formatCurrency(data.payoutInvoice.paidOutAmount), colTwoXValue, baseYValue + lineBreakYValue);
+
+  doc
+    .text(`${data.petBusiness.companyName}`, colThreeXValue, baseYValue)
+    .text(data.petBusiness.user.email, colThreeXValue, baseYValue + lineBreakYValue)
+    .text("+65 " + data.petBusiness.contactNumber, colThreeXValue, baseYValue + 2 * lineBreakYValue)
     .moveDown();
 
   generateHr(doc, 310, true);
@@ -144,6 +207,64 @@ function generateItems(doc, data, removeVoucherCode = false) {
   return yPosition;
 }
 
+function generatePayoutItems(doc, data) {
+  let isFirstPage = true;
+  let baseYValue = 360;
+  let yPosition = baseYValue;
+  let pageItemCount = 0;
+
+  generatePayoutTableHeader(doc, baseYValue)
+
+  const groupedOrderItems = {};
+  data.orderItems.forEach((item) => {
+    const serviceListingId = item.serviceListingId;
+
+    if (!groupedOrderItems[serviceListingId]) {
+      groupedOrderItems[serviceListingId] = [];
+    }
+
+    groupedOrderItems[serviceListingId].push(item);
+  });
+
+  let i = 0
+  for (const serviceListingId in groupedOrderItems) {
+    if (groupedOrderItems.hasOwnProperty(serviceListingId)) {
+      yPosition += 30;
+      pageItemCount++;
+
+      if (
+        (isFirstPage && pageItemCount > FIRST_PAGE_MAX_ITEMS) ||
+        (!isFirstPage && pageItemCount > SUBSEQUENT_PAGE_MAX_ITEMS)
+      ) {
+        generateFooter(doc, "~~continues on the next page~~");
+        doc.addPage();
+        generatePayoutTableHeader(doc, PAGE_MARGIN);
+        yPosition = PAGE_MARGIN + 30;
+        pageItemCount = 1;
+        isFirstPage = false;
+      }
+      
+      const orderItems = groupedOrderItems[serviceListingId];
+      const serviceListingName = orderItems[0].itemName; // Assuming all items in a group have the same name
+      const itemPrice = orderItems[0].itemPrice; // Assuming all items in a group have the same price
+      const quantity = orderItems.length;
+  
+      generatePayoutTableRow(
+        doc,
+        yPosition,
+        i + 1,
+        serviceListingName,
+        quantity,
+        formatCurrency(itemPrice),
+        formatCurrency(itemPrice * quantity)
+      );
+      generateHr(doc, yPosition + 20);
+      i++;
+    }
+  }
+  return yPosition;
+}
+
 function generateTotals(doc, data, yStartPosition) {
   const lineBreakYValue = 20;
 
@@ -171,6 +292,37 @@ function generateTotals(doc, data, yStartPosition) {
     "",
     "Amount Paid",
     formatCurrency(data.totalPrice)
+  );
+  generateHr(doc, yStartPosition + 3 * lineBreakYValue, false, true);
+  generateHr(doc, yStartPosition + 3 * lineBreakYValue + 2, false, true);
+}
+
+function generatePayoutTotals(doc, data, yStartPosition) {
+  const lineBreakYValue = 20;
+  doc.font("Helvetica-Bold");
+  generateTableRow(
+    doc,
+    yStartPosition,
+    "",
+    "",
+    "Subtotal",
+    formatCurrency(data.payoutInvoice.totalAmount)
+  );
+  generateTableRow(
+    doc,
+    yStartPosition + lineBreakYValue,
+    "",
+    "",
+    "Commission Charges",
+    formatCurrency(data.payoutInvoice.commissionCharge)
+  );
+  generateTableRow(
+    doc,
+    yStartPosition + 2 * lineBreakYValue,
+    "",
+    "",
+    "Paid out amount",
+    formatCurrency(data.payoutInvoice.paidOutAmount)
   );
   generateHr(doc, yStartPosition + 3 * lineBreakYValue, false, true);
   generateHr(doc, yStartPosition + 3 * lineBreakYValue + 2, false, true);
@@ -204,9 +356,13 @@ function generatePageNumbers(doc) {
 
 module.exports = {
   invoiceGeneratePethubInfo: generatePethubInfo,
+  invoiceGeneratePetBusinessHeaderInfo: generatePetBusinessHeaderInfo,
   invoiceGeneratePethubImage: generatePethubImage,
   invoiceGenerateCustomerInfo: generateCustomerInfo,
+  invoiceGeneratePetBusinessInfo: generatePetBusinessInfo,
   invoiceGenerateItems: generateItems,
+  invoiceGeneratePayoutItems: generatePayoutItems,
+  invoiceGenerateInvoiceTotals: generatePayoutTotals,
   invoiceGenerateTotals: generateTotals,
   invoiceGenerateFooter: generateFooter,
   invoiceGeneratePageNumbers: generatePageNumbers,
