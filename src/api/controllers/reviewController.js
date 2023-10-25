@@ -2,9 +2,19 @@ const baseValidations = require('../validations/baseValidation')
 const reviewValidation = require('../validations/reviewValidations')
 const reviewService = require('../services/serviceListing/reviewService')
 const s3ServiceInstance = require("../services/s3Service.js");
+const constants = require("../../constants/common");
+const errorMessages = constants.errorMessages;
+const { getUserFromToken } = require("../../utils/nextAuth");
 
 exports.createReview = async (req, res, next) => {
     try {
+
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
         const orderItemId = req.query.orderItemId;
         if (!await baseValidations.isValidInteger(orderItemId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: orderItemId` });
@@ -24,7 +34,7 @@ exports.createReview = async (req, res, next) => {
             );
         }
 
-        const newReview = await reviewService.createReview(reviewPayload, orderItemId)
+        const newReview = await reviewService.createReview(reviewPayload, orderItemId, callee)
         res.status(201).json(newReview)
     } catch (error) {
         next(error)
@@ -33,6 +43,13 @@ exports.createReview = async (req, res, next) => {
 
 exports.updateReview = async (req, res, next) => {
     try {
+
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
         const reviewId = req.params.id;
         if (!await baseValidations.isValidInteger(reviewId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
@@ -53,7 +70,7 @@ exports.updateReview = async (req, res, next) => {
             );
         }
 
-        const updatedReview = await reviewService.updateReview(reviewPayload, Number(reviewId))
+        const updatedReview = await reviewService.updateReview(reviewPayload, Number(reviewId), callee)
         res.status(200).json(updatedReview)
     } catch(error) {
         next(error)
@@ -62,12 +79,19 @@ exports.updateReview = async (req, res, next) => {
 
 exports.deleteReview = async (req, res, next) => {
     try {
+
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
         const reviewId = req.params.id;
         if (!await baseValidations.isValidInteger(reviewId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
         }
 
-        await reviewService.deleteReview(Number(reviewId))
+        await reviewService.deleteReview(Number(reviewId), callee)
         res.status(200).json("Review Successfully deleted")
     } catch(error) {
         next(error);
@@ -76,12 +100,19 @@ exports.deleteReview = async (req, res, next) => {
 
 exports.hideReview = async (req, res, next) => {
     try {
+
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
         const reviewId = req.params.id;
         if (!await baseValidations.isValidInteger(reviewId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
         }
 
-        const review = await reviewService.hideReview(Number(reviewId))
+        const review = await reviewService.hideReview(Number(reviewId), callee)
         res.status(200).json(review)
     } catch(error) {
         next(error)
@@ -90,12 +121,19 @@ exports.hideReview = async (req, res, next) => {
 
 exports.showReview = async (req, res, next) => {
     try {
+
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
         const reviewId = req.params.id;
         if (!await baseValidations.isValidInteger(reviewId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
         }
 
-        const review = await reviewService.showReview(Number(reviewId))
+        const review = await reviewService.showReview(Number(reviewId), callee)
         res.status(200).json(review)
     } catch(error) {
         next(error)
@@ -104,6 +142,13 @@ exports.showReview = async (req, res, next) => {
 
 exports.replyReview = async (req, res, next) => {
     try {
+
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
         const reviewId = req.params.id;
         if (!await baseValidations.isValidInteger(reviewId)) {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
@@ -116,7 +161,7 @@ exports.replyReview = async (req, res, next) => {
             return;
         }
 
-        const review = await reviewService.replyReview(Number(reviewId), replyPayload)
+        const review = await reviewService.replyReview(Number(reviewId), replyPayload, callee)
         res.status(200).json(review)
     } catch(error) {
         next(error)

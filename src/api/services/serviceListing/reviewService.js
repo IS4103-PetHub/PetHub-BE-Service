@@ -7,12 +7,22 @@ const s3ServiceInstance = require("../s3Service");
 
 class ReviewService {
 
-    async createReview(payload, orderItemId) {
+    async createReview(payload, orderItemId, callee) {
         try {
 
             const orderItem = await orderItemService.getOrderItemById(Number(orderItemId));
             if (orderItem.review) {
                 throw new CustomError("orderItem already has a review", 400)
+            }
+            if (callee.userId != orderItem.invoice.PetOwner.userId) {
+                throw new CustomError("Review can only be created by orderItem Owner", 400)
+            }
+            if (!orderItem.dateFulfilled) {
+                throw new CustomError("Review can only be created after order is fulfilled", 400)
+            }
+            const dateCreated = new Date(orderItem.dateFulfilled)
+            if (dateCreated > new Date().setDate(dateCreated + 15)) {
+                throw new CustomError("Unable to create review after 15 days since order fulfilled", 400)
             }
             const serviceListingId = orderItem.serviceListingId;
             const serviceListing = await serviceListingService.getServiceListingById(serviceListingId)
@@ -57,10 +67,17 @@ class ReviewService {
         }
     }
 
-    async updateReview(payload, reviewId) {
+    async updateReview(payload, reviewId, callee) {
         try {
 
             const reviewToUpdate = await this.getReviewById(reviewId)
+            if (callee.userId != reviewToUpdate.orderItem.invoice.petOwnerUserId) {
+                throw new CustomError("Review can only be updated by orderItem Owner", 400)
+            }
+            const dateCreated = new Date(reviewToUpdate.dateCreated)
+            if (dateCreated > new Date().setDate(dateCreated + 15)) {
+                throw new CustomError("Unable to update review after 15 days since review is created", 400)
+            }
             const newRating = ((reviewToUpdate.serviceListing.overallRating * reviewToUpdate.serviceListing.reviews.length) - reviewToUpdate.rating + Number(payload.rating)) / (reviewToUpdate.serviceListing.reviews.length)
 
             const updateReview = await prisma.review.update({
@@ -87,10 +104,17 @@ class ReviewService {
         }
     }
 
-    async deleteReview(reviewId) {
+    async deleteReview(reviewId, callee) {
         try {
 
             const reviewToDelete = await this.getReviewById(reviewId)
+            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId) {
+                throw new CustomError("Review can only be deleted by orderItem Owner", 400)
+            }
+            const dateCreated = new Date(reviewToDelete.dateCreated)
+            if (dateCreated > new Date().setDate(dateCreated + 15)) {
+                throw new CustomError("Unable to delete review after 15 days since review is created", 400)
+            }
             // update the overall rating
             const newRating = reviewToDelete.serviceListing.reviews.length == 1
                 ? 0
@@ -122,7 +146,11 @@ class ReviewService {
                             reviews: true
                         }
                     },
-                    orderItem: true
+                    orderItem: {
+                        include: {
+                            invoice: true
+                        }
+                    }
                 }
             });
             if (!review) throw new CustomError("Review Record not found", 404)
@@ -133,8 +161,11 @@ class ReviewService {
         }
     }
 
-    async hideReview(reviewId) {
+    async hideReview(reviewId, callee) {
         try {
+            if (callee.accountType != "INTERNAL_USER") {
+                throw new CustomError("Only admin can hide a review", 400)
+            }
             const reviewToHide = await this.getReviewById(reviewId)
             const updatedReview = await prisma.review.update({
                 where: { reviewId: reviewId },
@@ -149,8 +180,13 @@ class ReviewService {
         }
     }
 
-    async showReview(reviewId) {
+    async showReview(reviewId, callee) {
         try {
+
+            if (callee.accountType != "INTERNAL_USER") {
+                throw new CustomError("Only admin can hide a review", 400)
+            }
+
             const reviewToHide = await this.getReviewById(reviewId)
             const updatedReview = await prisma.review.update({
                 where: { reviewId: reviewId },
@@ -165,9 +201,12 @@ class ReviewService {
         }
     }
 
-    async replyReview(reviewId, payload) {
+    async replyReview(reviewId, payload, callee) {
         try {
-            const reviewToHide = await this.getReviewById(reviewId)
+            const reviewToReply = await this.getReviewById(reviewId)
+            if (callee.userId != reviewToReply.serviceListing.petBusinessId) {
+                throw new CustomError("Review can only be replied by petBusiness", 400)
+            }
             const updatedReview = await prisma.review.update({
                 where: { reviewId: reviewId },
                 data: {
