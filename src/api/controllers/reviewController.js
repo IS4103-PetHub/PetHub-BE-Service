@@ -153,7 +153,7 @@ exports.getAllReviews = async (req, res, next) => {
     }
 }
 
-exports.likedReview = async (req, res, next) => {
+exports.toggleLikedReview = async (req, res, next) => {
     try {
         
         const token = req.headers['authorization'].split(' ')[1];
@@ -167,29 +167,8 @@ exports.likedReview = async (req, res, next) => {
             return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
         }
 
-        const resposne = await reviewService.likedReview(Number(reviewId), callee)
+        const resposne = await reviewService.toggleLikedReview(Number(reviewId), callee)
         res.status(200).json(resposne)
-    } catch(error) {
-        next(error)
-    }
-}
-
-exports.unlikedReview = async (req, res, next) => {
-    try {
-        
-        const token = req.headers['authorization'].split(' ')[1];
-        const callee = await getUserFromToken(token);
-        if (!callee) {
-            return res.status(400).json({ message: "Unable to find request caller!" });
-        }
-
-        const reviewId = req.params.id;
-        if (!await baseValidations.isValidInteger(reviewId)) {
-            return res.status(400).json({ message: `${errorMessages.INVALID_ID}: reviewId` });
-        }
-
-        const response = await reviewService.unlikedReview(Number(reviewId), callee)
-        res.status(200).json(response)
     } catch(error) {
         next(error)
     }

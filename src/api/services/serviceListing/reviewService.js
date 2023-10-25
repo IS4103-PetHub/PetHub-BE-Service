@@ -186,19 +186,35 @@ class ReviewService {
         }
     }
 
-    async likedReview(reviewId, callee) {
+    async toggleLikedReview(reviewId, callee) {
         try {
             const likedReview = await this.getReviewById(reviewId)
-            const updatedReview = await prisma.review.update({
-                where: { reviewId: reviewId },
-                data: {
-                    likedBy: {
-                        connect: {
-                            userId: callee.userId
+            const likedByPetOwner = (likedReview.likedBy.length == 0)
+                ? false
+                : await likedReview.likedBy.find((petOwner) => petOwner.userId == callee.userId);
+            if (likedByPetOwner) {
+                const updatedReview = await prisma.review.update({
+                    where: { reviewId: reviewId },
+                    data: {
+                        likedBy: {
+                            disconnect: {
+                                userId: callee.userId
+                            }
                         }
                     }
-                }
-            })
+                })
+            } else {
+                const updatedReview = await prisma.review.update({
+                    where: { reviewId: reviewId },
+                    data: {
+                        likedBy: {
+                            connect: {
+                                userId: callee.userId,
+                            },
+                        },
+                    },
+                });
+            }
             const updatedReviewWithLikedBy = await prisma.review.findUnique({
                 where: { reviewId: reviewId },
                 include: {
@@ -210,33 +226,6 @@ class ReviewService {
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error)
-        }
-    }
-
-    async unlikedReview(reviewId, callee) {
-        try {
-            const unlikedReview = await this.getReviewById(reviewId);
-            const updatedReview = await prisma.review.update({
-                where: { reviewId: reviewId },
-                data: {
-                    likedBy: {
-                        disconnect: {
-                            userId: callee.userId,
-                        },
-                    },
-                },
-            });
-            const updatedReviewWithLikedBy = await prisma.review.findUnique({
-                where: { reviewId: reviewId },
-                include: {
-                    likedBy: true,
-                },
-            });
-
-            return updatedReviewWithLikedBy;
-        } catch (error) {
-            if (error instanceof CustomError) throw error;
-            throw new ReviewError(error);
         }
     }
 

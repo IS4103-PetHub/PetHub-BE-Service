@@ -27,8 +27,7 @@ function registerReviewRoutes(controller) {
     router.delete(`/:id`, controller.deleteReview)
 
     // PO like and unlike review
-    router.post(`/liked-review/:id`, controller.likedReview)
-    router.post(`/unliked-review/:id`, controller.unlikedReview)
+    router.post(`/toggle-liked-review/:id`, controller.toggleLikedReview)
 
     // PO report review
     router.post(`/report-review/:id`, controller.reportReview)
