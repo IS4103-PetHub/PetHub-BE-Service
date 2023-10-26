@@ -140,14 +140,10 @@ exports.getReviewById = async (req, res, next) => {
     }
 }
 
-exports.getAllReviews = async (req, res, next) => {
+exports.getAllReportedReviews = async (req, res, next) => {
     try {
-        const verifiedFilter = req.query.verifiedFilter;
-        if(verifiedFilter && !(baseValidations.isValidBooleanString(verifiedFilter))) {
-            return res.status(400).json({ message: `${errorMessages.INVALID_BOOL}: verifiedFilter` });
-        }
-
-
+        const response = await reviewService.getAllReportedReviews()
+        res.status(200).json(response)
     } catch(error) {
         next(error)
     }

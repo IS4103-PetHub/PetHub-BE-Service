@@ -12,8 +12,9 @@ const upload = multer({ storage: storage });
 
 function registerReviewRoutes(controller) {
 
+    router.get(`/reported-reviews`, controller.getAllReportedReviews)
     router.get(`/:id`, controller.getReviewById)
-    // router.get(`/`, controller.getAllReviews)
+
     // CREATE NEW REIVEW
     router.post(`/`, upload.array('file'), controller.createReview)
 

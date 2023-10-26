@@ -16,12 +16,12 @@ exports.isCreateReviewPayload = (payload) => {
         comment: Joi.string()
             .trim()
             .min(1)
-            .max(500)
+            .max(2000)
             .required()
             .messages({
                 'string.empty': 'Comment must not be empty.',
                 'string.min': 'Comment must contain at least one character.',
-                'string.max': 'Comment has a maximum of five hundred characters.'
+                'string.max': 'Comment has a maximum of two thousand characters.'
             }),
         rating: Joi.string()
             .valid('1', '2', '3', '4', '5')

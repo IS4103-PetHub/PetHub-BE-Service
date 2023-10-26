@@ -286,6 +286,26 @@ class ReviewService {
         }
     }
 
+    async getAllReportedReviews() {
+        try {
+            const reviews = await prisma.review.findMany({
+                where: {
+                  reportedBy: {
+                    some: {},
+                  },
+                },
+                include: {
+                  reportedBy: true,
+                  serviceListing: true
+                },
+              });
+              return reviews;
+        } catch(error) {
+            if (error instanceof CustomError) throw error;
+            throw new ReviewError(error);
+        }
+    }
+
     async deleteFilesOfAReview(reviewId) {
         try {
             // delete images from S3
