@@ -38,6 +38,10 @@ const permissions = [
     // Order Items
     { code: "WRITE_ORDER_ITEMS", name: "Write Order Items", description: "Permission to write Order Items" },
     { code: "READ_ORDER_ITEMS", name: "Read Order Items", description: "Permission to read Order Items" },
+
+    // Review
+    { code: "WRITE_REPORTED_REVIEWS", name: "Write Reported Reviews", description: "Permission to write Reported Reviews" },
+    { code: "READ_REPORTED_REVIEWS", name: "Read Reported Reviews", description: "Permission to read Reported Reviews" },
 ];
 
 // Root Administrator User Data

@@ -86,5 +86,5 @@ model ReportReview {
   reportedBy              PetOwner @relation(fields: [petOwnerId], references: [userId])
   reportReason            ReviewReportReason
   reviewId                Int
-  review                  Review @relation(fields: [reviewId], references: [reviewId])
+  review                  Review @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
 }

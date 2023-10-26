@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Oct 25 2023 22:54:13 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Thu Oct 26 2023 20:08:04 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -407,7 +407,7 @@ model ReportReview {
   reportedBy     PetOwner           @relation(fields: [petOwnerId], references: [userId])
   reportReason   ReviewReportReason
   reviewId       Int
-  review         Review             @relation(fields: [reviewId], references: [reviewId])
+  review         Review             @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
 }
 
 // models for Role Based Access Control (RBAC)

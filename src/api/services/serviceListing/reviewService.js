@@ -131,6 +131,7 @@ class ReviewService {
             })
 
         } catch (error) {
+            console.log(error)
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error)
         }
@@ -280,7 +281,7 @@ class ReviewService {
                 },
             });
 
-        } catch(error) {
+        } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error);
         }
@@ -290,17 +291,31 @@ class ReviewService {
         try {
             const reviews = await prisma.review.findMany({
                 where: {
-                  reportedBy: {
-                    some: {},
-                  },
+                    reportedBy: {
+                        some: {},
+                    },
                 },
                 include: {
-                  reportedBy: true,
-                  serviceListing: true
-                },
-              });
-              return reviews;
-        } catch(error) {
+                    reportedBy: true,
+                    serviceListing: {
+                        include: {
+                            petBusiness: true
+                        }
+                    },
+                    orderItem: {
+                        include: {
+                            invoice: {
+                                include: {
+                                    PetOwner: true
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            reviews.sort((a, b) => b.reportedBy.length - a.reportedBy.length);
+            return reviews;
+        } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error);
         }
