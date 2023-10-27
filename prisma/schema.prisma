@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Oct 27 2023 20:16:51 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Sat Oct 28 2023 00:42:59 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -388,6 +388,7 @@ model Review {
   title            String
   comment          String
   reply            String?
+  replyDate        DateTime?
   rating           Int
   dateCreated      DateTime       @default(now())
   lastUpdated      DateTime?

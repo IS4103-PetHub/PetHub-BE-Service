@@ -178,7 +178,8 @@ class ReviewService {
             const updatedReview = await prisma.review.update({
                 where: { reviewId: reviewId },
                 data: {
-                    reply: payload.reply
+                    reply: payload.reply,
+                    replyDate: new Date()
                 }
             })
             return updatedReview
