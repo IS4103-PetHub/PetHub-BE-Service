@@ -251,12 +251,17 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
         },
         CalendarGroup: true,
         reviews: {
-          include: {
+          select: {
             orderItem: {
-              include: {
+              select: {
                 invoice: {
-                  include: {
-                    PetOwner: true
+                  select: {
+                    PetOwner: {
+                      select: {
+                        firstName: true,
+                        lastName: true,
+                      }
+                    }
                   }
                 }
               }
