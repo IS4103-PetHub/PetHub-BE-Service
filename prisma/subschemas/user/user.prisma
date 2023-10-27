@@ -59,7 +59,7 @@ model PetOwner {
   petLostAndFound   PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
-  reportRevivew     ReportReview[]
+  reportReview      ReportReview[]
   likedReview       Review[]
 }
 

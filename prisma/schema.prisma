@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Oct 26 2023 20:08:04 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Fri Oct 27 2023 20:16:51 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -501,7 +501,7 @@ model PetOwner {
   petLostAndFound   PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
-  reportRevivew     ReportReview[]
+  reportReview      ReportReview[]
   likedReview       Review[]
 }
 
