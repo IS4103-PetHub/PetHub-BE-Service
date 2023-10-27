@@ -251,7 +251,7 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
         },
         CalendarGroup: true,
         reviews: {
-          select: {
+          include: {
             orderItem: {
               select: {
                 invoice: {
