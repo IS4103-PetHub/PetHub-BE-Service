@@ -1,12 +1,12 @@
 const prisma = require("../../../../prisma/prisma");
-const { getPreviousWeekDatesFromToday } = require("../../../utils/date");
+const { getPreviousWeekDatesFromToday, getPreviousWeekDates } = require("../../../utils/date");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
 const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
-const { getHottestListingsInATimePeriod, createFeaturedListingSetForTimePeriod } = require("./featuredServiceListing");
+const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, } = require("./featuredServiceListing");
 
 
 exports.createServiceListing = async (data) => {
@@ -236,8 +236,13 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
         tags: true,
         addresses: true,
         petBusiness: {
-          include: {
-            user: true,
+          select: {
+            companyName: true,
+            user: {
+              select: {
+                accountStatus: true,
+              },
+            },
             commissionRule: showCommissionRule
           },
         },
@@ -431,12 +436,12 @@ exports.getRecommendedListings = async (petOwnerId) => {
     }
 
     // If user do not have pets or past orders, recommend popular listings within the past week
-    if (recommendedListings.length < 5) {
+    if (recommendedListings.length < 6) {
       const currentDate = new Date();
       const endDate = new Date(currentDate);
       const startDate = new Date(currentDate);
       startDate.setDate(currentDate.getDate() - 7);
-      const hottestListingsIds = await getHottestListingsInATimePeriod(startDate, endDate, 5);
+      const hottestListingsMap = await getHottestListingsInATimePeriod(startDate, endDate);
       const hottestListings = await prisma.serviceListing.findMany({
         include: {
           tags: true,
@@ -454,7 +459,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
         },
         where: {
           serviceListingId: {
-            in: hottestListingsIds,
+            in:  Array.from(hottestListingsMap.keys()),
           },
         },
       });
@@ -502,7 +507,27 @@ exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6
       validityPeriodEnd: { lte: endDate },
     },
     include: {
-      serviceListings: true, 
+      featuredListings: {
+        include: {
+          serviceListing: {
+            include: {
+              tags: true,
+              addresses: true,
+              petBusiness: {
+                select: {
+                  companyName: true,
+                  user: {
+                    select: {
+                      accountStatus: true,
+                    },
+                  },
+                },
+              },
+              CalendarGroup: true
+            },
+          },
+        },
+      },
     },
   });
 
@@ -516,7 +541,7 @@ exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6
   }
 
   // If no existing sets are found, create new sets
-  const createdSetsMap = await createFeaturedListingSetForTimePeriod(currentDate, startDate, endDate, numListings);
+  const createdSetsMap = await getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, numListings);
   return createdSetsMap;
 }
 
@@ -547,28 +572,27 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
 
 // UTILITY METHODS
 
-exports.filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
-  const currentDate = new Date();
-  
-  const filteredListings = listings.filter((listing) =>
-    listing.petBusiness.user.accountStatus === 'ACTIVE' &&
-    listing.lastPossibleDate >= currentDate &&
-    (!listing.requiresBooking || (listing.calendarGroupId !== null && listing.duration !== null))
-  );
-
-  // Filter based on the INVALID condition:
-  // INVALID if: SL requires booking and (CG == null OR duration == null)
-  const validListings = filteredListings.filter((listing) =>
+exports.filterValidListingsForPetOwners = (listings, categories, tags, limit) => {  
+  const validListings = listings.filter(exports.isServiceListingValid);
+  const filteredListings = validListings.filter((listing) =>
     (categories.length === 0 || categories.includes(listing.category)) &&
     (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag))
   ));
 
   if (limit !== null && limit > 0) {
-    return validListings.slice(0, limit);
+    return filteredListings.slice(0, limit);
   }
 
-  return validListings;
+  return filteredListings;
 };
+
+exports.isServiceListingValid = (listing) => {
+  return (
+    listing.petBusiness.user.accountStatus === 'ACTIVE' &&
+    listing.lastPossibleDate >= new Date() &&
+    (!listing.requiresBooking || (listing.calendarGroupId !== null && listing.duration !== null))
+  );
+}
 
 exports.sendDeleteServiceListingEmail = async (petBusinessName, email, postTitle) => {
   try {

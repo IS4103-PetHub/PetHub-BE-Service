@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Thu Oct 26 2023 00:08:46 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Oct 27 2023 07:23:05 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -336,15 +336,14 @@ model ServiceListing {
   // tags that a service listing has (implicit many-to-many relationship)
   tags             Tag[]
   addresses        Address[]
-  petBusiness      PetBusiness          @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusiness      PetBusiness       @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   petBusinessId    Int
   favouritedUsers  PetOwner[]
-  featuredListings FeaturedListingSet[]
-
-  calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
-  Booking         Booking[]
-  OrderItem       OrderItem[]
+  calendarGroupId  Int?
+  CalendarGroup    CalendarGroup?    @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  Booking          Booking[]
+  OrderItem        OrderItem[]
+  FeaturedListings FeaturedListing[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -364,7 +363,18 @@ model FeaturedListingSet {
   category            FeaturedListingCategoryEnum
   validityPeriodStart DateTime?
   validityPeriodEnd   DateTime?
-  serviceListings     ServiceListing[]
+  featuredListings    FeaturedListing[]
+}
+
+model FeaturedListing {
+  id          Int    @id @default(autoincrement())
+  description String
+
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  serviceListingId Int
+
+  featuredListingSet   FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
+  featuredListingSetId Int
 }
 
 // models for Role Based Access Control (RBAC)

@@ -3,11 +3,13 @@ const prisma = require("../../../../prisma/prisma");
 const { getPreviousWeekDates } = require("../../../utils/date");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
+const { getServiceListingById, isServiceListingValid } = require("./baseServiceListing");
 
 // This method will get the top n service listings ordered between startDate and endDate by quantity
 // Results are ordered by quantity ordered in descending order
 // EG [ 3, 4, 14, 1, 10 ] --> SL with id 3 was purchased the most, and SL with id 10 was purchased the least
-exports.getHottestListingsInATimePeriod = async (startDate, endDate, n) => {
+// Returns a map of serviceListingId --> description, EG. { 1 => '5 listings sold last week!',  14 => '4 listings sold last week!' }
+exports.getHottestListingsInATimePeriod = async (startDate, endDate) => {
   try {
     const invoices = await prisma.invoice.findMany({
       where: {
@@ -41,12 +43,15 @@ exports.getHottestListingsInATimePeriod = async (startDate, endDate, n) => {
     const sortedServiceListingsIds = Array.from(orderCountMap.entries()).sort(
       (a, b) => b[1] - a[1]
     );
-    // Select the top n service listings with the highest order count and extract the service listing IDs
-    const nHottestListingsIds = sortedServiceListingsIds
-      .slice(0, n)
-      .map((entry) => entry[0]);
 
-    return nHottestListingsIds;
+    // map service listing IDs to descriptions
+    const hottestListingsWithDescriptions = new Map();
+    sortedServiceListingsIds.forEach(([serviceListingId, orderCount]) => {
+      const description = `${orderCount} listings sold last week!`;
+      hottestListingsWithDescriptions.set(serviceListingId, description);
+    });
+
+    return hottestListingsWithDescriptions; 
 
   } catch (error) {
     console.error("Error fetching hottest service listings in a specified time period:", error);
@@ -66,19 +71,28 @@ exports.getExpiringListingsInATimePeriod = async (currentDate, endDate) => {
       },
       select: {
         serviceListingId: true, 
+        lastPossibleDate: true,
       },
     });
 
-    const expiringListingIds = expiringListings.map((listing) => listing.serviceListingId);
-    return expiringListingIds;
+    // Create a map of listingId to description
+    const listingsWithDescriptions = new Map();
+    expiringListings.forEach((listing) => {
+      const serviceListingId = listing.serviceListingId;
+      const lastPossibleDate = listing.lastPossibleDate.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+      const description = `Hurry! Expiring ${lastPossibleDate}!`;
+      listingsWithDescriptions.set(serviceListingId, description);
+    });
+
+    return listingsWithDescriptions;
   } catch (error) {
     console.error("Error fetching expiring service listings in a specified time period:", error);
     throw new ServiceListingError(error);
   }
 };
 
-// This method will get the top n service listings that have been favourited by the most users
-exports.getTopFavoritedListings = async (n) => {
+// This method will get the top service listings that have been favourited by the most users
+exports.getTopFavoritedListings = async () => {
   try {
     // Query all pet owners along with their favorite listings and associated users
     const petOwners = await prisma.petOwner.findMany({
@@ -112,12 +126,14 @@ exports.getTopFavoritedListings = async (n) => {
       (a, b) => b[1] - a[1]
     );
 
-    // Select the top `n` listings with the highest favoriting count and extract the IDs
-    const topFavoritedListingIds = sortedListings
-      .slice(0, n)
-      .map((entry) => entry[0]);
+    // Map listing IDs to descriptions
+    const topFavoritedListingsWithDescriptions = new Map();
+    sortedListings.forEach(([listingId, favoritedCount]) => {
+      const description = `Favourited by ${favoritedCount} users!`;
+      topFavoritedListingsWithDescriptions.set(listingId, description);
+    });
 
-    return topFavoritedListingIds;
+    return topFavoritedListingsWithDescriptions;
 
   } catch (error) {
     console.error("Error fetching top favorited service listings:", error);
@@ -126,7 +142,7 @@ exports.getTopFavoritedListings = async (n) => {
 };
 
 // This method will get the top n service listings that have been created between startDate and endDate, that already have users favouriting or purchasing it
-exports.getRisingNewListings = async (startDate, endDate, n) => {
+exports.getRisingNewListings = async (startDate, endDate) => {
     try {
       // Query favorited listings of pet owners and apply date filtering
       const favoritedListings = await prisma.petOwner.findMany({
@@ -179,24 +195,15 @@ exports.getRisingNewListings = async (startDate, endDate, n) => {
       const sortedListings = Array.from(listingCountMap.entries()).sort(
         (a, b) => b[1] - a[1]
       );
-  
-      // Select the top N most promising new listings and extract the IDs
-      let topListingIds = sortedListings.slice(0, n).map((entry) => entry[0]);
-  
-      // Query the actual service listings based on the IDs
-      const risingListings = await prisma.serviceListing.findMany({
-        where: {
-          serviceListingId: {
-            in: topListingIds,
-          },
-          dateCreated: {
-            gte: startDate,
-            lte: endDate,
-        },
-        },
+
+      // Create a map of listingId to description
+      const risingListingsWithDescriptions = new Map();
+      sortedListings.forEach(([listingId, count]) => {
+        const description = `Favorited or bought ${count} times!`;
+        risingListingsWithDescriptions.set(listingId, description);
       });
-      topListingIds = risingListings.map((listing) => listing.serviceListingId);
-      return topListingIds;
+
+      return risingListingsWithDescriptions;
 
     } catch (error) {
       console.error("Error fetching most promising new listings:", error);
@@ -204,7 +211,7 @@ exports.getRisingNewListings = async (startDate, endDate, n) => {
     }
 };
 
-exports.createFeaturedListingSetForTimePeriod = async (currentDate, startDate, endDate, n) => {
+exports.getFeaturedListingsForTimePeriod = async (currentDate, startDate, endDate, n) => {
   try {
     const { lastWeekStart, lastWeekEnd } = getPreviousWeekDates(startDate, endDate);
     const categories = [
@@ -215,25 +222,25 @@ exports.createFeaturedListingSetForTimePeriod = async (currentDate, startDate, e
     ];
     const createdFeaturedListingSetMap = {};
     for (const category of categories) {
-      let listings = [];
+      let listingIdToDescriptionMap = [];
 
       switch (category) {
         case FeaturedListingCategoryEnum.HOTTEST_LISTINGS:
-          listings = await exports.getHottestListingsInATimePeriod(lastWeekStart, lastWeekEnd, n);
+          listingIdToDescriptionMap = await exports.getHottestListingsInATimePeriod(lastWeekStart, lastWeekEnd);
           break;
         case FeaturedListingCategoryEnum.ALMOST_GONE:
-          listings = await exports.getExpiringListingsInATimePeriod(currentDate, endDate, n);
+          listingIdToDescriptionMap = await exports.getExpiringListingsInATimePeriod(currentDate, endDate);
           break;
         case FeaturedListingCategoryEnum.ALL_TIME_FAVS:
-          listings = await exports.getTopFavoritedListings(n);
+          listingIdToDescriptionMap = await exports.getTopFavoritedListings();
           break;
         case FeaturedListingCategoryEnum.RISING_LISTINGS:
-          listings = await exports.getRisingNewListings(lastWeekStart, lastWeekEnd, n);
+          listingIdToDescriptionMap = await exports.getRisingNewListings(lastWeekStart, lastWeekEnd);
           break;
         default:
           break;
       }
-      createdFeaturedListingSetMap[category] = await exports.createFeaturedListing(category, startDate, endDate, listings);
+      createdFeaturedListingSetMap[category] = await exports.createFeaturedListingSet(category, startDate, endDate, listingIdToDescriptionMap, n);
     }
 
     console.log('Featured Listing Sets created successfully');
@@ -245,28 +252,61 @@ exports.createFeaturedListingSetForTimePeriod = async (currentDate, startDate, e
   }
 };
 
-exports.createFeaturedListing = async (category, startDate, endDate, serviceListingIds) => {
+exports.createFeaturedListingSet = async (category, startDate, endDate, listingIdToDescriptionMap, n) => {
   try {
-    const listings = await prisma.serviceListing.findMany({
-      where: {
-        serviceListingId: { in: serviceListingIds },
-      },
-    });
-
-    const featuredListing = await prisma.featuredListingSet.create({
+    // Create the FeaturedListingSet
+    let featuredListingSet = await prisma.featuredListingSet.create({
       data: {
         category: category,
         validityPeriodStart: startDate,
         validityPeriodEnd: endDate,
-        serviceListings: {
-          connect: listings.map((serviceListing) => ({ serviceListingId: serviceListing.serviceListingId })),
+      }
+    });
+
+    // Slice to get top n (listingIdToDescriptionMap is already sorted)
+    const sortedMap = Array.from(listingIdToDescriptionMap.entries()).slice(0, n);
+
+    // Create FeaturedListing entities
+    for (const [serviceListingId, description] of sortedMap) {
+      await prisma.featuredListing.create({
+        data: {
+          description: description,
+          serviceListing: {
+            connect: {
+              serviceListingId: serviceListingId, 
+            }
+          },
+          featuredListingSet: {
+            connect: {
+              id: featuredListingSet.id, 
+            },
+          },
         },
+      });
+    }
+    featuredListingSet = await prisma.featuredListingSet.findUnique({
+      where: {
+        id: featuredListingSet.id,
       },
       include: {
-        serviceListings: true, 
+        featuredListings: {
+          include: {
+            serviceListing: {
+              include: {
+                tags: true,
+                addresses: true,
+                petBusiness: {
+                  select: {
+                    companyName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
-    return featuredListing;
+    return featuredListingSet;
   } catch (error) {
     console.error(`Error creating featured listing for ${category}:`, error);
     throw new Error(`Error creating featured listing for ${category}`);

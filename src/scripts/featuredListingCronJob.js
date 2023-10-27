@@ -9,7 +9,7 @@ cron.schedule('0 0 * * 0', async () => {
   try {
     const currentDate = new Date();
     const { startDate, endDate } = dateService.getCurrentWeekDates(currentDate);
-    await featuredServiceListingService.createFeaturedListingSetForTimePeriod(currentDate, startDate, endDate, 6);
+    await featuredServiceListingService.getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, 6);
 
     console.log(`Featured Listing Sets created successfully for period between ${startDate} and ${endDate}`);
 } catch (error) {

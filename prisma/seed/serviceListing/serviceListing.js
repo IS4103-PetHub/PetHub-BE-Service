@@ -562,7 +562,8 @@ async function seedBusinessData(prisma) {
   }
 
   for (const data of serviceListings) {
-    const petOwnerIds = generateRandomPetOwnerIds(2, 9, 18); // Generate 2 unique random pet owner IDs from a range of 9 - 18
+    const randomCount = Math.floor(Math.random() * 6) + 1;
+    const petOwnerIds = generateRandomPetOwnerIds(randomCount, 9, 18); // Generate randomCount unique random pet owner IDs from a range of 9 - 18
     const createObject = {
       title: data.title,
       description: data.description,

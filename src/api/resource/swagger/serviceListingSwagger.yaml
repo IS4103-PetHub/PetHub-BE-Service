@@ -466,49 +466,65 @@ paths:
                   category: HOTTEST_LISTINGS
                   validityPeriodStart: '2023-10-15T00:00:00.000Z'
                   validityPeriodEnd: '2023-10-21T00:00:00.000Z'
-                  serviceListings:
-                    - serviceListingId: 1
-                      title: Professional Pet Grooming
-                      description: Professional Pet Grooming offers top-quality pet grooming services for your beloved furry friend.
-                      basePrice: 40
-                    - serviceListingId: 2
-                      title: Dog Training Session
-                      description: Dog Training Session provides expert dog training to teach your pet new tricks.
-                      basePrice: 60
+                  featuredListings:
+                    - id: 112
+                      description: "10 listings sold last week!"
+                      serviceListingId: 14
+                      serviceListing:
+                        serviceListingId: 5
+                        title: "Reliable Pet Sitting Service"
+                        description: "Trustworthy pet sitting services for your beloved pets"
+                        basePrice: 50.5
+                        attachmentKeys: []
+                        attachmentURLs: []
+                        dateCreated: "2023-10-14T16:58:39.323Z"
+                        lastUpdated: null
+                        duration: 60
+                        defaultExpiryDays: 30
+                        lastPossibleDate: "2023-11-21T00:24:23.108Z"
+                        requiresBooking: false
+                        category: "PET_BOARDING"
+                        petBusinessId: 4
+                        calendarGroupId: null
+                        tags:
+                          - tagId: 1
+                            name: "Free"
+                            dateCreated: "2023-10-27T00:24:30.075Z"
+                          - tagId: 2
+                            name: "Not Free"
+                            dateCreated: "2023-10-27T00:24:30.085Z"
+                        addresses:
+                          - addressId: 6
+                            addressName: "Cedar Heights"
+                            line1: "333 Cedar Avenue"
+                            line2: null
+                            postalCode: "13579"
+                            petBusinessId: 4
+                            petBusinessApplicationId: null
+                        petBusiness:
+                          companyName: "Susan's Animal Store"
+                          user:
+                            accountStatus: "ACTIVE"
+                          commissionRule: null
+                        CalendarGroup: null
                 ALMOST_GONE:
                   id: 6
                   category: ALMOST_GONE
                   validityPeriodStart: '2023-10-15T00:00:00.000Z'
                   validityPeriodEnd: '2023-10-21T00:00:00.000Z'
-                  serviceListings: []
+                  featuredListings: []
                 ALL_TIME_FAVS:
                   id: 7
                   category: ALL_TIME_FAVS
                   validityPeriodStart: '2023-10-15T00:00:00.000Z'
                   validityPeriodEnd: '2023-10-21T00:00:00.000Z'
-                  serviceListings:
-                    - serviceListingId: 2
-                      title: Dog Training Session
-                      description: Dog Training Session provides expert dog training to teach your pet new tricks.
-                      basePrice: 60
-                    - serviceListingId: 3
-                      title: Normal grooming waterslide experience
-                      description: Treat your pets to a day of grooming by regular groomers!
-                      basePrice: 80
+                  featuredListings: []
                 RISING_LISTINGS:
                   id: 8
                   category: RISING_LISTINGS
                   validityPeriodStart: '2023-10-15T00:00:00.000Z'
                   validityPeriodEnd: '2023-10-21T00:00:00.000Z'
-                  serviceListings:
-                    - serviceListingId: 4
-                      title: Routine Pet Health Checkup
-                      description: Ensure your pet's well-being with our thorough health checkup.
-                      basePrice: 75
-                    - serviceListingId: 5
-                      title: Reliable Pet Sitting Service
-                      description: Trustworthy pet sitting services for your beloved pets.
-                      basePrice: 50.5
+                  featuredListings: []
       tags:
         - Service Listing
   
