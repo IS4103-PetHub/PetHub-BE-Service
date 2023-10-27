@@ -4,6 +4,7 @@ const ReviewError = require('../../errors/reviewError')
 const orderItemService = require("../finance/orderItemService");
 const serviceListingService = require("../serviceListing/baseServiceListing")
 const s3ServiceInstance = require("../s3Service");
+const service = require('studio/src/service');
 
 class ReviewService {
 
@@ -320,6 +321,54 @@ class ReviewService {
             throw new ReviewError(error);
         }
     }
+
+    async getLikedAndReportedReview(serviceListingId, callee) {
+        if (callee.accountType != "PET_OWNER") {
+            throw new CustomError("You don't have permission to get the list of liked and reported review.", 400);
+        }
+    
+        const likedList = await prisma.serviceListing.findUnique({
+            where: { serviceListingId },
+            select: {
+                reviews: {
+                    where: {
+                        likedBy: {
+                            some: {
+                                userId: {
+                                    equals: callee.userId
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const reportedList = await prisma.serviceListing.findUnique({
+            where: { serviceListingId },
+            select: {
+                reviews: {
+                    where: {
+                        reportedBy: {
+                            some: {
+                                petOwnerId: callee.userId
+                            }
+                        }
+                    },
+                }
+            }
+        });
+
+        const filteredLikedBy = likedList.reviews.map(review => review.reviewId);
+        const filteredReportedBy = reportedList.reviews.map(review => review.reviewId);
+
+    
+        return {
+            likedBy: filteredLikedBy,
+            reportedBy: filteredReportedBy
+        };
+    }
+    
 
     async deleteFilesOfAReview(reviewId) {
         try {

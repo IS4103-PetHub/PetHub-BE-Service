@@ -35,6 +35,9 @@ function registerReviewRoutes(controller) {
 
     // Admin resolve review
     router.post(`/resolve-review/:id`, controller.resolveReview)
+
+    // PO get liked/reported review of a SL
+    router.get(`/liked-reported/:serviceListingId`, controller.getLikedAndReportedReview)
 }
 
 registerReviewRoutes(reviewController);

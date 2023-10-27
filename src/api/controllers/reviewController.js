@@ -214,3 +214,23 @@ exports.resolveReview = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.getLikedAndReportedReview = async (req, res, next) => {
+    try {
+        const token = req.headers['authorization'].split(' ')[1];
+        const callee = await getUserFromToken(token);
+        if (!callee) {
+            return res.status(400).json({ message: "Unable to find request caller!" });
+        }
+
+        const serviceListingId = req.params.serviceListingId;
+        if (!await baseValidations.isValidInteger(serviceListingId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID}: serviceListingId` });
+        }
+
+        const response = await reviewService.getLikedAndReportedReview(Number(serviceListingId), callee)
+        res.status(200).json(response)
+    } catch(error) {
+        next(error)
+    }
+}
