@@ -223,7 +223,7 @@ class ReviewService {
                 },
             });
 
-            return updatedReviewWithLikedBy;
+            return { liked: likedByPetOwner !== false }; // Done this way as likedByPetOwner above can only be either false or a petOwner object
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ReviewError(error)

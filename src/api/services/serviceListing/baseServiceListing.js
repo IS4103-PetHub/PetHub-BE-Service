@@ -260,6 +260,7 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
                       select: {
                         firstName: true,
                         lastName: true,
+                        reportRevivew: true,
                       }
                     }
                   }
