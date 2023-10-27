@@ -365,8 +365,8 @@ class ReviewService {
 
     
         return {
-            likedBy: filteredLikedBy,
-            reportedBy: filteredReportedBy
+            likesBy: filteredLikedBy,
+            reportsBy: filteredReportedBy
         };
     }
     
