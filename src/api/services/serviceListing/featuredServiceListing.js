@@ -136,7 +136,7 @@ exports.getTopFavoritedListings = async () => {
     return topFavoritedListingsWithDescriptions;
 
   } catch (error) {
-    console.error("Error fetching top favorited service listings:", error);
+    console.error("Error fetching top favourited service listings:", error);
     throw new ServiceListingError(error);
   }
 };
@@ -199,14 +199,14 @@ exports.getRisingNewListings = async (startDate, endDate) => {
       // Create a map of listingId to description
       const risingListingsWithDescriptions = new Map();
       sortedListings.forEach(([listingId, count]) => {
-        const description = `Favorited or bought ${count} times!`;
+        const description = `Favourited or bought ${count} times!`;
         risingListingsWithDescriptions.set(listingId, description);
       });
 
       return risingListingsWithDescriptions;
 
     } catch (error) {
-      console.error("Error fetching most promising new listings:", error);
+      console.error("Error fetching rising listings:", error);
       throw new ServiceListingError(error);
     }
 };
