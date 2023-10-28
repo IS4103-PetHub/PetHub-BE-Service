@@ -25,12 +25,11 @@ model ServiceListing {
   petBusiness      PetBusiness          @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   petBusinessId    Int
   favouritedUsers  PetOwner[]
-  featuredListings FeaturedListingSet[]
-
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  CalendarGroup   CalendarGroup?    @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
+  FeaturedListings FeaturedListing[]
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -46,9 +45,20 @@ model Tag {
 }
 
 model FeaturedListingSet {
-  id                  Int                         @id @default(autoincrement())
-  category            FeaturedListingCategoryEnum
-  validityPeriodStart DateTime?
-  validityPeriodEnd   DateTime?
-  serviceListings     ServiceListing[]
+  id                             Int                         @id @default(autoincrement())
+  category                       FeaturedListingCategoryEnum
+  validityPeriodStart            DateTime?
+  validityPeriodEnd              DateTime?
+  featuredListings               FeaturedListing[]
+}
+
+model FeaturedListing {
+  id                             Int                @id @default(autoincrement())
+  description                    String
+
+  serviceListing                 ServiceListing     @relation(fields: [serviceListingId], references: [serviceListingId])
+  serviceListingId               Int
+
+  featuredListingSet             FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
+  featuredListingSetId           Int
 }

@@ -1,17 +1,3 @@
-// Function to calculate the 1 week validity period 
-// currentDate is a sunday. 
-// startDate should be Sunday 00:00:00 -> Day 0
-// endDate should be Saturday 23:59:59 -> Day 6
-function getCurrentWeekDates(currentDate) {
-  const startDate = new Date(currentDate);
-  startDate.setHours(0, 0, 0, 0);
-
-  const endDate = new Date(currentDate);
-  endDate.setDate(endDate.getDate() + 6);
-  endDate.setHours(23, 59, 59, 999);
-
-  return { startDate, endDate };
-}
 
 // Function to calculate the prev dates 1 week before
 // startDate is Sunday 00:00:00 -> Day 7, endDate is 23:59:59 -> Day 13
@@ -28,28 +14,43 @@ function getPreviousWeekDates(startDate, endDate) {
   return { lastWeekStart, lastWeekEnd };
 }
 
-// Function to get a random date between the current date and a date 3 weeks ago
+// Function to calculate this week's start and end date
+// If today is 25th Oct (Wed), this function should return thisWeekStart (Sunday 22nd, midnight) and thisWeekEnd (Saturday 28th, 2359) 
+function getCurrentWeekStartAndEndDatesFromToday(today) {
+  const thisWeekStart = new Date(today);
+  thisWeekStart.setDate(today.getDate() - (today.getDay() + 7) % 7); // Set to this Sunday
+
+  const thisWeekEnd = new Date(today);
+  thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Set to this Saturday
+
+  thisWeekStart.setHours(0, 0, 0, 0);
+  thisWeekEnd.setHours(23, 59, 59, 999);
+
+  return { thisWeekStart, thisWeekEnd };
+}
+
+// Function to get a random date between the current date and a date 2 weeks ago
 function getRandomPastDate(currentDate) {
   const threeWeeksAgo = new Date(currentDate);
-  threeWeeksAgo.setDate(currentDate.getDate() - 21);
+  threeWeeksAgo.setDate(currentDate.getDate() - 14);
   const randomTimestamp = threeWeeksAgo.getTime() + Math.random() * (currentDate.getTime() - threeWeeksAgo.getTime());
   const randomPastDate = new Date(randomTimestamp);
 
   return randomPastDate;
 }
 
-// Function to get a random future date, between 6-12 weeks from the current date
+// Function to get a random future date, between 0-4 weeks from the current date
 function getRandomFutureDate(currentDate) {
 const randomFutureDate = new Date(currentDate);
-  const daysToAdd = Math.floor(Math.random() * 42) + 42; // Random value between 42 and 84 (6 to 12 weeks)
+  const daysToAdd = Math.floor(Math.random() * 28); // Random value between 0 - 4 weeks
   randomFutureDate.setDate(currentDate.getDate() + daysToAdd);
 
   return randomFutureDate;
 }
 
 module.exports = {
-getCurrentWeekDates,
 getPreviousWeekDates,
   getRandomPastDate,
   getRandomFutureDate,
+  getCurrentWeekStartAndEndDatesFromToday,
 };

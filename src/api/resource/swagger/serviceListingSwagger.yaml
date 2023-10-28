@@ -436,6 +436,98 @@ paths:
       tags:
         - Service Listing
 
+  /api/service-listings/get-featured-listings:
+    get:
+      summary: Get featured service listings
+      description: Retrieve featured service listings for a specific time period.
+      parameters:
+        - in: query
+          name: startDate
+          description: The start date of the featured listings period (optional).
+          schema:
+            type: string
+            format: date
+            example: '2023-10-15'
+        - in: query
+          name: endDate
+          description: The end date of the featured listings period (optional).
+          schema:
+            type: string
+            format: date
+            example: '2023-10-21'
+      responses:
+        200:
+          description: An object containing featured service listings for different categories.
+          content:
+            application/json:
+              example: 
+                HOTTEST_LISTINGS:
+                  id: 5
+                  category: HOTTEST_LISTINGS
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  featuredListings:
+                    - id: 112
+                      description: "10 listings sold last week!"
+                      serviceListingId: 14
+                      serviceListing:
+                        serviceListingId: 5
+                        title: "Reliable Pet Sitting Service"
+                        description: "Trustworthy pet sitting services for your beloved pets"
+                        basePrice: 50.5
+                        attachmentKeys: []
+                        attachmentURLs: []
+                        dateCreated: "2023-10-14T16:58:39.323Z"
+                        lastUpdated: null
+                        duration: 60
+                        defaultExpiryDays: 30
+                        lastPossibleDate: "2023-11-21T00:24:23.108Z"
+                        requiresBooking: false
+                        category: "PET_BOARDING"
+                        petBusinessId: 4
+                        calendarGroupId: null
+                        tags:
+                          - tagId: 1
+                            name: "Free"
+                            dateCreated: "2023-10-27T00:24:30.075Z"
+                          - tagId: 2
+                            name: "Not Free"
+                            dateCreated: "2023-10-27T00:24:30.085Z"
+                        addresses:
+                          - addressId: 6
+                            addressName: "Cedar Heights"
+                            line1: "333 Cedar Avenue"
+                            line2: null
+                            postalCode: "13579"
+                            petBusinessId: 4
+                            petBusinessApplicationId: null
+                        petBusiness:
+                          companyName: "Susan's Animal Store"
+                          user:
+                            accountStatus: "ACTIVE"
+                          commissionRule: null
+                        CalendarGroup: null
+                ALMOST_GONE:
+                  id: 6
+                  category: ALMOST_GONE
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  featuredListings: []
+                ALL_TIME_FAVS:
+                  id: 7
+                  category: ALL_TIME_FAVS
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  featuredListings: []
+                RISING_LISTINGS:
+                  id: 8
+                  category: RISING_LISTINGS
+                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
+                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  featuredListings: []
+      tags:
+        - Service Listing
+  
   /api/service-listings/active:
     get:
       summary: Get all service listings available for pet owners. Fill in query params to filter accordingly.

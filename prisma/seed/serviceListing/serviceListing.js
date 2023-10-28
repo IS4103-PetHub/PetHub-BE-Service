@@ -318,11 +318,161 @@ const serviceListings = [
     basePrice: 40.0,
     requiresBooking: false,
   },
-  
-  // This service listings (id 21-22) have requiresBooking: true but no CG
-  // On the customer side, pet owners should not be able to see these listings as this SL is invalid.
   {
     id: 21,
+    title: "Cat Grooming Paradise",
+    description: "Top-notch grooming services for your beloved cats. Make them feel purr-fect!",
+    petBusinessId: 1,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 35.0,
+    requiresBooking: false,
+  },
+  {
+    id: 22,
+    title: "Pet-Friendly Cafe",
+    description: "Enjoy a cup of coffee while your furry friend socializes with other pets at our cafe.",
+    petBusinessId: 2,
+    category: "DINING",
+    defaultExpiryDays: 30,
+    basePrice: 10.0,
+    requiresBooking: false,
+  },
+  {
+    id: 23,
+    title: "Veterinary Checkup",
+    description: "Routine checkup and healthcare services for your pets by experienced veterinarians.",
+    petBusinessId: 3,
+    category: "VETERINARY",
+    defaultExpiryDays: 30,
+    basePrice: 45.0,
+    requiresBooking: true,
+  },
+  {
+    id: 24,
+    title: "Pet Toys and Accessories",
+    description: "Explore a wide range of toys and accessories for your pets. Keep them entertained and happy.",
+    petBusinessId: 4,
+    category: "PET_RETAIL",
+    defaultExpiryDays: 30,
+    basePrice: 20.0,
+    requiresBooking: false,
+  },
+  {
+    id: 25,
+    title: "Luxury Rabbit Boarding",
+    description: "Luxurious accommodations and personalized care for your rabbits while you're away.",
+    petBusinessId: 5,
+    category: "PET_BOARDING",
+    defaultExpiryDays: 30,
+    basePrice: 50.0,
+    requiresBooking: true,
+  },
+  {
+    id: 26,
+    title: "Terrapin Pampering Package",
+    description: "Indulge your Terrapin with a spa day and grooming session. They'll love it!",
+    petBusinessId: 1,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 40.0,
+    requiresBooking: false,
+  },
+  {
+    id: 27,
+    title: "Pet-Friendly Restaurant",
+    description: "Dine with your pets in our outdoor pet-friendly seating area. A meal for you and your furry companions!",
+    petBusinessId: 2,
+    category: "DINING",
+    defaultExpiryDays: 30,
+    basePrice: 25.0,
+    requiresBooking: false,
+  },
+  {
+    id: 28,
+    title: "Emergency Veterinary Care",
+    description: "24/7 emergency veterinary services to ensure your pet's well-being at all times.",
+    petBusinessId: 3,
+    category: "VETERINARY",
+    defaultExpiryDays: 30,
+    basePrice: 60.0,
+    requiresBooking: true,
+  },
+  {
+    id: 29,
+    title: "Pet Apparel and Fashion",
+    description: "Dress up your pets in the latest pet fashion trends. Find the perfect outfit for every occasion.",
+    petBusinessId: 4,
+    category: "PET_RETAIL",
+    defaultExpiryDays: 30,
+    basePrice: 15.0,
+    requiresBooking: false,
+  },
+  {
+    id: 30,
+    title: "Bird Boarding Services",
+    description: "Safe and comfortable boarding services for your feathered friends while you're on vacation.",
+    petBusinessId: 5,
+    category: "PET_BOARDING",
+    defaultExpiryDays: 30,
+    basePrice: 30.0,
+    requiresBooking: true,
+  },
+  {
+    id: 31,
+    title: "Reptile Grooming",
+    description: "Grooming and spa services tailored to the unique needs of your reptilian pets.",
+    petBusinessId: 1,
+    category: "PET_GROOMING",
+    defaultExpiryDays: 30,
+    basePrice: 35.0,
+    requiresBooking: false,
+  },
+  {
+    id: 32,
+    title: "Pet-Friendly Bistro",
+    description: "A bistro that serves delicious meals for both pet and pet owner. A culinary delight!",
+    petBusinessId: 2,
+    category: "DINING",
+    defaultExpiryDays: 30,
+    basePrice: 20.0,
+    requiresBooking: false,
+  },
+  {
+    id: 33,
+    title: "Holistic Pet Care",
+    description: "Holistic healthcare and wellness services for pets. Nurture their body, mind, and spirit.",
+    petBusinessId: 3,
+    category: "VETERINARY",
+    defaultExpiryDays: 30,
+    basePrice: 45.0,
+    requiresBooking: true,
+  },
+  {
+    id: 34,
+    title: "Pet Photography Studio",
+    description: "Capture the beauty and personality of your pets with our professional pet photography services.",
+    petBusinessId: 4,
+    category: "PET_RETAIL",
+    defaultExpiryDays: 30,
+    basePrice: 30.0,
+    requiresBooking: false,
+  },
+  {
+    id: 35,
+    title: "Pet Training and Obedience",
+    description: "Train your pets to be well-behaved and obedient with our expert pet training services.",
+    petBusinessId: 5,
+    category: "PET_BOARDING",
+    defaultExpiryDays: 30,
+    basePrice: 40.0,
+    requiresBooking: true,
+  },
+  
+  // This service listings (id 36-37) have requiresBooking: true but no CG
+  // On the customer side, pet owners should not be able to see these listings as this SL is invalid.
+  {
+    id: 36,
     title: "Normal grooming fun times",
     description: "Treat your pets to a day of grooming by regular groomers!",
     petBusinessId: 2,
@@ -335,7 +485,7 @@ const serviceListings = [
     defaultExpiryDays: 14,
   },
   {
-    id: 22,
+    id: 37,
     title: "Puppy Training Class",
     description: "Join our fun and interactive puppy training class!",
     petBusinessId: 3,
@@ -347,10 +497,10 @@ const serviceListings = [
     duration: 90,
     requiresBooking: true,
   },
-  // This service listing (id 23) will have a lastPossibleDate to be < currentDate
+  // This service listing (id 38) will have a lastPossibleDate to be < currentDate
   // On the customer side, pet owners should not be able to see these listings as the SL is already invalid.
   {
-    id: 23,
+    id: 38,
     title: "Pet Photography Session",
     description: "Capture beautiful moments with your pets in a professional photoshoot.",
     petBusinessId: 2,
@@ -361,7 +511,7 @@ const serviceListings = [
     addressIds: [],
   },
   {
-    id: 24,
+    id: 39,
     title: "John Dog suppliments",
     description:
       "Elevate your dogs health with Johns premium Dog Supplements We offer a wide range of quality supplements to keep your furry friend in top shape Choose from a variety of options to support your dogs wellbeing Give your dog the care they deserve with our topnotch products.",
@@ -412,6 +562,8 @@ async function seedBusinessData(prisma) {
   }
 
   for (const data of serviceListings) {
+    const randomCount = Math.floor(Math.random() * 6) + 1;
+    const petOwnerIds = generateRandomPetOwnerIds(randomCount, 9, 18); // Generate randomCount unique random pet owner IDs from a range of 9 - 18
     const createObject = {
       title: data.title,
       description: data.description,
@@ -419,8 +571,8 @@ async function seedBusinessData(prisma) {
       category: data.category,
       duration: data.duration,
       requiresBooking: data.requiresBooking,
-      dateCreated: getRandomPastDate(CURRENT_DATE),
-      lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 6-12 weeks from the current date
+      dateCreated: getRandomPastDate(CURRENT_DATE), // get a random date between the current date and a date 2 weeks ago
+      lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 0-4 weeks from the current date
       defaultExpiryDays: data.defaultExpiryDays,
       tags: {
         connect: data.tagIds,
@@ -432,6 +584,9 @@ async function seedBusinessData(prisma) {
         connect: {
           userId: data.petBusinessId,
         },
+      },
+      favouritedUsers: {
+        connect: petOwnerIds.map((ownerId) => ({ userId: ownerId })),
       },
     };
 
@@ -447,7 +602,7 @@ async function seedBusinessData(prisma) {
         createObject.attachmentKeys = vetKey;
         createObject.attachmentURLs = vetUrl;
         break;
-      case 23:
+      case 39:
         createObject.attachmentKeys = sittingKey;
         createObject.attachmentURLs = sittingUrl;
         createObject.lastPossibleDate = pastDate;
@@ -484,5 +639,18 @@ async function remoteImageUrlToFile(url, filename) {
     throw error;
   }
 }
+
+// UTILITY METHODS
+function generateRandomPetOwnerIds(count, min, max) {
+  const randomIds = new Set();
+
+  while (randomIds.size < count) {
+    const randomId = Math.floor(Math.random() * (max - min + 1)) + min;
+    randomIds.add(randomId);
+  }
+
+  return Array.from(randomIds);
+}
+
 
 module.exports = { serviceListings, tags, seedBusinessData };
