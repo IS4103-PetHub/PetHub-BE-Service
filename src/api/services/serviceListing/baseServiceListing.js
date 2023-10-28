@@ -252,6 +252,7 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
         CalendarGroup: true,
         reviews: {
           include: {
+            likedBy: true,
             orderItem: {
               select: {
                 invoice: {
@@ -274,6 +275,15 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
     if (!serviceListing) {
       throw new CustomError("Service listing not found", 404);
     }
+
+    serviceListing.reviews = serviceListing.reviews
+      .map(review => ({
+        ...review,
+        likedByCount: review.likedBy.length, // Count the number of POs who liked the review
+        likedBy: undefined // remove likedBy
+      }))
+      .sort((a, b) => b.dateCreated - a.dateCreated); // Sort reviews by latest first
+
     return serviceListing;
   } catch (error) {
     console.error("Error fetching service listing by ID:", error);
