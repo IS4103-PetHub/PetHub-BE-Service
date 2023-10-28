@@ -8,6 +8,9 @@ const { getUserFromToken } = require("../../utils/nextAuth");
 
 exports.createReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
 
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
@@ -43,6 +46,9 @@ exports.createReview = async (req, res, next) => {
 
 exports.updateReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
 
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
@@ -79,6 +85,9 @@ exports.updateReview = async (req, res, next) => {
 
 exports.deleteReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
 
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
@@ -100,6 +109,9 @@ exports.deleteReview = async (req, res, next) => {
 
 exports.replyReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
 
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
@@ -151,6 +163,9 @@ exports.getAllReportedReviews = async (req, res, next) => {
 
 exports.toggleLikedReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
         
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
@@ -172,6 +187,10 @@ exports.toggleLikedReview = async (req, res, next) => {
 
 exports.reportReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
+
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
         if (!callee) {
@@ -197,6 +216,10 @@ exports.reportReview = async (req, res, next) => {
 
 exports.resolveReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
+
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
         if (!callee) {
@@ -217,6 +240,10 @@ exports.resolveReview = async (req, res, next) => {
 
 exports.getLikedAndReportedReview = async (req, res, next) => {
     try {
+        if (!req.headers["authorization"]) {
+          return res.status(401).json({ message: "You are not logged in" });
+        }
+
         const token = req.headers['authorization'].split(' ')[1];
         const callee = await getUserFromToken(token);
         if (!callee) {
