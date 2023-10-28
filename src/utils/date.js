@@ -1,17 +1,3 @@
-// Function to calculate the 1 week validity period 
-// currentDate is a sunday. 
-// startDate should be Sunday 00:00:00 -> Day 0
-// endDate should be Saturday 23:59:59 -> Day 6
-function getCurrentWeekDates(currentDate) {
-  const startDate = new Date(currentDate);
-  startDate.setHours(0, 0, 0, 0);
-
-  const endDate = new Date(currentDate);
-  endDate.setDate(endDate.getDate() + 6);
-  endDate.setHours(23, 59, 59, 999);
-
-  return { startDate, endDate };
-}
 
 // Function to calculate the prev dates 1 week before
 // startDate is Sunday 00:00:00 -> Day 7, endDate is 23:59:59 -> Day 13
@@ -28,18 +14,19 @@ function getPreviousWeekDates(startDate, endDate) {
   return { lastWeekStart, lastWeekEnd };
 }
 
-function getPreviousWeekDatesFromToday() {
-  const today = new Date(); // Get the current date
-  const lastWeekStart = new Date(today);
-  lastWeekStart.setDate(today.getDate() - (today.getDay() + 7) % 7); // Set to last Sunday
+// Function to calculate this week's start and end date
+// If today is 25th Oct (Wed), this function should return thisWeekStart (Sunday 22nd, midnight) and thisWeekEnd (Saturday 28th, 2359) 
+function getCurrentWeekStartAndEndDatesFromToday(today) {
+  const thisWeekStart = new Date(today);
+  thisWeekStart.setDate(today.getDate() - (today.getDay() + 7) % 7); // Set to this Sunday
 
-  const lastWeekEnd = new Date(lastWeekStart);
-  lastWeekEnd.setDate(lastWeekStart.getDate() + 6); // Set to last Saturday
+  const thisWeekEnd = new Date(today);
+  thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Set to this Saturday
 
-  lastWeekStart.setHours(0, 0, 0, 0);
-  lastWeekEnd.setHours(23, 59, 59, 999);
+  thisWeekStart.setHours(0, 0, 0, 0);
+  thisWeekEnd.setHours(23, 59, 59, 999);
 
-  return { lastWeekStart, lastWeekEnd };
+  return { thisWeekStart, thisWeekEnd };
 }
 
 // Function to get a random date between the current date and a date 2 weeks ago
@@ -62,9 +49,8 @@ const randomFutureDate = new Date(currentDate);
 }
 
 module.exports = {
-getCurrentWeekDates,
 getPreviousWeekDates,
   getRandomPastDate,
   getRandomFutureDate,
-  getPreviousWeekDatesFromToday,
+  getCurrentWeekStartAndEndDatesFromToday,
 };

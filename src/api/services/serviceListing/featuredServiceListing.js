@@ -5,6 +5,168 @@ const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
 const { getServiceListingById, isServiceListingValid } = require("./baseServiceListing");
 
+// This function should return the set of featured listings for a certain time period.
+// For simplicity, lets take startDate and endDate as the validity period of this featuredListings --> These featured listings are valid to be shown from startDate to endDate
+// Start date can be known as day 1, end date can be known as day 7
+exports.getFeaturedListingsForTimePeriod = async (currentDate, startDate, endDate, n) => {
+  try {
+    const { lastWeekStart, lastWeekEnd } = getPreviousWeekDates(startDate, endDate);
+    const categories = [
+      FeaturedListingCategoryEnum.HOTTEST_LISTINGS,
+      FeaturedListingCategoryEnum.ALMOST_GONE,
+      FeaturedListingCategoryEnum.ALL_TIME_FAVS,
+      FeaturedListingCategoryEnum.RISING_LISTINGS,
+    ];
+    const createdFeaturedListingSetMap = {};
+    for (const category of categories) {
+      let listingIdToDescriptionMap = [];
+
+      switch (category) {
+        case FeaturedListingCategoryEnum.HOTTEST_LISTINGS:
+          // Find hottest listings last week --> from day -6 to day 0
+          listingIdToDescriptionMap = await exports.getHottestListingsInATimePeriod(lastWeekStart, lastWeekEnd);
+          break;
+        case FeaturedListingCategoryEnum.ALMOST_GONE:
+          // Find listings that are expiring this week --> from currentDate to day 7
+          listingIdToDescriptionMap = await exports.getExpiringListingsInATimePeriod(currentDate, endDate);
+          break;
+        case FeaturedListingCategoryEnum.ALL_TIME_FAVS:
+          listingIdToDescriptionMap = await exports.getTopFavoritedListings();
+          break;
+        case FeaturedListingCategoryEnum.RISING_LISTINGS:
+          // Find listings that were created and already popular last week --> created last week --> from day -6 to day 0
+          listingIdToDescriptionMap = await exports.getRisingNewListings(lastWeekStart, lastWeekEnd);
+          break;
+        default:
+          break;
+      }
+      createdFeaturedListingSetMap[category] = await exports.createFeaturedListingSet(category, startDate, endDate, listingIdToDescriptionMap, n);
+    }
+
+    console.log('Featured Listing Sets created successfully');
+    return createdFeaturedListingSetMap;
+
+  } catch (error) {
+    console.error('Error creating featured listing sets:', error);
+    throw new CustomError('Error creating featured listing sets');
+  }
+};
+
+exports.createFeaturedListingSet = async (category, startDate, endDate, listingIdToDescriptionMap, n) => {
+  try {
+    // Create the FeaturedListingSet
+    let featuredListingSet = await prisma.featuredListingSet.create({
+      data: {
+        category: category,
+        validityPeriodStart: startDate,
+        validityPeriodEnd: endDate,
+      }
+    });
+
+    // Slice to get top n (listingIdToDescriptionMap is already sorted)
+    const sortedMap = Array.from(listingIdToDescriptionMap.entries()).slice(0, n);
+
+    // Create FeaturedListing entities
+    for (const [serviceListingId, description] of sortedMap) {
+      await prisma.featuredListing.create({
+        data: {
+          description: description,
+          serviceListing: {
+            connect: {
+              serviceListingId: serviceListingId, 
+            }
+          },
+          featuredListingSet: {
+            connect: {
+              id: featuredListingSet.id, 
+            },
+          },
+        },
+      });
+    }
+    featuredListingSet = await prisma.featuredListingSet.findUnique({
+      where: {
+        id: featuredListingSet.id,
+      },
+      include: {
+        featuredListings: {
+          include: {
+            serviceListing: {
+              include: {
+                tags: true,
+                addresses: true,
+                petBusiness: {
+                  select: {
+                    companyName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return featuredListingSet;
+  } catch (error) {
+    console.error(`Error creating featured listing for ${category}:`, error);
+    throw new CustomError(`Error creating featured listing for ${category}`);
+  }
+};
+
+exports.getFeaturedListingSetById = async (featuredListingSetId) => {
+  try {
+    const featuredListingSet = await prisma.featuredListingSet.findUnique({
+      where: { id: featuredListingSetId },
+    });
+
+    return featuredListingSet;
+  } catch (error) {
+    console.error("Error fetching FeaturedListingSet by ID:", error);
+    throw new CustomError("Error fetching FeaturedListingSet by ID");
+  }
+};
+
+exports.getFeaturedListingSetsByDateRange = async (startDate, endDate) => {
+  try {
+    const featuredListingSets = await prisma.featuredListingSet.findMany({
+      where: {
+        validityPeriodStart: { gte: startDate },
+        validityPeriodEnd: { lte: endDate },
+      },
+      include: {
+        featuredListings: {
+          include: {
+            serviceListing: {
+              include: {
+                tags: true,
+                addresses: true,
+                petBusiness: {
+                  select: {
+                    companyName: true,
+                    user: {
+                      select: {
+                        accountStatus: true,
+                      },
+                    },
+                  },
+                },
+                CalendarGroup: true
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return featuredListingSets;
+  } catch (error) {
+    console.error("Error fetching FeaturedListingSets by date range:", error);
+    throw new CustomError("Error fetching FeaturedListingSets by date range");
+  }
+};
+
+// DATA PROCESSING METHODS
+  
 // This method will get the top n service listings ordered between startDate and endDate by quantity
 // Results are ordered by quantity ordered in descending order
 // EG [ 3, 4, 14, 1, 10 ] --> SL with id 3 was purchased the most, and SL with id 10 was purchased the least
@@ -141,7 +303,7 @@ exports.getTopFavoritedListings = async () => {
   }
 };
 
-// This method will get the top n service listings that have been created between startDate and endDate, that already have users favouriting or purchasing it
+// This method will get the top service listings that have been created between startDate and endDate, that already have users favouriting or purchasing it
 exports.getRisingNewListings = async (startDate, endDate) => {
     try {
       // Query favorited listings of pet owners and apply date filtering
@@ -210,140 +372,3 @@ exports.getRisingNewListings = async (startDate, endDate) => {
       throw new ServiceListingError(error);
     }
 };
-
-exports.getFeaturedListingsForTimePeriod = async (currentDate, startDate, endDate, n) => {
-  try {
-    const { lastWeekStart, lastWeekEnd } = getPreviousWeekDates(startDate, endDate);
-    const categories = [
-      FeaturedListingCategoryEnum.HOTTEST_LISTINGS,
-      FeaturedListingCategoryEnum.ALMOST_GONE,
-      FeaturedListingCategoryEnum.ALL_TIME_FAVS,
-      FeaturedListingCategoryEnum.RISING_LISTINGS,
-    ];
-    const createdFeaturedListingSetMap = {};
-    for (const category of categories) {
-      let listingIdToDescriptionMap = [];
-
-      switch (category) {
-        case FeaturedListingCategoryEnum.HOTTEST_LISTINGS:
-          listingIdToDescriptionMap = await exports.getHottestListingsInATimePeriod(lastWeekStart, lastWeekEnd);
-          break;
-        case FeaturedListingCategoryEnum.ALMOST_GONE:
-          listingIdToDescriptionMap = await exports.getExpiringListingsInATimePeriod(currentDate, endDate);
-          break;
-        case FeaturedListingCategoryEnum.ALL_TIME_FAVS:
-          listingIdToDescriptionMap = await exports.getTopFavoritedListings();
-          break;
-        case FeaturedListingCategoryEnum.RISING_LISTINGS:
-          listingIdToDescriptionMap = await exports.getRisingNewListings(lastWeekStart, lastWeekEnd);
-          break;
-        default:
-          break;
-      }
-      createdFeaturedListingSetMap[category] = await exports.createFeaturedListingSet(category, startDate, endDate, listingIdToDescriptionMap, n);
-    }
-
-    console.log('Featured Listing Sets created successfully');
-    return createdFeaturedListingSetMap;
-
-  } catch (error) {
-    console.error('Error creating featured listing sets:', error);
-    throw new Error('Error creating featured listing sets');
-  }
-};
-
-exports.createFeaturedListingSet = async (category, startDate, endDate, listingIdToDescriptionMap, n) => {
-  try {
-    // Create the FeaturedListingSet
-    let featuredListingSet = await prisma.featuredListingSet.create({
-      data: {
-        category: category,
-        validityPeriodStart: startDate,
-        validityPeriodEnd: endDate,
-      }
-    });
-
-    // Slice to get top n (listingIdToDescriptionMap is already sorted)
-    const sortedMap = Array.from(listingIdToDescriptionMap.entries()).slice(0, n);
-
-    // Create FeaturedListing entities
-    for (const [serviceListingId, description] of sortedMap) {
-      await prisma.featuredListing.create({
-        data: {
-          description: description,
-          serviceListing: {
-            connect: {
-              serviceListingId: serviceListingId, 
-            }
-          },
-          featuredListingSet: {
-            connect: {
-              id: featuredListingSet.id, 
-            },
-          },
-        },
-      });
-    }
-    featuredListingSet = await prisma.featuredListingSet.findUnique({
-      where: {
-        id: featuredListingSet.id,
-      },
-      include: {
-        featuredListings: {
-          include: {
-            serviceListing: {
-              include: {
-                tags: true,
-                addresses: true,
-                petBusiness: {
-                  select: {
-                    companyName: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    return featuredListingSet;
-  } catch (error) {
-    console.error(`Error creating featured listing for ${category}:`, error);
-    throw new Error(`Error creating featured listing for ${category}`);
-  }
-};
-
-exports.getFeaturedListingSetById = async (featuredListingSetId) => {
-  try {
-    const featuredListingSet = await prisma.featuredListingSet.findUnique({
-      where: { id: featuredListingSetId },
-    });
-
-    return featuredListingSet;
-  } catch (error) {
-    console.error("Error fetching FeaturedListingSet by ID:", error);
-    throw new Error("Error fetching FeaturedListingSet by ID");
-  }
-};
-
-exports.getFeaturedListingSetsByDateRange = async (startDate, endDate) => {
-  try {
-    const featuredListingSets = await prisma.featuredListingSet.findMany({
-      where: {
-        validityPeriodStart: {
-          gte: startDate,
-        },
-        validityPeriodEnd: {
-          lte: endDate,
-        },
-      },
-    });
-
-    return featuredListingSets;
-  } catch (error) {
-    console.error("Error fetching FeaturedListingSets by date range:", error);
-    throw new Error("Error fetching FeaturedListingSets by date range");
-  }
-};
-  
-  

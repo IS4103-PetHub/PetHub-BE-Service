@@ -1,12 +1,12 @@
 const prisma = require("../../../../prisma/prisma");
-const { getPreviousWeekDatesFromToday, getPreviousWeekDates } = require("../../../utils/date");
+const { getCurrentWeekStartAndEndDatesFromToday } = require("../../../utils/date");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
 const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
-const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, } = require("./featuredServiceListing");
+const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, getFeaturedListingSetsByDateRange, } = require("./featuredServiceListing");
 
 
 exports.createServiceListing = async (data) => {
@@ -491,59 +491,35 @@ exports.getRecommendedListings = async (petOwnerId) => {
 // The featured listing sets for each time period should be created by a weekly cronjob, set to trigger at Sunday midnight every week. When this 
 // However, if it is not created when this method is called, this method will create and return the featured listing sets for this week 
 exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6) => {
-  const currentDate = new Date(); 
-  
-  // If startDate or endDate is not provided, use the previous week's dates
-  if (!startDate || !endDate) {
-    const { lastWeekStart, lastWeekEnd } = getPreviousWeekDatesFromToday();
-    startDate = lastWeekStart;
-    endDate = lastWeekEnd;
-  }
-  
-  // Find existing featured listing sets
-  const existingSets = await prisma.featuredListingSet.findMany({
-    where: {
-      validityPeriodStart: { gte: startDate },
-      validityPeriodEnd: { lte: endDate },
-    },
-    include: {
-      featuredListings: {
-        include: {
-          serviceListing: {
-            include: {
-              tags: true,
-              addresses: true,
-              petBusiness: {
-                select: {
-                  companyName: true,
-                  user: {
-                    select: {
-                      accountStatus: true,
-                    },
-                  },
-                },
-              },
-              CalendarGroup: true
-            },
-          },
-        },
-      },
-    },
-  });
+  try {
+    const currentDate = new Date(); 
+    
+    // If startDate or endDate is not provided, use the previous week's dates
+    if (!startDate || !endDate) {
+      const { thisWeekStart, thisWeekEnd } = getCurrentWeekStartAndEndDatesFromToday(currentDate);
+      startDate = thisWeekStart;
+      endDate = thisWeekEnd;
+    }
 
-  // If existing sets are found, return them as a map
-  if (existingSets.length > 0) {
-    const existingSetsMap = {};
-    existingSets.forEach((set) => {
-      existingSetsMap[set.category] = set; // Use the category as the key
-    });
-    return existingSetsMap;
-  }
+    const existingSets = await getFeaturedListingSetsByDateRange(startDate, endDate);
 
-  // If no existing sets are found, create new sets
-  const createdSetsMap = await getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, numListings);
-  return createdSetsMap;
-}
+    // If existing sets are found, return them as a map
+    if (existingSets.length > 0) {
+      const existingSetsMap = {};
+      existingSets.forEach((set) => {
+        existingSetsMap[set.category] = set; // Use the category as the key
+      });
+      return existingSetsMap;
+    }
+
+    // If no existing sets are found, create and return new sets
+    const createdSetsMap = await getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, numListings);
+    return createdSetsMap;
+  } catch (error) {
+    console.error("Error getting featured listings:", error);
+    throw new CustomError(error);
+  }
+};
 
 exports.deleteServiceListing = async (serviceListingId, callee) => {
   // TODO: Add logic to check for existing unfulfilled orders when order management is done
