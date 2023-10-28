@@ -7,17 +7,71 @@ const constants = require("../../../constants/transactions");
 const s3ServiceInstance = require("../s3Service.js");
 const {
   invoiceGeneratePethubInfo,
+  invoiceGeneratePetBusinessHeaderInfo,
+  invoiceGeneratePetBusinessInfo,
   invoiceGeneratePethubImage,
   invoiceGenerateCustomerInfo,
   invoiceGenerateItems,
+  invoiceGeneratePayoutItems,
   invoiceGenerateTotals,
+  invoiceGenerateInvoiceTotals,
   invoiceGenerateFooter,
   invoiceGeneratePageNumbers,
 } = require("./invoice/invoice.js");
 const { pet } = require("../../../../prisma/prisma");
+const petBusinessService = require("../user/petBusinessService");
 
 class ReportService {
   constructor() { }
+
+  async generatePayoutInvoice(payoutInvoice, orderItems) {
+    try {
+
+      let data = {};
+      const petBusiness = await petBusinessService.getUserById(payoutInvoice.userId)
+      
+      data.orderItems = JSON.parse(JSON.stringify(orderItems))
+      data.payoutInvoice = JSON.parse(JSON.stringify(payoutInvoice))
+      data.petBusiness = petBusiness
+
+      let doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true })
+      // header
+      invoiceGeneratePetBusinessHeaderInfo(doc, payoutInvoice.paymentId, data);
+      invoiceGeneratePethubImage(doc);
+
+      // order summary
+      invoiceGeneratePetBusinessInfo(doc, data);
+
+      // main content
+      let yEndPosition = invoiceGeneratePayoutItems(doc, data);
+      invoiceGenerateInvoiceTotals(doc, data, yEndPosition + 40);
+
+      // footer
+      invoiceGenerateFooter(
+        doc,
+        "Thank you for choosing PetHub. PetHub is committed to ensuring the best for your furry, feathery, or scaly family member. Here's to many more happy moments together. Stay pawsome!"
+      );
+      invoiceGeneratePageNumbers(doc);
+      // Uncomment to pipe to a file on local for testing
+      // doc.end();
+      // doc.pipe(fs.createWriteStream(`IN-${payoutInvoice.paymentId}.pdf`));
+
+      // Attempt s3 upload and returns the attachment key and URL from the uploaded file
+      return this.uploadReportToS3(
+        [
+          {
+            originalname: `IN-${payoutInvoice.paymentId}.pdf`,
+            buffer: await this.docToBuffer(doc),
+          },
+        ],
+        "invoices"
+      );
+
+    } catch(error) {
+      if (error instanceof CustomError) throw error;
+      throw new ReportError(error);
+    }
+  }
 
   async generateInvoice(invoice, orderItems, singleItem = false) {
     try {
