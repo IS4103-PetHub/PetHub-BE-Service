@@ -111,12 +111,12 @@ class ReviewService {
         try {
 
             const reviewToDelete = await this.getReviewById(reviewId)
-            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId && callee.accountType != "INTERNAL_USER") {
+            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId || callee.accountType != "INTERNAL_USER") {
                 throw new CustomError("Review can only be deleted by orderItem Owner or Administrator", 400)
             }
             const dateCreated = new Date(reviewToDelete.dateCreated)
             dateCreated.setDate(dateCreated.getDate() + 15);
-            if (new Date() > dateCreated) {
+            if (new Date() > dateCreated && callee.accountType != "INTERNAL_USER") {
                 throw new CustomError("Unable to delete review after 15 days since review is created", 400)
             }
             // update the overall rating
