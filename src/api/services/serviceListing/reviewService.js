@@ -22,7 +22,8 @@ class ReviewService {
                 throw new CustomError("Review can only be created after order is fulfilled", 400)
             }
             const dateCreated = new Date(orderItem.dateFulfilled)
-            if (dateCreated > new Date().setDate(dateCreated + 15)) {
+            dateCreated.setDate(dateCreated.getDate() + 15);
+            if (new Date() > dateCreated) {
                 throw new CustomError("Unable to create review after 15 days since order fulfilled", 400)
             }
             const serviceListingId = orderItem.serviceListingId;
@@ -76,7 +77,8 @@ class ReviewService {
                 throw new CustomError("Review can only be updated by orderItem Owner", 400)
             }
             const dateCreated = new Date(reviewToUpdate.dateCreated)
-            if (dateCreated > new Date().setDate(dateCreated + 15)) {
+            dateCreated.setDate(dateCreated.getDate() + 15);
+            if (new Date() > dateCreated) {
                 throw new CustomError("Unable to update review after 15 days since review is created", 400)
             }
             const newRating = ((reviewToUpdate.serviceListing.overallRating * reviewToUpdate.serviceListing.reviews.length) - reviewToUpdate.rating + Number(payload.rating)) / (reviewToUpdate.serviceListing.reviews.length)
@@ -113,7 +115,8 @@ class ReviewService {
                 throw new CustomError("Review can only be deleted by orderItem Owner or Administrator", 400)
             }
             const dateCreated = new Date(reviewToDelete.dateCreated)
-            if (dateCreated > new Date().setDate(dateCreated + 15)) {
+            dateCreated.setDate(dateCreated.getDate() + 15);
+            if (new Date() > dateCreated) {
                 throw new CustomError("Unable to delete review after 15 days since review is created", 400)
             }
             // update the overall rating
