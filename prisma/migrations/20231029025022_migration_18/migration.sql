@@ -5,7 +5,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "FeaturedListingCategoryEnum" AS ENUM ('HOTTEST_LISTINGS', 'ALMOST_GONE', 'MOST_PROMISING_NEW_LISTINGS', 'ALL_TIME_FAVS');
+CREATE TYPE "FeaturedListingCategoryEnum" AS ENUM ('HOTTEST_LISTINGS', 'ALMOST_GONE', 'RISING_LISTINGS', 'ALL_TIME_FAVS');
 
 -- CreateEnum
 CREATE TYPE "ReviewReportReason" AS ENUM ('RUDE_ABUSIVE', 'PORNOGRAPHIC', 'SPAM', 'EXPOSING_PERSONAL_INFORMATION', 'UNAUTHORIZED_ADVERTISEMENT', 'INACCURATE_MISLEADING', 'OTHERS');
@@ -49,11 +49,22 @@ CREATE TABLE "FeaturedListingSet" (
 );
 
 -- CreateTable
+CREATE TABLE "FeaturedListing" (
+    "id" SERIAL NOT NULL,
+    "description" TEXT NOT NULL,
+    "serviceListingId" INTEGER NOT NULL,
+    "featuredListingSetId" INTEGER NOT NULL,
+
+    CONSTRAINT "FeaturedListing_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Review" (
     "reviewId" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "comment" TEXT NOT NULL,
     "reply" TEXT,
+    "replyDate" TIMESTAMP(3),
     "rating" INTEGER NOT NULL,
     "dateCreated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lastUpdated" TIMESTAMP(3),
@@ -83,12 +94,6 @@ CREATE TABLE "EmailVerification" (
 );
 
 -- CreateTable
-CREATE TABLE "_FeaturedListingSetToServiceListing" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "_PetOwnerToReview" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -107,12 +112,6 @@ CREATE UNIQUE INDEX "EmailVerification_token_key" ON "EmailVerification"("token"
 CREATE UNIQUE INDEX "EmailVerification_email_key" ON "EmailVerification"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_FeaturedListingSetToServiceListing_AB_unique" ON "_FeaturedListingSetToServiceListing"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_FeaturedListingSetToServiceListing_B_index" ON "_FeaturedListingSetToServiceListing"("B");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_PetOwnerToReview_AB_unique" ON "_PetOwnerToReview"("A", "B");
 
 -- CreateIndex
@@ -125,6 +124,12 @@ ALTER TABLE "PayoutInvoice" ADD CONSTRAINT "PayoutInvoice_userId_fkey" FOREIGN K
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_payoutInvoiceInvoiceId_fkey" FOREIGN KEY ("payoutInvoiceInvoiceId") REFERENCES "PayoutInvoice"("invoiceId") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "FeaturedListing" ADD CONSTRAINT "FeaturedListing_serviceListingId_fkey" FOREIGN KEY ("serviceListingId") REFERENCES "ServiceListing"("serviceListingId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "FeaturedListing" ADD CONSTRAINT "FeaturedListing_featuredListingSetId_fkey" FOREIGN KEY ("featuredListingSetId") REFERENCES "FeaturedListingSet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_orderItemId_fkey" FOREIGN KEY ("orderItemId") REFERENCES "OrderItem"("orderItemId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -135,12 +140,6 @@ ALTER TABLE "ReportReview" ADD CONSTRAINT "ReportReview_petOwnerId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "ReportReview" ADD CONSTRAINT "ReportReview_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_FeaturedListingSetToServiceListing" ADD CONSTRAINT "_FeaturedListingSetToServiceListing_A_fkey" FOREIGN KEY ("A") REFERENCES "FeaturedListingSet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_FeaturedListingSetToServiceListing" ADD CONSTRAINT "_FeaturedListingSetToServiceListing_B_fkey" FOREIGN KEY ("B") REFERENCES "ServiceListing"("serviceListingId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PetOwnerToReview" ADD CONSTRAINT "_PetOwnerToReview_A_fkey" FOREIGN KEY ("A") REFERENCES "PetOwner"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
