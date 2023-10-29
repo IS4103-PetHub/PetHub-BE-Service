@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Oct 29 2023 19:03:42 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Sun Oct 29 2023 20:22:34 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -287,7 +287,7 @@ enum RefundStatus {
   PENDING
   APPROVED
   REJECTED
-  CANCELLED
+  CANCELLED // not required
 }
 
 model RefundRequest {
@@ -295,7 +295,8 @@ model RefundRequest {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @default(now()) @updatedAt
   status          RefundStatus @default(PENDING)
-  reason          String? // Optional reason or notes for requesting the refund
+  reason          String // Required eason or notes for requesting the refund
+  comment         String? // Optional notes for approving / rejecting refund
   processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
 
   // Associations

@@ -45,5 +45,4 @@ exports.isValidCheckoutPayload = (payload) => {
     }
 
     return { isValid: true };
-
 }
