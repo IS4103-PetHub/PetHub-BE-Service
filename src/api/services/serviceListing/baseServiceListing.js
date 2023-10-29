@@ -1,11 +1,12 @@
 const prisma = require("../../../../prisma/prisma");
+const { getCurrentWeekStartAndEndDatesFromToday } = require("../../../utils/date");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
 const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
-const { getHottestListingsInATimePeriod, getMostPromisingNewListings } = require("./featuredServiceListing");
+const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, getFeaturedListingSetsByDateRange, } = require("./featuredServiceListing");
 
 
 exports.createServiceListing = async (data) => {
@@ -217,7 +218,7 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
         },
       },
     });
-    const filteredListings = filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
+    const filteredListings = exports.filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
     filteredListings.sort((a, b) => b.dateCreated - a.dateCreated);
     return filteredListings
 
@@ -468,12 +469,12 @@ exports.getRecommendedListings = async (petOwnerId) => {
     }
 
     // If user do not have pets or past orders, recommend popular listings within the past week
-    if (recommendedListings.length < 5) {
+    if (recommendedListings.length < 6) {
       const currentDate = new Date();
       const endDate = new Date(currentDate);
       const startDate = new Date(currentDate);
       startDate.setDate(currentDate.getDate() - 7);
-      const hottestListingsIds = await getHottestListingsInATimePeriod(startDate, endDate, 5);
+      const hottestListingsMap = await getHottestListingsInATimePeriod(startDate, endDate);
       const hottestListings = await prisma.serviceListing.findMany({
         include: {
           tags: true,
@@ -491,7 +492,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
         },
         where: {
           serviceListingId: {
-            in: hottestListingsIds,
+            in:  Array.from(hottestListingsMap.keys()),
           },
         },
       });
@@ -499,7 +500,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
     }
 
     // Emsure listings are valid
-    let validRecommendedListings = filterValidListingsForPetOwners(recommendedListings, [], [], null);
+    let validRecommendedListings = exports.filterValidListingsForPetOwners(recommendedListings, [], [], null);
 
     // If still no valid recommended listing, just get 6 random valid listings
     if (validRecommendedListings.length == 0) {
@@ -515,6 +516,41 @@ exports.getRecommendedListings = async (petOwnerId) => {
       throw error;
     }
     throw new ServiceListingError(error);
+  }
+};
+
+// This method will get the featured listings this week. 
+// EG if today is wednesday (day 3), it will get the featured listing sets from this week, AKA Sunday (day 0) to Saturday (Day 6) 
+// The featured listing sets for each time period should be created by a weekly cronjob, set to trigger at Sunday midnight every week. When this 
+// However, if it is not created when this method is called, this method will create and return the featured listing sets for this week 
+exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6) => {
+  try {
+    const currentDate = new Date(); 
+    
+    // If startDate or endDate is not provided, use the previous week's dates
+    if (!startDate || !endDate) {
+      const { thisWeekStart, thisWeekEnd } = getCurrentWeekStartAndEndDatesFromToday(currentDate);
+      startDate = thisWeekStart;
+      endDate = thisWeekEnd;
+    }
+
+    const existingSets = await getFeaturedListingSetsByDateRange(startDate, endDate);
+
+    // If existing sets are found, return them as a map
+    if (existingSets.length > 0) {
+      const existingSetsMap = {};
+      existingSets.forEach((set) => {
+        existingSetsMap[set.category] = set; // Use the category as the key
+      });
+      return existingSetsMap;
+    }
+
+    // If no existing sets are found, create and return new sets
+    const createdSetsMap = await getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, numListings);
+    return createdSetsMap;
+  } catch (error) {
+    console.error("Error getting featured listings:", error);
+    throw new CustomError(error);
   }
 };
 
@@ -545,28 +581,27 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
 
 // UTILITY METHODS
 
-const filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
-  const currentDate = new Date();
-  
-  const filteredListings = listings.filter((listing) =>
-    listing.petBusiness.user.accountStatus === 'ACTIVE' &&
-    listing.lastPossibleDate >= currentDate &&
-    (!listing.requiresBooking || (listing.calendarGroupId !== null && listing.duration !== null))
-  );
-
-  // Filter based on the INVALID condition:
-  // INVALID if: SL requires booking and (CG == null OR duration == null)
-  const validListings = filteredListings.filter((listing) =>
+exports.filterValidListingsForPetOwners = (listings, categories, tags, limit) => {  
+  const validListings = listings.filter(exports.isServiceListingValid);
+  const filteredListings = validListings.filter((listing) =>
     (categories.length === 0 || categories.includes(listing.category)) &&
     (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag))
   ));
 
   if (limit !== null && limit > 0) {
-    return validListings.slice(0, limit);
+    return filteredListings.slice(0, limit);
   }
 
-  return validListings;
+  return filteredListings;
 };
+
+exports.isServiceListingValid = (listing) => {
+  return (
+    listing.petBusiness.user.accountStatus === 'ACTIVE' &&
+    listing.lastPossibleDate >= new Date() &&
+    (!listing.requiresBooking || (listing.calendarGroupId !== null && listing.duration !== null))
+  );
+}
 
 exports.sendDeleteServiceListingEmail = async (petBusinessName, email, postTitle) => {
   try {

@@ -9,6 +9,6 @@ enum Category {
 enum FeaturedListingCategoryEnum {
   HOTTEST_LISTINGS
   ALMOST_GONE
-  MOST_PROMISING_NEW_LISTINGS
+  RISING_LISTINGS
   ALL_TIME_FAVS
 }

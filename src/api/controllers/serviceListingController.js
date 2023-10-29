@@ -291,14 +291,31 @@ exports.getRecommendedListings = async (req, res, next) => {
     if (!petOwnerId) { 
       return res.status(400).json({ message: "Pet Owner ID cannot be empty" }); 
     }
-    
     if (!(await BaseValidations.isValidInteger(petOwnerId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
     const recommendedListings = await ServiceListingService.getRecommendedListings(Number(petOwnerId));
-
     res.status(200).json(recommendedListings);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getFeaturedListings = async (req, res, next) => {
+  try {
+    let startDate = req.query.startDate;
+    let endDate = req.query.endDate;
+
+    if (startDate) {
+      startDate = new Date(startDate);
+    }
+    if (endDate) {
+      endDate = new Date(endDate);
+    }
+
+    const featuredListings = await ServiceListingService.getOrCreateFeaturedListings(startDate, endDate);
+    res.status(200).json(featuredListings);
   } catch (error) {
     next(error);
   }
