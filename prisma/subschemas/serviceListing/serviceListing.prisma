@@ -58,7 +58,7 @@ model FeaturedListingSet {
   category            FeaturedListingCategoryEnum
   validityPeriodStart DateTime?
   validityPeriodEnd   DateTime?
-  serviceListings     FeaturedListing[]
+  featuredListings     FeaturedListing[]
 }
 
 model FeaturedListing {
