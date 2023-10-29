@@ -22,8 +22,9 @@ const errorMessages = {
   INVALID_PET_TYPE: `Please enter a valid pet type`,
   EMPTY_PET_TYPE: "Pet type cannot be empty",
 
-  INVALID_INTEGER: 'Please ensure that integer fields are in the correct integer format!'
-
+  INVALID_INTEGER: 'Please ensure that integer fields are in the correct integer format!',
+  INVALID_BOOL: "Please enter true or false",
+  INVALID_REPORT_REASON: 'Please enter a valid reason'
 };
 
 module.exports = {

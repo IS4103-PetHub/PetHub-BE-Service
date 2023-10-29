@@ -42,6 +42,7 @@ class OrderItemService {
                 where: { orderItemId: orderItemId },
                 include: {
                     booking: true,
+                    review: true,
                     serviceListing: {
                         include: {
                             tags: true,
@@ -68,6 +69,7 @@ class OrderItemService {
                             }
                         },
                     },
+                    review: true
                 },
             });
 
@@ -115,6 +117,7 @@ class OrderItemService {
                             }
                         },
                     },
+                    review: true
                 },
             });
 
@@ -155,6 +158,7 @@ class OrderItemService {
                                     },
                                 },
                             },
+                            review: true
                         },
                     },
                     PetOwner: {
@@ -230,6 +234,7 @@ class OrderItemService {
                                     }
                                 },
                             },
+                            review: true
                         },
                     },
                 },

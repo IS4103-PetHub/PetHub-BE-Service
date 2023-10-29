@@ -236,22 +236,55 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
         tags: true,
         addresses: true,
         petBusiness: {
-          select: {
-            companyName: true,
+          include: {
             user: {
               select: {
+                userId: true,
+                email: true,
+                accountType: true,
                 accountStatus: true,
+                dateCreated: true,
+                lastUpdated: true,
               },
             },
             commissionRule: showCommissionRule
           },
         },
-        CalendarGroup: true
+        CalendarGroup: true,
+        reviews: {
+          include: {
+            likedBy: true,
+            orderItem: {
+              select: {
+                invoice: {
+                  select: {
+                    PetOwner: {
+                      select: {
+                        firstName: true,
+                        lastName: true,
+                        reportReview: true,
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       },
     });
     if (!serviceListing) {
       throw new CustomError("Service listing not found", 404);
     }
+
+    serviceListing.reviews = serviceListing.reviews
+      .map(review => ({
+        ...review,
+        likedByCount: review.likedBy.length, // Count the number of POs who liked the review
+        likedBy: undefined // remove likedBy
+      }))
+      .sort((a, b) => b.dateCreated - a.dateCreated); // Sort reviews by latest first
+
     return serviceListing;
   } catch (error) {
     console.error("Error fetching service listing by ID:", error);

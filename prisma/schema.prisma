@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Oct 27 2023 07:23:05 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Oct 29 2023 10:46:51 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -185,6 +185,16 @@ enum PetLostRequestType {
   FOUND_PET
 }
 
+enum ReviewReportReason {
+  RUDE_ABUSIVE
+  PORNOGRAPHIC
+  SPAM
+  EXPOSING_PERSONAL_INFORMATION
+  UNAUTHORIZED_ADVERTISEMENT
+  INACCURATE_MISLEADING
+  OTHERS
+}
+
 model CommissionRule {
   commissionRuleId Int           @id @default(autoincrement())
   name             String        @unique
@@ -269,6 +279,8 @@ model OrderItem {
   RefundRequest          RefundRequest?
   PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
   payoutInvoiceInvoiceId Int?
+
+  review Review?
 }
 
 enum RefundStatus {
@@ -334,15 +346,19 @@ model ServiceListing {
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags             Tag[]
-  addresses        Address[]
-  petBusiness      PetBusiness       @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId    Int
-  favouritedUsers  PetOwner[]
-  calendarGroupId  Int?
-  CalendarGroup    CalendarGroup?    @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
-  Booking          Booking[]
-  OrderItem        OrderItem[]
+  tags            Tag[]
+  addresses       Address[]
+  petBusiness     PetBusiness    @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId   Int
+  favouritedUsers PetOwner[]
+  calendarGroupId Int?
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  Booking         Booking[]
+  OrderItem       OrderItem[]
+
+  // review and ratings
+  reviews          Review[]
+  overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
 }
 
@@ -363,7 +379,7 @@ model FeaturedListingSet {
   category            FeaturedListingCategoryEnum
   validityPeriodStart DateTime?
   validityPeriodEnd   DateTime?
-  featuredListings    FeaturedListing[]
+  serviceListings     FeaturedListing[]
 }
 
 model FeaturedListing {
@@ -375,6 +391,34 @@ model FeaturedListing {
 
   featuredListingSet   FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
   featuredListingSetId Int
+}
+
+model Review {
+  reviewId         Int            @id @default(autoincrement())
+  title            String
+  comment          String
+  reply            String?
+  replyDate        DateTime?
+  rating           Int
+  dateCreated      DateTime       @default(now())
+  lastUpdated      DateTime?
+  attachmentKeys   String[]
+  attachmentURLs   String[]
+  orderItemId      Int            @unique
+  orderItem        OrderItem      @relation(fields: [orderItemId], references: [orderItemId])
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  reportedBy       ReportReview[]
+  likedBy          PetOwner[]
+}
+
+model ReportReview {
+  reportReviewId Int                @id @default(autoincrement())
+  petOwnerId     Int
+  reportedBy     PetOwner           @relation(fields: [petOwnerId], references: [userId])
+  reportReason   ReviewReportReason
+  reviewId       Int
+  review         Review             @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
 }
 
 // models for Role Based Access Control (RBAC)
@@ -468,6 +512,8 @@ model PetOwner {
   petLostAndFound   PetLostAndFound[]
   invoices          Invoice[]
   RefundRequest     RefundRequest[]
+  reportReview      ReportReview[]
+  likedReview       Review[]
 }
 
 model PetBusiness {

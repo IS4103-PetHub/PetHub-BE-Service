@@ -88,6 +88,7 @@ class ArticleService {
 
     async deleteArticle(articleId) {
         try {
+            await this.deleteFilesOfAnArticle(articleId)
             await prisma.article.delete({
                 where: {articleId}
             });
