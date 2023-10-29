@@ -3,7 +3,6 @@ const prisma = require("../../../../prisma/prisma");
 const { getPreviousWeekDates } = require("../../../utils/date");
 const CustomError = require("../../errors/customError");
 const ServiceListingError = require("../../errors/serviceListingError");
-const { getServiceListingById, isServiceListingValid } = require("./baseServiceListing");
 
 // This function should return the set of featured listings for a certain time period.
 // For simplicity, lets take startDate and endDate as the validity period of this featuredListings --> These featured listings are valid to be shown from startDate to endDate
