@@ -111,7 +111,7 @@ class ReviewService {
         try {
 
             const reviewToDelete = await this.getReviewById(reviewId)
-            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId || callee.accountType != "INTERNAL_USER") {
+            if (callee.userId != reviewToDelete.orderItem.invoice.petOwnerUserId && callee.accountType != "INTERNAL_USER") {
                 throw new CustomError("Review can only be deleted by orderItem Owner or Administrator", 400)
             }
             const dateCreated = new Date(reviewToDelete.dateCreated)
