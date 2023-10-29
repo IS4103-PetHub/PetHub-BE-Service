@@ -231,6 +231,9 @@ exports.getExpiringListingsInATimePeriod = async (currentDate, endDate) => {
           lte: endDate, 
         },
       },
+      orderBy: {
+        lastPossibleDate: 'asc', // Sort by lastPossibleDate in ascending order
+      },
       select: {
         serviceListingId: true, 
         lastPossibleDate: true,
