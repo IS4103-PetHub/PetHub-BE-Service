@@ -1,4 +1,4 @@
-const ServiceListingService = require("../services/serviceListing/baseServiceListing");
+const ServiceListingService = require("../services/serviceListing/serviceListingService");
 const BaseValidations = require("../validations/baseValidation");
 const ServiceListingValidations = require("../validations/servicelistingValidation");
 const constants = require("../../constants/common");

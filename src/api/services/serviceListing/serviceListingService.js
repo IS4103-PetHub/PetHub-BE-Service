@@ -6,7 +6,7 @@ const { deleteServiceListingEmail } = require("../../resource/emailTemplate");
 const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
-const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, getFeaturedListingSetsByDateRange, } = require("./featuredServiceListing");
+const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, getFeaturedListingSetsByDateRange, } = require("./featuredListingService");
 
 
 exports.createServiceListing = async (data) => {

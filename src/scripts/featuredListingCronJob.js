@@ -1,6 +1,5 @@
 const cron = require('node-cron');
-const prisma = require("../../../../prisma/prisma");
-const featuredServiceListingService = require('../api/services/serviceListing/featuredServiceListing');
+const featuredListingService = require('../api/services/serviceListing/featuredListingService');
 const dateService = require('../utils/date');
 
 // Define the schedule for the cron job to run every Sunday at midnight
@@ -9,7 +8,7 @@ cron.schedule('0 0 * * 0', async () => {
   try {
     const currentDate = new Date();
     const { startDate, endDate } = dateService.getCurrentWeekStartAndEndDatesFromToday(currentDate);
-    await featuredServiceListingService.getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, 6);
+    await featuredListingService.getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, 6);
 
     console.log(`Featured Listing Sets created successfully for period between ${startDate} and ${endDate}`);
 } catch (error) {
