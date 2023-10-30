@@ -46,8 +46,8 @@ class RefundRequestService {
             const lastEligibleRefundDate = orderItem.dateFulfilled;
             lastEligibleRefundDate.setDate(lastEligibleRefundDate.getDate() + transactionConstants.HOLDING_PERIOD);
             const currentDate = new Date()
-            if (orderItem.status === OrderItemStatus.FULFILLED && lastEligibleRefundDate >= currentDate) {
-                throw new CustomError(`Order Item cannot be refunded, date fulfilled is more than ${transactionConstants.HOLDING_PERIOD} before current date`, 400);
+            if (orderItem.status === OrderItemStatus.FULFILLED && currentDate >= lastEligibleRefundDate) {
+                throw new CustomError(`Order Item cannot be refunded, it has been more than ${transactionConstants.HOLDING_PERIOD} days since the order was fulfilled!`, 400);
             }
 
             // 2. Create a new refund request with status as PENDING
