@@ -2,7 +2,7 @@ const prisma = require('../../../../prisma/prisma');
 const CustomError = require('../../errors/customError');
 const ReviewError = require('../../errors/reviewError')
 const orderItemService = require("../finance/orderItemService");
-const serviceListingService = require("../serviceListing/baseServiceListing")
+const serviceListingService = require("../serviceListing/serviceListingService")
 const s3ServiceInstance = require("../s3Service");
 const service = require('studio/src/service');
 

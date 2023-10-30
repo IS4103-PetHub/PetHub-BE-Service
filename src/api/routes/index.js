@@ -22,6 +22,7 @@ const paymentRoutes = require('./paymentRoutes')
 const orderItemRoutes = require('./orderItemRoutes')
 const articleRoutes = require('./articleRoutes')
 const reviewRoutes = require('./reviewRoutes')
+const chartRoutes = require('./chartRoutes')
 const refundRequest = require('./refundRequestRoutes')
 
 // Use route modules
@@ -40,6 +41,7 @@ router.use("/commission-rules", commissionRuleRoutes);
 router.use("/order-items", orderItemRoutes);
 router.use("/articles", articleRoutes);
 router.use("/reviews", reviewRoutes);
+router.use("/chart", chartRoutes);
 router.use("/refund-requests", refundRequest);
 
 module.exports = router;

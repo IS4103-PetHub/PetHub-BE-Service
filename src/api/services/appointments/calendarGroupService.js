@@ -9,7 +9,7 @@ const emailTemplate = require('../../resource/emailTemplate');
 const PetBusinessService = require('../user/petBusinessService');
 const emailService = require('../emailService');
 const orderItemService = require('../finance/orderItemService');
-const serviceListingService = require('../serviceListing/baseServiceListing');
+const serviceListingService = require('../serviceListing/serviceListingService');
 
 class CalendarGroupService {
 
