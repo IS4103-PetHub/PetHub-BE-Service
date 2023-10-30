@@ -43,6 +43,7 @@ class OrderItemService {
                 include: {
                     booking: true,
                     review: true,
+                    RefundRequest: true,
                     serviceListing: {
                         include: {
                             tags: true,
@@ -69,7 +70,6 @@ class OrderItemService {
                             }
                         },
                     },
-                    review: true
                 },
             });
 

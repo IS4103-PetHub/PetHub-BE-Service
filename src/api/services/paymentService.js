@@ -66,7 +66,6 @@ class PaymentService {
       throw new PaymentError(error);
     }
   };
-
 }
 
 module.exports = new PaymentService();

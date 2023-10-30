@@ -1,0 +1,118 @@
+swagger: "2.0"
+definitions:
+  CreateRefundRequest:
+    type: object
+    properties:
+      orderItemId:
+        type: integer
+        description: The ID of the orderItem.
+      reason:
+        type: string
+        description: reason for creating refund request.
+    example:
+      orderItemId: 1
+      reason: "some reason"
+
+  UpdateRefundRequest:
+    type: object
+    properties:
+      comment:
+        type: string
+        description: reason for rejecting/approving refund request.
+    example:
+      comment: "some reason"
+
+paths:
+  /api/refund-requests:
+    post:
+      summary: create refund request for order item
+      requestBody:
+        description: refund request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/CreateRefundRequest"
+
+      responses:
+        200:
+          description: newly created refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/{refundRequestId}:
+    get:
+      summary: get refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: refund request
+      tags:
+        - RefundRequest
+
+    delete:
+      summary: cancel refund request for order item
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: deleted refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/reject/{refundRequestId}:
+    patch:
+      summary: reject refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      requestBody:
+        description: reject refund request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/UpdateRefundRequest"
+      responses:
+        200:
+          description: rejected refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/approve/{refundRequestId}:
+    patch:
+      summary: approve refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      requestBody:
+        description: approve refund request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/UpdateRefundRequest"
+      responses:
+        200:
+          description: approved refund request
+      tags:
+        - RefundRequest

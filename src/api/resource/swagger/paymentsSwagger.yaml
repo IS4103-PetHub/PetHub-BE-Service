@@ -36,6 +36,7 @@ definitions:
           quantity: 1
         - serviceListingId: 6
           quantity: 1
+
   # wil change when OrderItems and Invoice is generated
   PaymentResponse:
     type: object
