@@ -29,10 +29,10 @@ function getCurrentWeekStartAndEndDatesFromToday(today) {
   return { thisWeekStart, thisWeekEnd };
 }
 
-// Function to get a random date between the current date and a date 2 weeks ago
-function getRandomPastDate(currentDate) {
+// Function to get a random date between the current date and (period) days ago
+function getRandomPastDate(currentDate, period) {
   const threeWeeksAgo = new Date(currentDate);
-  threeWeeksAgo.setDate(currentDate.getDate() - 14);
+  threeWeeksAgo.setDate(currentDate.getDate() - period);
   const randomTimestamp = threeWeeksAgo.getTime() + Math.random() * (currentDate.getTime() - threeWeeksAgo.getTime());
   const randomPastDate = new Date(randomTimestamp);
 
