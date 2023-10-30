@@ -1,5 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../../../../prisma/prisma");
+
 
 exports.getPetBusinessData = async (petBusinessId) => {
   try {
@@ -147,8 +147,6 @@ exports.getAllTimeTopNServiceListings = async (petBusinessId, n) => {
     return allTimeTopN;
   } catch (error) {
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 };
 
@@ -273,12 +271,8 @@ exports.getMonthlySales = async (petBusinessId) => {
 
     monthlySales.push([`${monthName} ${year}`, totalSales]);
 
-    // Adjust the date to the previous month, accounting for January where the year needs to shift backwards by 1
+    // Adjust the date to the previous month
     currentDate.setMonth(currentDate.getMonth() - 1);
-    if (month === 1) {
-      currentDate.setFullYear(year - 1);
-      currentDate.setMonth(11);
-    }
   }
 
   return monthlySales;
