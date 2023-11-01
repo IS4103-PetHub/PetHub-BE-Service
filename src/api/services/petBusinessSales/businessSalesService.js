@@ -6,10 +6,10 @@ exports.getPetBusinessData = async (petBusinessId) => {
     const summary = await this.getPetBusinessSummary(petBusinessId);
     const allTimeTop5ServiceListings = await this.getAllTimeTopNServiceListings(
       petBusinessId,
-      6
+      5 
     );
     const top5ServiceListingsWithin30Days =
-      await this.getTopNServiceListingsWithin30Days(petBusinessId, 6);
+      await this.getTopNServiceListingsWithin30Days(petBusinessId, 5);
     const monthlySales = await this.getMonthlySales(petBusinessId);
 
     const petBusinessData = {
@@ -194,6 +194,7 @@ exports.getTopNServiceListingsWithin30Days = async (petBusinessId, n) => {
             orderItem.itemPrice;
         } else {
           serviceListingsMap.set(serviceListingId, {
+            serviceListingId: serviceListingId,
             title: orderItem.serviceListing.title,
             category: orderItem.serviceListing.category,
             totalOrders: 1,
@@ -210,6 +211,7 @@ exports.getTopNServiceListingsWithin30Days = async (petBusinessId, n) => {
 
   // Select the top n service listings
   const topN = serviceListingsArray.slice(0, n);
+  console.log(topN);
 
   // Calculate sales for the top n service listings
   const topNSalesWithin30Days = topN.map((service) => ({
@@ -228,14 +230,17 @@ exports.getTopNServiceListingsWithin30Days = async (petBusinessId, n) => {
 exports.getMonthlySales = async (petBusinessId) => {
   const currentDate = new Date();
   currentDate.setDate(1);
-  const monthlySales = [["Month", "Sales"]];
+  const monthlySales = [];
 
   for (let i = 0; i < 12; i++) {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
-    const monthName = new Date(year, month - 1, 1).toLocaleString("default", {
+    let monthName = new Date(year, month - 1, 1).toLocaleString("default", {
       month: "short",
     });
+    if (monthName === "Sept") {
+      monthName = "Sep";
+    }
 
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month - 1, 31, 23, 59, 59, 999);
@@ -274,6 +279,9 @@ exports.getMonthlySales = async (petBusinessId) => {
     // Adjust the date to the previous month
     currentDate.setMonth(currentDate.getMonth() - 1);
   }
+
+  monthlySales.reverse();
+  monthlySales.unshift(["Month", "Sales"]);
 
   return monthlySales;
 };
