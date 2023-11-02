@@ -8,6 +8,4 @@ router.get("/health-check", async (req, res, next) => {
 });
 
 router.post("/checkout", paymentController.checkout);
-router.post("/refund", paymentController.refund)
-
 module.exports = router;

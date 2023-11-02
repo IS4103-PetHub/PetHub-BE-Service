@@ -1,4 +1,4 @@
-const serviceListingService = require("../../services/serviceListing/baseServiceListing");
+const serviceListingService = require("../../services/serviceListing/serviceListingService");
 const reportService = require("../reports/reportService");
 const { OrderItemStatus } = require("@prisma/client");
 const CustomError = require("../../errors/customError");

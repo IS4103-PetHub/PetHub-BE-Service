@@ -1,0 +1,132 @@
+swagger: '2.0'
+definitions:
+  PetBusinessSalesSummary:
+    type: object
+    properties:
+      totalNumOrders:
+        type: integer
+      totalSales:
+        type: number
+      last30DaySales:
+        type: number
+      mostSalesDate:
+        type: string
+        format: date-time
+      mostSalesAmount:
+        type: number
+
+  ServiceListing:
+    type: object
+    properties:
+      serviceListingId:
+        type: integer
+      title:
+        type: string
+      category:
+        type: string
+      totalOrders:
+        type: integer
+      totalSales:
+        type: number
+
+  MonthlySalesData:
+    type: array
+    items:
+      type: array
+      items:
+        type: any
+
+paths:
+  /api/chart/pet-business-sales/data/{petBusinessId}:
+    get:
+      summary: Get Pet Business Sales Data
+      parameters:
+        - name: petBusinessId
+          in: path
+          description: The ID of the pet business
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              summary:
+                $ref: '#/definitions/PetBusinessSalesSummary'
+              lists:
+                type: object
+                properties:
+                  allTimeTop5ServiceListings:
+                    type: array
+                    items:
+                      $ref: '#/definitions/ServiceListing'
+                  top5ServiceListingsWithin30Days:
+                    type: array
+                    items:
+                      $ref: '#/definitions/ServiceListing'
+              charts:
+                type: object
+                properties:
+                  monthlySales:
+                    $ref: '#/definitions/MonthlySalesData'
+          content:
+            application/json:
+              example: 
+                summary:
+                  totalNumOrders: 90
+                  totalSales: 4690
+                  last30DaySales: 2875
+                  mostSalesDate: "2023-10-27T11:26:44.357Z"
+                  mostSalesAmount: 347.75
+                lists:
+                  allTimeTop5ServiceListings:
+                    - serviceListingId: 1
+                      title: "Professional Pet Grooming"
+                      category: "PET_GROOMING"
+                      totalOrders: 20
+                      totalSales: 800
+                    - serviceListingId: 2
+                      title: "Dog Training Session"
+                      category: "PET_BOARDING"
+                      totalOrders: 14
+                      totalSales: 840
+                top5ServiceListingsWithin30Days:
+                    - serviceListingId: 1
+                      title: "Professional Pet Grooming"
+                      category: "PET_GROOMING"
+                      totalOrders: 11
+                      totalSales: 440
+                    - serviceListingId: 1
+                      title: "Dog Training Session"
+                      category: "PET_BOARDING"
+                      totalOrders: 8
+                      totalSales: 480
+                charts:
+                  monthlySales:
+                    - ["Month", "Sales"]
+                    - ["Nov 2022", 70]
+                    - ["Dec 2022", 300]
+                    - ["Jan 2023", 50]
+                    - ["Feb 2023", 60]
+                    - ["Mar 2023", 160]
+                    - ["Apr 2023", 0]
+                    - ["May 2023", 80]
+                    - ["Jun 2023", 0]
+                    - ["Jul 2023", 190]
+                    - ["Aug 2023", 220]
+                    - ["Sep 2023", 685]
+                    - ["Oct 2023", 2875]
+                  aggregatedAndProjectedSales:
+                    - ["Month", "Sales", "Projected"]
+                    - ["Jun 2023", 0, null]
+                    - ["Jul 2023", 190, null]
+                    - ["Aug 2023", 220, null]
+                    - ["Sep 2023", 685, null]
+                    - ["Oct 2023", 2875, null]
+                    - ["Nov 2023", 0, 1260]
+                    - ["Dec 2023", null, 1606]
+                    - ["Jan 2024", null, 1913]                          
+      tags:
+        - Charts

@@ -1,8 +1,7 @@
 import {PetOwner, PetBusiness} from "../user/user"
 import {ServiceListing} from "../serviceListing/serviceListing"
 import {Booking} from "../appointments/appointments"
-import { OrderItemStatus } from "../../schema"
-import { Review } from "..\serviceListing\serviceListing"
+import { Review } from "../serviceListing/serviceListing"
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
@@ -80,14 +79,14 @@ model OrderItem {
   PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
   payoutInvoiceInvoiceId Int?
 
-  review                 Review?
+  review Review?
 }
 
 enum RefundStatus {
   PENDING
   APPROVED
   REJECTED
-  CANCELLED
+  CANCELLED // not required
 }
 
 model RefundRequest {
@@ -95,7 +94,8 @@ model RefundRequest {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @default(now()) @updatedAt
   status          RefundStatus @default(PENDING)
-  reason          String? // Optional reason or notes for requesting the refund
+  reason          String // Required eason or notes for requesting the refund
+  comment         String? // Optional notes for approving / rejecting refund
   processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
 
   // Associations

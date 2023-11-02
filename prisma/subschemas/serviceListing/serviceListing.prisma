@@ -2,11 +2,9 @@ import {Category, FeaturedListingCategoryEnum} from "../enums/businessLogicEnums
 import {PetBusiness, Address, PetOwner} from "../user/user"
 import {CalendarGroup, Booking} from "../appointments/appointments"
 import {OrderItem, Invoice} from "../finance/transactions"
-import { OrderItem } from "..\finance\transactions"
-import { ServiceListing } from "..\..\schema"
-import { PetOwner } from "..\user\user"
-import { PetOwner } from "..\..\schema"
-import { ReviewReportReason } from "..\enums\reviewEnums"
+import { OrderItem } from "../finance/transactions"
+import { PetOwner } from "../user/user"
+import { ReviewReportReason } from "../enums/reviewEnums"
 
 model ServiceListing {
   serviceListingId  Int       @id @default(autoincrement())
@@ -25,19 +23,19 @@ model ServiceListing {
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags             Tag[]
-  addresses        Address[]
-  petBusiness      PetBusiness          @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId    Int
-  favouritedUsers  PetOwner[]
+  tags            Tag[]
+  addresses       Address[]
+  petBusiness     PetBusiness    @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId   Int
+  favouritedUsers PetOwner[]
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup?    @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
   OrderItem       OrderItem[]
 
   // review and ratings
-  reviews Review[]
-  overallRating Float @default(0)
+  reviews          Review[]
+  overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
 }
 
@@ -62,40 +60,40 @@ model FeaturedListingSet {
 }
 
 model FeaturedListing {
-  id                             Int                @id @default(autoincrement())
-  description                    String
+  id          Int    @id @default(autoincrement())
+  description String
 
-  serviceListing                 ServiceListing     @relation(fields: [serviceListingId], references: [serviceListingId])
-  serviceListingId               Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  serviceListingId Int
 
-  featuredListingSet             FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
-  featuredListingSetId           Int
+  featuredListingSet   FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
+  featuredListingSetId Int
 }
 
 model Review {
-  reviewId Int             @id @default(autoincrement())
-  title                    String
-  comment                  String
-  reply                    String?
-  replyDate                DateTime?
-  rating                   Int
-  dateCreated              DateTime @default(now())
-  lastUpdated              DateTime?
-  attachmentKeys           String[]
-  attachmentURLs           String[]
-  orderItemId              Int @unique
-  orderItem                OrderItem @relation(fields: [orderItemId], references: [orderItemId])
-  serviceListingId         Int
-  serviceListing           ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
-  reportedBy               ReportReview[]
-  likedBy                  PetOwner[]
+  reviewId         Int            @id @default(autoincrement())
+  title            String
+  comment          String
+  reply            String?
+  replyDate        DateTime?
+  rating           Int
+  dateCreated      DateTime       @default(now())
+  lastUpdated      DateTime?
+  attachmentKeys   String[]
+  attachmentURLs   String[]
+  orderItemId      Int            @unique
+  orderItem        OrderItem      @relation(fields: [orderItemId], references: [orderItemId])
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  reportedBy       ReportReview[]
+  likedBy          PetOwner[]
 }
 
 model ReportReview {
-  reportReviewId          Int @id @default(autoincrement())
-  petOwnerId              Int 
-  reportedBy              PetOwner @relation(fields: [petOwnerId], references: [userId])
-  reportReason            ReviewReportReason
-  reviewId                Int
-  review                  Review @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
+  reportReviewId Int                @id @default(autoincrement())
+  petOwnerId     Int
+  reportedBy     PetOwner           @relation(fields: [petOwnerId], references: [userId])
+  reportReason   ReviewReportReason
+  reviewId       Int
+  review         Review             @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
 }

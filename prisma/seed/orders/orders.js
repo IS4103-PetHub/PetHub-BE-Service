@@ -7,8 +7,8 @@ const CalendarGroupService = require("../../../src/api/services/appointments/cal
 const { getRandomPastDate } = require("../../../src/utils/date");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
-const NUM_INVOICES = 10;
-const NUM_CART_ITEMS = 5;
+const NUM_INVOICES = 20;
+const NUM_CART_ITEMS = 3;
 const CURRENT_DATE = new Date();
 
 const JOHNS_SERVICELISTINGS = [
@@ -62,10 +62,155 @@ const JOHNS_SERVICELISTINGS = [
     requiresBooking: true,
   },
   {
-    id: 14,
-    price: 15,
+    id: 11,
+    defaultExpiryDays: 30,
+    basePrice: 15.0,
     requiresBooking: false,
   },
+  {
+    id: 12,
+    defaultExpiryDays: 45,
+    basePrice: 25.0,
+    requiresBooking: false,
+  },
+  {
+    id: 13,
+    defaultExpiryDays: 30,
+    basePrice: 18.0,
+    requiresBooking: false,
+  },
+  {
+    id: 14,
+    defaultExpiryDays: 30,
+    basePrice: 0.0,
+    requiresBooking: false,
+  },
+  {
+    id: 15,
+    defaultExpiryDays: 30,
+    basePrice: 20.0,
+    requiresBooking: false,
+  },
+  {
+    id: 16,
+    defaultExpiryDays: 30,
+    basePrice: 30.0,
+    requiresBooking: false,
+  },
+  {
+    id: 17,
+    defaultExpiryDays: 30,
+    basePrice: 15.0,
+    requiresBooking: false,
+  },
+  {
+    id: 18,
+    defaultExpiryDays: 30,
+    basePrice: 35.0,
+    requiresBooking: false,
+  },
+  {
+    id: 19,
+    defaultExpiryDays: 30,
+    basePrice: 25.0,
+    requiresBooking: false,
+  },
+  {
+    id: 20,
+    defaultExpiryDays: 30,
+    basePrice: 40.0,
+    requiresBooking: false,
+  },
+  {
+    id: 21,
+    defaultExpiryDays: 30,
+    basePrice: 35.0,
+    requiresBooking: false,
+  },
+  {
+    id: 22,
+    defaultExpiryDays: 30,
+    basePrice: 10.0,
+    requiresBooking: false,
+  },
+  {
+    id: 23,
+    defaultExpiryDays: 30,
+    basePrice: 45.0,
+    requiresBooking: true,
+  },
+  {
+    id: 24,
+    defaultExpiryDays: 30,
+    basePrice: 20.0,
+    requiresBooking: false,
+  },
+  {
+    id: 25,
+    defaultExpiryDays: 30,
+    basePrice: 50.0,
+    requiresBooking: true,
+  },
+  {
+    id: 26,
+    defaultExpiryDays: 30,
+    basePrice: 40.0,
+    requiresBooking: false,
+  },
+  {
+    id: 27,
+    defaultExpiryDays: 30,
+    basePrice: 25.0,
+    requiresBooking: false,
+  },
+  {
+    id: 28,
+    defaultExpiryDays: 30,
+    basePrice: 60.0,
+    requiresBooking: true,
+  },
+  {
+    id: 29,
+    defaultExpiryDays: 30,
+    basePrice: 15.0,
+    requiresBooking: false,
+  },
+  {
+    id: 30,
+    defaultExpiryDays: 30,
+    basePrice: 30.0,
+    requiresBooking: true,
+  },
+  {
+    id: 31,
+    defaultExpiryDays: 30,
+    basePrice: 35.0,
+    requiresBooking: false,
+  },
+  {
+    id: 32,
+    defaultExpiryDays: 30,
+    basePrice: 20.0,
+    requiresBooking: false,
+  },
+  {
+    id: 33,
+    defaultExpiryDays: 30,
+    basePrice: 45.0,
+    requiresBooking: true,
+  },
+  {
+    id: 34,
+    defaultExpiryDays: 30,
+    basePrice: 30.0,
+    requiresBooking: false,
+  },
+  {
+    id: 35,
+    defaultExpiryDays: 30,
+    basePrice: 40.0,
+    requiresBooking: true,
+  }
 ];
 
 // ============================== Helper functions ============================== //
@@ -117,11 +262,17 @@ function createCheckoutPayload(numCartItems) {
     Simulate a checkout without stripe or emails. 
     This is because its easier to call the top level function rather than manually inserting via a prisma client (e.g. The need to generate invoice PDF manually etcetc)
 */
-async function simulateCheckout(data) {
+async function simulateCheckout(data, lastMonth = false) {
   const user = await petOwnerService.getUserById(data.userId);
   const { invoice, orderItems } = await TransactionService.buildTransaction(data.cartItems);
   const paymentIntentId = uuidv4();
-  invoice.createdAt = getRandomPastDate(CURRENT_DATE)
+  if (lastMonth) {
+    // Seed data within the past month for dashboarding and analysis (featured listings) purposes
+    invoice.createdAt = getRandomPastDate(CURRENT_DATE, 30);
+  } else {
+    // Seed data within the past year
+    invoice.createdAt = getRandomPastDate(CURRENT_DATE, 365); 
+  }  
   return await TransactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId); // returns invoice obj
 }
 
@@ -146,7 +297,9 @@ async function seedInvoicesAndOrders(prisma) {
   for (const [index, payload] of checkoutPayloads.entries()) {
     try {
       const confirmedInvoice = await simulateCheckout(payload);
+      const confirmedInvoiceLastMonth = await simulateCheckout(payload, true);
       orderItems.push(confirmedInvoice.orderItems);
+      orderItems.push(confirmedInvoiceLastMonth.orderItems)
     } catch (error) {
       console.log = originalLog; // Restore console.log so I can print the shortened log below
       console.log(`Error seeding invoices and orders for payload at index ${index}.`);
