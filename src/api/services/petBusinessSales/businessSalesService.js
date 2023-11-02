@@ -4,13 +4,10 @@ const prisma = require("../../../../prisma/prisma");
 exports.getPetBusinessData = async (petBusinessId) => {
   try {
     const summary = await this.getPetBusinessSummary(petBusinessId);
-    const allTimeTop5ServiceListings = await this.getAllTimeTopNServiceListings(
-      petBusinessId,
-      6
-    );
-    const top5ServiceListingsWithin30Days =
-      await this.getTopNServiceListingsWithin30Days(petBusinessId, 6);
+    const allTimeTop5ServiceListings = await this.getAllTimeTopNServiceListings(petBusinessId, 5);
+    const top5ServiceListingsWithin30Days = await this.getTopNServiceListingsWithin30Days(petBusinessId, 5);
     const monthlySales = await this.getMonthlySales(petBusinessId);
+    const aggregatedAndProjectedSales = await this.generateProjectedData(monthlySales);
 
     const petBusinessData = {
       summary,
@@ -20,6 +17,7 @@ exports.getPetBusinessData = async (petBusinessId) => {
       },
       charts: {
         monthlySales: monthlySales,
+        aggregatedAndProjectedSales: aggregatedAndProjectedSales
       },
     };
 
@@ -194,6 +192,7 @@ exports.getTopNServiceListingsWithin30Days = async (petBusinessId, n) => {
             orderItem.itemPrice;
         } else {
           serviceListingsMap.set(serviceListingId, {
+            serviceListingId: serviceListingId,
             title: orderItem.serviceListing.title,
             category: orderItem.serviceListing.category,
             totalOrders: 1,
@@ -228,14 +227,17 @@ exports.getTopNServiceListingsWithin30Days = async (petBusinessId, n) => {
 exports.getMonthlySales = async (petBusinessId) => {
   const currentDate = new Date();
   currentDate.setDate(1);
-  const monthlySales = [["Month", "Sales"]];
+  const monthlySales = [];
 
   for (let i = 0; i < 12; i++) {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
-    const monthName = new Date(year, month - 1, 1).toLocaleString("default", {
+    let monthName = new Date(year, month - 1, 1).toLocaleString("default", {
       month: "short",
     });
+    if (monthName === "Sept") {
+      monthName = "Sep";
+    }
 
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month - 1, 31, 23, 59, 59, 999);
@@ -275,5 +277,57 @@ exports.getMonthlySales = async (petBusinessId) => {
     currentDate.setMonth(currentDate.getMonth() - 1);
   }
 
+  monthlySales.reverse();
+  monthlySales.unshift(["Month", "Sales"]);
+
   return monthlySales;
 };
+
+// This function will obtain the past 6 months of sales data and project 3 months of sales data --> (currentMonth, nextMonth, followingMonth)
+// To get a projected sale data, we take the average of the past 3 months of data
+// EG if current month is Nov, we take (aug + sep + oct) // 3
+// for nextMonth (dec), we take (sep + oct + nov (projected)) // 3
+// Similar concept for followingMonth
+exports.generateProjectedData = async (pastYearData) => {
+  const outputData = [["Month", "Sales", "Projected"]];
+  const last6MonthsData = pastYearData.slice(-6);
+
+  let past3MonthsSum = 0;
+  for (let i = 2; i <= 4; i++) {
+    past3MonthsSum += pastYearData[pastYearData.length - i][1];
+  }
+  let projected = Math.floor(past3MonthsSum / 3);
+
+  for (let i = 0; i < 6; i++) {
+    const [month, sales] = last6MonthsData[i];
+
+    if (i === 5) {
+      // For the current month, calculate the projected value
+      outputData.push([month, sales, projected]);
+    } else {
+      outputData.push([month, sales, null]);
+    }
+  }
+
+  // Calculate projected data for next month
+  let outputDataLen = outputData.length;
+  const nextMonth = getFutureMonth(outputData[outputDataLen - 1][0]);
+  past3MonthsSum = outputData[outputDataLen - 1][2] + outputData[outputDataLen - 2][1] + outputData[outputDataLen - 3][1]
+  outputData.push([nextMonth, null, Math.floor(past3MonthsSum / 3)]);
+
+  // Calculate projected data for following month
+  outputDataLen = outputData.length;
+  const followingMonth = getFutureMonth(outputData[outputDataLen - 1][0]);
+  past3MonthsSum = outputData[outputDataLen - 1][2] + outputData[outputDataLen - 2][2] + outputData[outputDataLen - 3][1]
+  outputData.push([followingMonth, null, Math.floor(past3MonthsSum / 3)]);
+
+  return outputData;
+}
+
+// Given "Dec 2023", return "Jan 2024"
+function getFutureMonth(currentMonth) {
+  const [month, year] = currentMonth.split(' ');
+  const nextMonth = new Date(`${year} ${month} 01`);
+  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  return `${nextMonth.toLocaleString('default', { month: 'short' })} ${nextMonth.getFullYear()}`;
+}
