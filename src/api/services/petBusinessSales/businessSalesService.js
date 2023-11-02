@@ -209,7 +209,6 @@ exports.getTopNServiceListingsWithin30Days = async (petBusinessId, n) => {
 
   // Select the top n service listings
   const topN = serviceListingsArray.slice(0, n);
-  console.log(topN);
 
   // Calculate sales for the top n service listings
   const topNSalesWithin30Days = topN.map((service) => ({
@@ -325,21 +324,7 @@ exports.generateProjectedData = async (pastYearData) => {
   return outputData;
 }
 
-function getFutureMonth(currentMonth) {
-  const [month, year] = currentMonth.split(' ');
-  const date = new Date(year, getMonthNumber(month), 1);
-  date.setMonth(date.getMonth() + 1);
-  return `${getMonthName(date.getMonth())} ${date.getFullYear()}`;
-}
-
-function getMonthNumber(month) {
-  return new Date(Date.parse(month + " 1, 2022")).getMonth();
-}
-
-function getMonthName(month) {
-  return new Date(Date.parse(`1 ${month + 1} 2022`)).toLocaleString('default', { month: 'short' });
-}
-
+// Given "Dec 2023", return "Jan 2024"
 function getFutureMonth(currentMonth) {
   const [month, year] = currentMonth.split(' ');
   const nextMonth = new Date(`${year} ${month} 01`);
