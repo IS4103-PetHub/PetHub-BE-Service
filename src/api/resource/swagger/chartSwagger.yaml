@@ -81,28 +81,52 @@ paths:
                   mostSalesDate: "2023-10-27T11:26:44.357Z"
                   mostSalesAmount: 347.75
                 lists:
-                  allTimeTop5ServiceListings:
-                    - serviceListingId: 1
-                      title: "Professional Pet Grooming"
-                      category: "PET_GROOMING"
-                      totalOrders: 20
-                      totalSales: 800
-                    - serviceListingId: 2
-                      title: "Dog Training Session"
-                      category: "PET_BOARDING"
-                      totalOrders: 14
-                      totalSales: 840
-                top5ServiceListingsWithin30Days:
-                    - serviceListingId: 1
-                      title: "Professional Pet Grooming"
-                      category: "PET_GROOMING"
-                      totalOrders: 11
-                      totalSales: 440
-                    - serviceListingId: 1
-                      title: "Dog Training Session"
-                      category: "PET_BOARDING"
-                      totalOrders: 8
-                      totalSales: 480
+                  byOrderCount:
+                    allTimeTop5ByOrders:
+                      - serviceListingId: 1
+                        title: "Professional Pet Grooming"
+                        category: "PET_GROOMING"
+                        totalOrders: 20
+                        totalSales: 800
+                      - serviceListingId: 2
+                        title: "Dog Training Session"
+                        category: "PET_BOARDING"
+                        totalOrders: 14
+                        totalSales: 840
+                    top5Within30DaysByOrders:
+                      - serviceListingId: 1
+                        title: "Professional Pet Grooming"
+                        category: "PET_GROOMING"
+                        totalOrders: 11
+                        totalSales: 440
+                      - serviceListingId: 1
+                        title: "Dog Training Session"
+                        category: "PET_BOARDING"
+                        totalOrders: 8
+                        totalSales: 480
+                  bySaleAmount:
+                    allTimeTop5BySales:
+                      - serviceListingId: 1
+                        title: "Professional Pet Grooming"
+                        category: "PET_GROOMING"
+                        totalOrders: 5
+                        totalSales: 1000
+                      - serviceListingId: 2
+                        title: "Dog Training Session"
+                        category: "PET_BOARDING"
+                        totalOrders: 14
+                        totalSales: 840
+                    top5Within30DaysBySales:
+                      - serviceListingId: 1
+                        title: "Professional Pet Grooming"
+                        category: "PET_GROOMING"
+                        totalOrders: 4
+                        totalSales: 600
+                      - serviceListingId: 1
+                        title: "Dog Training Session"
+                        category: "PET_BOARDING"
+                        totalOrders: 8
+                        totalSales: 480
                 charts:
                   monthlySales:
                     - ["Month", "Sales"]
