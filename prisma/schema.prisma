@@ -298,6 +298,7 @@ model RefundRequest {
   reason          String // Required eason or notes for requesting the refund
   comment         String? // Optional notes for approving / rejecting refund
   processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
+  stripeRefundId  String?      @unique // to be obtained from Stripe transaction after refund is successful
 
   // Associations
   petOwnerId Int
