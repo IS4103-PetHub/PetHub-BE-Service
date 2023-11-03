@@ -7,6 +7,7 @@ import { CommissionRule } from "../finance/commissions"
 import { PetLostAndFound } from "../petLostAndFound/petLostAndFound"
 import { Article, Article } from "../article/article"
 import { ReportReview, Review } from "../serviceListing/serviceListing"
+import { Comment, SupportTicket } from "../support/support"
 
 // Entities
 model User {
@@ -25,6 +26,7 @@ model User {
   petOwner            PetOwner?
   petBusiness         PetBusiness?
   UserGroupMembership UserGroupMembership[]
+  Comment             Comment[]
 }
 
 model EmailVerification {
@@ -61,6 +63,7 @@ model PetOwner {
   RefundRequest     RefundRequest[]
   reportReview      ReportReview[]
   likedReview       Review[]
+  SupportTicket     SupportTicket[]
 }
 
 model PetBusiness {
@@ -86,6 +89,7 @@ model PetBusiness {
   commissionRuleId Int?
   commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
   PayoutInvoice    PayoutInvoice[]
+  SupportTicket    SupportTicket[]
 }
 
 model ResetPassword {
