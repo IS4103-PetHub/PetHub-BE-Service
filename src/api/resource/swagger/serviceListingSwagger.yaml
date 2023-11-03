@@ -1,4 +1,4 @@
-swagger: '2.0'
+swagger: "2.0"
 definitions:
   ServiceListingRequest:
     type: object
@@ -95,11 +95,11 @@ definitions:
           name: "Not Free"
           dateCreated: "2023-09-02T01:33:10.287Z"
           lastUpdated: null
-  
+
   GetAllServiceListingResponse:
     type: array
     items:
-      $ref: '#/definitions/ServiceListingResponse'
+      $ref: "#/definitions/ServiceListingResponse"
     example:
       - serviceListingId: 1
         title: "Professional Pet Grooming"
@@ -110,16 +110,16 @@ definitions:
         category: "PET_GROOMING"
         petBusinessId: 1
         tags:
-        - tagId: 4
-          name: "Free"
-          dateCreated: "2023-09-01T08:29:02.262Z"
-          lastUpdated: null
-        - tagId: 7
-          name: "Not Free"
-          dateCreated: "2023-09-02T01:33:10.287Z"
-          lastUpdated: null
+          - tagId: 4
+            name: "Free"
+            dateCreated: "2023-09-01T08:29:02.262Z"
+            lastUpdated: null
+          - tagId: 7
+            name: "Not Free"
+            dateCreated: "2023-09-02T01:33:10.287Z"
+            lastUpdated: null
         petBusiness:
-        - companyName: "My Company"
+          - companyName: "My Company"
       - serviceListingId: 2
         title: "Dog Training Session"
         description: "Expert dog training to teach your pet new tricks"
@@ -129,12 +129,12 @@ definitions:
         category: "PET_RETAIL"
         petBusinessId: 1
         tags:
-        - tagId: 4
-          name: "Free"
-          dateCreated: "2023-09-01T08:29:02.262Z"
-          lastUpdated: null
+          - tagId: 4
+            name: "Free"
+            dateCreated: "2023-09-01T08:29:02.262Z"
+            lastUpdated: null
         petBusiness:
-        - companyName: "My Company"
+          - companyName: "My Company"
 
   ServiceListingUpdateRequest:
     type: object
@@ -165,34 +165,34 @@ definitions:
       tagIds: [1, 2, 3]
       calendarGroupId: 1
   ServiceListingActiveResponse:
-      type: object
-      properties:
-        serviceListingId:
-          type: integer
-        title:
+    type: object
+    properties:
+      serviceListingId:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      basePrice:
+        type: number
+      duration:
+        type: integer
+      category:
+        type: string
+      tags:
+        type: array
+        items:
           type: string
-        description:
-          type: string
-        basePrice:
-          type: number
-        duration:
-          type: integer
-        category:
-          type: string
-        tags:
-          type: array
-          items:
-            type: string
 
 paths:
   /api/service-listings/health-check:
     get:
-        summary: Test endpoint to check if the Service Listing API is working
-        responses:
-          200:
-            description: API is working
-        tags:
-          - Health
+      summary: Test endpoint to check if the Service Listing API is working
+      responses:
+        200:
+          description: API is working
+      tags:
+        - Health
 
   /api/service-listings:
     get:
@@ -205,7 +205,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/GetAllServiceListingResponse'
+                  $ref: "#/definitions/GetAllServiceListingResponse"
       tags:
         - Service Listing
     post:
@@ -264,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/definitions/ServiceListingResponse'
+                $ref: "#/definitions/ServiceListingResponse"
         400:
           description: Bad request
         500:
@@ -319,7 +319,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/definitions/ServiceListingResponse'
+                $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
 
@@ -338,7 +338,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/ServiceListingUpdateRequest'
+              $ref: "#/definitions/ServiceListingUpdateRequest"
             example:
               title: "Pet Grooming updated"
               description: "updated"
@@ -351,7 +351,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/definitions/ServiceListingResponse'
+                $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
     delete:
@@ -387,7 +387,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/ServiceListingResponse'
+                  $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
 
@@ -408,10 +408,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/ServiceListingResponse'
+                  $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
-  
+
   /api/service-listings/get-recommended-listings/{petOwnerId}:
     get:
       summary: Get recommended service listings
@@ -432,7 +432,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/ServiceListingResponse'
+                  $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
 
@@ -447,25 +447,25 @@ paths:
           schema:
             type: string
             format: date
-            example: '2023-10-15'
+            example: "2023-10-15"
         - in: query
           name: endDate
           description: The end date of the featured listings period (optional).
           schema:
             type: string
             format: date
-            example: '2023-10-21'
+            example: "2023-10-21"
       responses:
         200:
           description: An object containing featured service listings for different categories.
           content:
             application/json:
-              example: 
+              example:
                 HOTTEST_LISTINGS:
                   id: 5
                   category: HOTTEST_LISTINGS
-                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
-                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  validityPeriodStart: "2023-10-15T00:00:00.000Z"
+                  validityPeriodEnd: "2023-10-21T00:00:00.000Z"
                   featuredListings:
                     - id: 112
                       description: "10 listings sold last week!"
@@ -510,24 +510,24 @@ paths:
                 ALMOST_GONE:
                   id: 6
                   category: ALMOST_GONE
-                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
-                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  validityPeriodStart: "2023-10-15T00:00:00.000Z"
+                  validityPeriodEnd: "2023-10-21T00:00:00.000Z"
                   featuredListings: []
                 ALL_TIME_FAVS:
                   id: 7
                   category: ALL_TIME_FAVS
-                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
-                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  validityPeriodStart: "2023-10-15T00:00:00.000Z"
+                  validityPeriodEnd: "2023-10-21T00:00:00.000Z"
                   featuredListings: []
                 RISING_LISTINGS:
                   id: 8
                   category: RISING_LISTINGS
-                  validityPeriodStart: '2023-10-15T00:00:00.000Z'
-                  validityPeriodEnd: '2023-10-21T00:00:00.000Z'
+                  validityPeriodStart: "2023-10-15T00:00:00.000Z"
+                  validityPeriodEnd: "2023-10-21T00:00:00.000Z"
                   featuredListings: []
       tags:
         - Service Listing
-  
+
   /api/service-listings/active:
     get:
       summary: Get all service listings available for pet owners. Fill in query params to filter accordingly.
@@ -562,10 +562,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/ServiceListingResponse'
+                  $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
-  
+
   /api/service-listings/filter:
     get:
       summary: Get service listings by filter
@@ -594,10 +594,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/ServiceListingResponse'
+                  $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
-        
+
   /api/service-listings/pet-businesses/{id}:
     get:
       summary: Get all service listings by pet business ID
@@ -616,7 +616,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/ServiceListingResponse'
+                  $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
 /api/service-listings/active:
@@ -641,19 +641,19 @@ paths:
         required: false
         schema:
           type: integer
-          format: int32  # Assuming limit is an integer
+          format: int32 # Assuming limit is an integer
     responses:
       200:
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/definitions/ServiceListingActiveResponse'
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/ServiceListingActiveResponse"
       400:
         description: Bad request
       500:
         description: Internal server error
     tags:
-        - Service Listing
+      - Service Listing

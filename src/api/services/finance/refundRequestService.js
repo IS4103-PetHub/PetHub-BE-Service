@@ -43,14 +43,15 @@ class RefundRequestService {
                 throw new CustomError(`Order Item cannot be refunded. Order is in ${orderItem.status} state`, 400);
             }
 
-            if (orderItem.status == OrderItemStatus.FULFILLED) {
+            if (orderItem.status === OrderItemStatus.FULFILLED) {
                 const lastEligibleRefundDate = orderItem.dateFulfilled;
                 lastEligibleRefundDate.setDate(lastEligibleRefundDate.getDate() + transactionConstants.HOLDING_PERIOD);
                 const currentDate = new Date()
-                if (orderItem.status === OrderItemStatus.FULFILLED && currentDate >= lastEligibleRefundDate) {
-                    throw new CustomError(`Order Item cannot be refunded, as the order has been fulfilled but it has been more than ${transactionConstants.HOLDING_PERIOD} days since fulfillment!`, 400);
+                if (currentDate >= lastEligibleRefundDate) {
+                    throw new CustomError(`Order Item cannot be refunded, it has been more than ${transactionConstants.HOLDING_PERIOD} days since the order was fulfilled!`, 400);
                 }
             }
+
 
             // 2. Create a new refund request with status as PENDING
             const newRefundRequest = await prisma.refundRequest.create({
