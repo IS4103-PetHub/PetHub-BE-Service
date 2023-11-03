@@ -97,7 +97,7 @@ exports.updateServiceListing = async (serviceListingId, data) => {
     if (!serviceListing) {
       throw new CustomError("Service listing not found", 404);
     }
-    
+
     let tagIdsArray = [], addressIdsArray = [];
     if (data.tagIds) {
       tagIdsArray = data.tagIds.map((id) => ({ tagId: id }));
@@ -431,7 +431,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
 
     if (mostRecentPurchase) {
       // Get the first order item from the most recent purchase
-      const orderItem = mostRecentPurchase.orderItems[0]; 
+      const orderItem = mostRecentPurchase.orderItems[0];
 
       if (orderItem) {
         const serviceListingId = orderItem.serviceListingId;
@@ -492,7 +492,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
         },
         where: {
           serviceListingId: {
-            in:  Array.from(hottestListingsMap.keys()),
+            in: Array.from(hottestListingsMap.keys()),
           },
         },
       });
@@ -525,8 +525,8 @@ exports.getRecommendedListings = async (petOwnerId) => {
 // However, if it is not created when this method is called, this method will create and return the featured listing sets for this week 
 exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6) => {
   try {
-    const currentDate = new Date(); 
-    
+    const currentDate = new Date();
+
     // If startDate or endDate is not provided, use the previous week's dates
     if (!startDate || !endDate) {
       const { thisWeekStart, thisWeekEnd } = getCurrentWeekStartAndEndDatesFromToday(currentDate);
@@ -581,12 +581,12 @@ exports.deleteServiceListing = async (serviceListingId, callee) => {
 
 // UTILITY METHODS
 
-exports.filterValidListingsForPetOwners = (listings, categories, tags, limit) => {  
+exports.filterValidListingsForPetOwners = (listings, categories, tags, limit) => {
   const validListings = listings.filter(exports.isServiceListingValid);
   const filteredListings = validListings.filter((listing) =>
     (categories.length === 0 || categories.includes(listing.category)) &&
     (tags.length === 0 || tags.some((tag) => listing.tags.some((listingTag) => listingTag.name === tag))
-  ));
+    ));
 
   if (limit !== null && limit > 0) {
     return filteredListings.slice(0, limit);

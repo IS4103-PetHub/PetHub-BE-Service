@@ -30,7 +30,11 @@ class BaseUserService {
     try {
       const user = await prisma.user.findUnique({
         where: { userId },
-        select: userSelectFields,
+        include: {
+          petBusiness: true,
+          petOwner: true,
+          internalUser: true
+        }
       });
 
       if (!user) throw new CustomError('User not found', 404);
@@ -132,7 +136,7 @@ class BaseUserService {
             await this.createVerifyEmailRecord(token, user.email)
             await emailService.sendEmail(user.email, "Verify Your Email Address for PetHub Registration", body)
             throw new CustomError('Account not verified, The verification email has been resent, please check your email to verify the account')
-          } 
+          }
           // else throw error and ask user to check email
           else {
             throw new CustomError('Account not verified, please check your email to verify the account')
@@ -251,7 +255,7 @@ class BaseUserService {
       const record = await prisma.emailVerification.findUnique({
         where: { token }
       })
-      if(!record) {
+      if (!record) {
         throw new CustomError('Verification Token not found', 400);
       }
       if (record.expiryDate < new Date()) {
@@ -280,7 +284,7 @@ class BaseUserService {
       await emailService.sendEmail(user.email, "PetHub Account Successfully Activated", body)
 
       return this.removePassword(updatedUser);
-    } catch(error) {
+    } catch (error) {
       if (error instanceof CustomError || error instanceof UserError) {
         throw error;
       }
@@ -289,7 +293,7 @@ class BaseUserService {
   }
 
   async resendVerifyEmail(email) {
-    try{
+    try {
       const user = await prisma.user.findUnique({
         where: { email },
         include: {
@@ -301,11 +305,11 @@ class BaseUserService {
       if (user.accountStatus != 'PENDING_VERIFICATION') {
         throw new CustomError('Email is already verified', 400)
       };
-      
+
       const record = await prisma.emailVerification.findUnique({
         where: { email: email }
       })
-      if(record) {
+      if (record) {
         this.deleteVerifyEmailRecord(record.token)
       }
       const name = user.petBusiness ? user.petBusiness.companyName : user.petOwner.firstName;
@@ -314,8 +318,8 @@ class BaseUserService {
       const body = emailTemplate.AccountEmailVerificationEmail(name, link)
       await this.createVerifyEmailRecord(token, user.email)
       await emailService.sendEmail(user.email, "Verify Your Email Address for PetHub Registration", body)
-      return ;
-    } catch(error) {
+      return;
+    } catch (error) {
       if (error instanceof CustomError) throw error;
       throw new UserError(error);
     }
