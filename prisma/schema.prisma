@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Oct 29 2023 20:22:34 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Nov 03 2023 14:19:34 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -298,6 +298,7 @@ model RefundRequest {
   reason          String // Required eason or notes for requesting the refund
   comment         String? // Optional notes for approving / rejecting refund
   processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
+  stripeRefundId  String?      @unique // to be obtained from Stripe transaction after refund is successful
 
   // Associations
   petOwnerId Int

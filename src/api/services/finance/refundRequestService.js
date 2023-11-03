@@ -7,7 +7,7 @@ const orderItemService = require('./orderItemService')
 const emailService = require('../emailService')
 const emailTemplate = require('../../resource/emailTemplate');
 const { OrderItemStatus, RefundStatus } = require('@prisma/client');
-const transactionConstants = require('../../../constants/transactions')
+const transactionConstants = require('../../../constants/transactions');
 
 class RefundRequestService {
     constructor() { }
@@ -43,11 +43,13 @@ class RefundRequestService {
                 throw new CustomError(`Order Item cannot be refunded. Order is in ${orderItem.status} state`, 400);
             }
 
-            const lastEligibleRefundDate = orderItem.dateFulfilled;
-            lastEligibleRefundDate.setDate(lastEligibleRefundDate.getDate() + transactionConstants.HOLDING_PERIOD);
-            const currentDate = new Date()
-            if (orderItem.status === OrderItemStatus.FULFILLED && currentDate >= lastEligibleRefundDate) {
-                throw new CustomError(`Order Item cannot be refunded, it has been more than ${transactionConstants.HOLDING_PERIOD} days since the order was fulfilled!`, 400);
+            if (orderItem.status == OrderItemStatus.FULFILLED) {
+                const lastEligibleRefundDate = orderItem.dateFulfilled;
+                lastEligibleRefundDate.setDate(lastEligibleRefundDate.getDate() + transactionConstants.HOLDING_PERIOD);
+                const currentDate = new Date()
+                if (orderItem.status === OrderItemStatus.FULFILLED && currentDate >= lastEligibleRefundDate) {
+                    throw new CustomError(`Order Item cannot be refunded, as the order has been fulfilled but it has been more than ${transactionConstants.HOLDING_PERIOD} days since fulfillment!`, 400);
+                }
             }
 
             // 2. Create a new refund request with status as PENDING
@@ -118,12 +120,19 @@ class RefundRequestService {
 
     async approveRefundRequest(refundRequestId, data) {
         try {
-            const refundRequest = await this.getRefundRequestById(refundRequestId)
+            const refundRequest = await this.getRefundRequestById(refundRequestId);
+            let stripeRefundId = null;
 
             if (refundRequest.status != RefundStatus.PENDING) {
-                throw new CustomError(`Refund request cannot be rejected as it is in ${refundRequest.status} state`, 400);
+                throw new CustomError(`Refund request cannot be approved as it is in ${refundRequest.status} state`, 400);
             }
 
+            const orderItem = await orderItemService.getOrderItemById(refundRequest.orderItemId)
+            // If price is 0, immediately refund without using Stripe
+            if (orderItem.itemPrice != 0) {
+                const refundData = await stripeService.issuePartialRefund(orderItem.invoice.paymentId, orderItem.itemPrice)
+                stripeRefundId = refundData.id;
+            }
 
             const approvedRefundRequest = await prisma.$transaction(async (prismaClient) => {
                 const updatedRefundRequest = await prisma.refundRequest.update({
@@ -133,13 +142,10 @@ class RefundRequestService {
                     data: {
                         status: RefundStatus.APPROVED,
                         comment: data.comment,
+                        stripeRefundId: stripeRefundId,
                         processedAt: new Date(),
                     },
                 });
-
-                const orderItem = await orderItemService.getOrderItemById(refundRequest.orderItemId)
-                console.log(orderItem)
-                // await stripeService.issuePartialRefund(orderItem.invoice.paymentId, orderItem.itemPrice)
 
                 return updatedRefundRequest
             });
