@@ -3,6 +3,7 @@ const BusinessSalesService = require("../services/petBusinessSales/businessSales
 const AdminDashboardService = require("../services/dashboard/adminDashboardService");
 const PetBusinessDashboardService = require("../services/dashboard/petbusinessDashboardService");
 const constants = require("../../constants/common");
+const reviewService = require("../services/serviceListing/reviewService");
 const errorMessages = constants.errorMessages;
 
 exports.getPetBusinessSalesData = async (req, res, next) => {
@@ -41,3 +42,40 @@ exports.getPBDashboardData = async (req, res, next) => {
     next(error)
   }
 }
+
+exports.getReviewsDataForServiceListing = async (req, res, next) => {
+  try {
+    const serviceListingId = req.params.id;
+    const monthsBack = req.query.monthsBack;
+
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
+
+    if (!(await BaseValidations.isValidInteger(monthsBack)) || Number(monthsBack) > 12) {
+      return res
+        .status(400)
+        .json({ message: "`monthsBack` must be a valid integer between 0 and 12 inclusive." });
+    }
+
+    const averageReviewData = await reviewService.generateAverageReviewData(
+      Number(serviceListingId),
+      monthsBack
+    );
+    const ratingCountDistributionData = await reviewService.generateRatingCountDistributionData(
+      Number(serviceListingId),
+      monthsBack
+    );
+    const ratingCountData = await reviewService.generateRatingCountData(Number(serviceListingId), monthsBack);
+
+    const reviewsData = {
+      averageReviewData,
+      ratingCountDistributionData,
+      ratingCountData,
+    };
+
+    res.status(200).json(reviewsData);
+  } catch (error) {
+    next(error);
+  }
+};
