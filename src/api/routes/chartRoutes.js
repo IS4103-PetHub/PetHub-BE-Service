@@ -9,5 +9,6 @@ router.get("/health-check", async (req, res, next) => {
 
 router.get("/pet-business-sales/data/:id", chartController.getPetBusinessSalesData);
 router.get("/admin-dashboard", chartController.getAdminDashboardData)
+router.get("/pet-business-dashboard/data/:id", chartController.getPBDashboardData)
 
 module.exports = router;
