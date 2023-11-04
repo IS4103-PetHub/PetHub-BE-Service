@@ -1,7 +1,7 @@
 const BaseValidations = require("../validations/baseValidation");
 const BusinessSalesService = require("../services/petBusinessSales/businessSalesService");
 const AdminDashboardService = require("../services/dashboard/adminDashboardService");
-const PetBusinessDashbaordService = require("../services/dashboard/petbusinessDashboardService");
+const PetBusinessDashboardService = require("../services/dashboard/petbusinessDashboardService");
 const constants = require("../../constants/common");
 const errorMessages = constants.errorMessages;
 
@@ -35,7 +35,7 @@ exports.getPBDashboardData = async (req, res, next) => {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
-    const pbDashboardData = await PetBusinessDashbaordService.getPBDashboardData(Number(petBusinessId));
+    const pbDashboardData = await PetBusinessDashboardService.getPBDashboardData(Number(petBusinessId));
     res.status(200).json(pbDashboardData)
   } catch (error) {
     next(error)

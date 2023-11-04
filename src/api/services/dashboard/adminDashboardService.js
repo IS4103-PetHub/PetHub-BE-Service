@@ -16,8 +16,8 @@ exports.getAdminDashboardData = async () => {
 
         return adminDashboardData
     } catch (error) {
-        console.error("Error fetching Admin dashbaord Data:", error);
-        throw new Error("Error fetching admin dashbaord data");
+        console.error("Error fetching Admin dashboard Data:", error);
+        throw new Error("Error fetching admin dashboard data");
     }
 }
 
@@ -71,8 +71,8 @@ exports.getTotalUserCount = async () => {
         }
 
     } catch (error) {
-        console.error("Error generating Total PO count:", error);
-        throw new Error("Error generating Total PO count");
+        console.error("Error generating Total User count:", error);
+        throw new Error("Error generating Total User count");
     }
 }
 

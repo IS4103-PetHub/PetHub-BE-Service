@@ -19,18 +19,18 @@ exports.getPBDashboardData = async (petBusinessId) => {
         // open support ticket
         const openSupportRequestsCount = await this.getOpenSupportRequests(petBusinessId)
 
-        const pbDashbaordData = {
+        const pbDashboardData = {
             unrepliedReviewCount: unrepliedReviewCount,
             invalidSLCount: invalidSLCount,
             openRefundRequestsCount: openRefundRequestsCount,
             openSupportRequestsCount: openSupportRequestsCount
         }
 
-        return pbDashbaordData
+        return pbDashboardData
 
     } catch (error) {
         console.error("Error fetching PB dashboard data", error);
-        throw new Error("Error fetching PB dashbaord data");
+        throw new Error("Error fetching PB dashboard data");
     }
 }
 
