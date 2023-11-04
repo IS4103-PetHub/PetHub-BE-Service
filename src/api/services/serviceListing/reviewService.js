@@ -395,6 +395,7 @@ class ReviewService {
     async generateAverageReviewData(serviceListingId, monthsBack = 6) {
         try {
             const currentDate = new Date();
+            currentDate.setDate(1);
             const sixMonthsAgo = new Date(currentDate.setMonth(currentDate.getMonth() - monthsBack));
     
             // Fetch reviews in the last 6 months
@@ -426,7 +427,7 @@ class ReviewService {
             // FE lib expects list of list, first list is the header
             return [
                 ["Month", "Average rating"],
-                ...Array.from(result).map(([month, { sum, count }]) => [month, sum / count]),
+                ...Array.from(result).map(([month, { sum, count }]) => [month, sum / count]).reverse(), // reverse data coz so months are in ascending order
             ];
     
         } catch (error) {
@@ -441,6 +442,7 @@ class ReviewService {
     async generateRatingCountDistributionData(serviceListingId, monthsBack = 6) {
         try {
             const currentDate = new Date();
+            currentDate.setDate(1);
             const sixMonthsAgo = new Date(currentDate.setMonth(currentDate.getMonth() - monthsBack));
     
             const reviews = await prisma.review.findMany({
@@ -476,7 +478,7 @@ class ReviewService {
                 ["Month", "5 Paw", "4 Paw", "3 Paw", "2 Paw", "1 Paw"],
                 ...Array.from(ratingsDistribution).map(([month, data]) => [
                     month, data["5 Paw"], data["4 Paw"], data["3 Paw"], data["2 Paw"], data["1 Paw"]
-                ]),
+                ]).reverse(), // reverse data coz so months are in ascending order
             ];
     
         } catch (error) {
@@ -491,6 +493,7 @@ class ReviewService {
     async generateRatingCountData(serviceListingId, monthsBack = 6) {
         try {
             const currentDate = new Date();
+            currentDate.setDate(1);
             const sixMonthsAgo = new Date(currentDate.setMonth(currentDate.getMonth() - monthsBack));
     
             const reviews = await prisma.review.findMany({
