@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Oct 29 2023 20:22:34 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Nov 03 2023 15:49:34 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -298,6 +298,7 @@ model RefundRequest {
   reason          String // Required eason or notes for requesting the refund
   comment         String? // Optional notes for approving / rejecting refund
   processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
+  stripeRefundId  String?      @unique // to be obtained from Stripe transaction after refund is successful
 
   // Associations
   petOwnerId Int
@@ -422,6 +423,67 @@ model ReportReview {
   review         Review             @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
 }
 
+enum SupportTicketStatus {
+  PENDING
+  IN_PROGRESS
+  CLOSED_RESOLVED
+  CLOSED_UNRESOLVED
+}
+
+enum SupportCategoryEnum {
+  GENERAL_ENQUIRY
+  SERVICE_LISTINGS
+  ORDERS
+  APPOINTMENTS
+  PAYMENTS
+  ACCOUNTS
+  OTHERS
+}
+
+// 
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model SupportTicket {
+  supportTicketId Int                 @id @default(autoincrement())
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @default(now()) @updatedAt
+  status          SupportTicketStatus @default(PENDING)
+  reason          String // Required eason or notes for opening the support ticket
+  closedAt        DateTime? // Timestamp when the support ticket is closed
+
+  attachmentKeys String[]
+  attachmentURLs String[]
+  comments       Comment[]
+
+  supportCategory SupportCategoryEnum
+  priority        Priority
+
+  // user associations to be validated by service
+  petOwnerId Int?
+  petOwner   PetOwner? @relation(fields: [petOwnerId], references: [userId])
+
+  petBusinessId Int?
+  petBusiness   PetBusiness? @relation(fields: [petBusinessId], references: [userId])
+}
+
+model Comment {
+  commentId      Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  comment        String
+  attachmentKeys String[]
+  attachmentURLs String[]
+
+  supportTicketId Int
+  supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [supportTicketId], onDelete: Cascade, onUpdate: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
+
 // models for Role Based Access Control (RBAC)
 // UserGroup: Represents user groups in your system.
 // Permission: Represents the permissions that can be granted to user groups.
@@ -479,6 +541,7 @@ model User {
   petOwner            PetOwner?
   petBusiness         PetBusiness?
   UserGroupMembership UserGroupMembership[]
+  Comment             Comment[]
 }
 
 model EmailVerification {
@@ -515,6 +578,7 @@ model PetOwner {
   RefundRequest     RefundRequest[]
   reportReview      ReportReview[]
   likedReview       Review[]
+  SupportTicket     SupportTicket[]
 }
 
 model PetBusiness {
@@ -540,6 +604,7 @@ model PetBusiness {
   commissionRuleId Int?
   commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
   PayoutInvoice    PayoutInvoice[]
+  SupportTicket    SupportTicket[]
 }
 
 model ResetPassword {

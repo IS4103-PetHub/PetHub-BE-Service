@@ -44,6 +44,17 @@ class StripeService {
     }
   }
 
+  // Pass in the stripeRefundId (currently stored in RefundRequest.stripeRefundId after a successful refund)
+  // to get the refund details from stripe
+  async obtainRefundDetails(refundId) {
+    try {
+      const refundDetails = await this.stripe.refunds.retrieve(refundId);
+      return refundDetails;
+    } catch (error) {
+      throw new Error('Obtaining of refund details failed: ' + error.message);
+    }
+  }
+
   // UTILITY FUNCTIONS
 
   dollarToCents(amount = 0.00) {

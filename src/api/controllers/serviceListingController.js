@@ -20,11 +20,11 @@ exports.createServiceListing = async (req, res, next) => {
       !data.requiresBooking ||
       !data.defaultExpiryDays
     ) {
-      return res.status(400).json({ message: "Incomplete form data. Please fill in all required fields."});
+      return res.status(400).json({ message: "Incomplete form data. Please fill in all required fields." });
     }
 
-    if (!(await BaseValidations.isValidLength(data.title,limitations.SERVICE_LISTING_TITLE_LENGTH))) {
-      return res.status(400).json({message: errorMessages.INVALID_SERVICE_TITLE});
+    if (!(await BaseValidations.isValidLength(data.title, limitations.SERVICE_LISTING_TITLE_LENGTH))) {
+      return res.status(400).json({ message: errorMessages.INVALID_SERVICE_TITLE });
     }
 
     if (!(await BaseValidations.isValidInteger(data.petBusinessId)) ||
@@ -119,7 +119,7 @@ exports.updateServiceListing = async (req, res, next) => {
       updateData.lastPossibleDate = new Date(updateData.lastPossibleDate).toISOString();
     }
 
-    
+
     if (updateData.calendarGroupId) {
       if (!(await BaseValidations.isValidInteger(updateData.calendarGroupId))) {
         return res.status(400).json({ message: errorMessages.INVALID_INTEGER });
@@ -288,8 +288,8 @@ exports.getServiceListingByPBId = async (req, res, next) => {
 exports.getRecommendedListings = async (req, res, next) => {
   try {
     const petOwnerId = req.params.id;
-    if (!petOwnerId) { 
-      return res.status(400).json({ message: "Pet Owner ID cannot be empty" }); 
+    if (!petOwnerId) {
+      return res.status(400).json({ message: "Pet Owner ID cannot be empty" });
     }
     if (!(await BaseValidations.isValidInteger(petOwnerId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
@@ -335,7 +335,7 @@ exports.deleteServiceListing = async (req, res, next) => {
     if (!req.headers['authorization']) {
       return res.status(404).json({ message: "Unauthorized: Token missing" });
     }
-    
+
     const token = req.headers['authorization'].split(' ')[1];
     const callee = await getUserFromToken(token);
     if (!callee) {
