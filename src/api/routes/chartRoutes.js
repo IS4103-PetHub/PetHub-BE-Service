@@ -8,5 +8,6 @@ router.get("/health-check", async (req, res, next) => {
 });
 
 router.get("/pet-business-sales/data/:id", chartController.getPetBusinessSalesData);
+router.get("/reviews/data/:id", chartController.getReviewsDataForServiceListing);
 
 module.exports = router;
