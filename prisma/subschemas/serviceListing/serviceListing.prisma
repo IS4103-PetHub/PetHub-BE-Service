@@ -14,6 +14,7 @@ model ServiceListing {
   attachmentKeys    String[]
   attachmentURLs    String[]
   dateCreated       DateTime  @default(now())
+  listingTime       DateTime  @default(now())
   lastUpdated       DateTime?
   duration          Int?
   defaultExpiryDays Int // Number of days from purchase for the default expiry
@@ -56,7 +57,7 @@ model FeaturedListingSet {
   category            FeaturedListingCategoryEnum
   validityPeriodStart DateTime?
   validityPeriodEnd   DateTime?
-  featuredListings     FeaturedListing[]
+  featuredListings    FeaturedListing[]
 }
 
 model FeaturedListing {

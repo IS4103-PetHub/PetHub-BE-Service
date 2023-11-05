@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const crypto = require("crypto");
 const prisma = require("../../../../prisma/prisma");
 const constants = require("../../../constants/transactions");
+const petOwnerService = require("../user/petOwnerService");
 
 // 1) Payment service builds transaction which returns invoice and orderItems
 // 2) Once Payment service confirms payment, payment service must confirm the transaction with the payment ID
@@ -30,6 +31,7 @@ class TransactionService {
 
     async confirmTransaction(invoice, orderItems, paymentIntentId, petOwnerID) {
         try {
+            const petOwner = await petOwnerService.getUserById(petOwnerID)
             // Set the paymentId and petOwnerUserId for the invoice
             invoice.paymentId = paymentIntentId;
             invoice.petOwnerUserId = petOwnerID; // <-- This line links the PetOwner to the Invoice
@@ -67,6 +69,16 @@ class TransactionService {
                     data: orderItemsToCreate,
                 });
 
+
+                const updatedPoints = petOwner.points - invoice.pointsRedeemed + Math.floor(invoice.totalPrice)
+                // add points to user account
+                await prismaClient.petOwner.update({
+                    where: { userId: petOwnerID },
+                    data: {
+                        points: updatedPoints
+                    }
+                })
+
                 return createdInvoice;
             });
 
@@ -90,7 +102,7 @@ class TransactionService {
             const miscCharge = Math.round(totalOrderItemPrice * constants.MISC_CHARGE_PCT * 100) / 100;
 
             const invoice = {
-                totalPrice: totalOrderItemPrice + miscCharge,
+                totalPrice: totalOrderItemPrice,
                 miscCharge: miscCharge,
             };
 

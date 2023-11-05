@@ -8,7 +8,10 @@ definitions:
         description: The ID of the payment method.
       totalPrice:
         type: integer
-        description: total amount payable.
+        description: total amount payable = totalPrice (from cart items) + miscCharge - pointsRedeemed (in cents, capped at miscCharge).
+      pointsRedeemed:
+        type: integer
+        description: points to offset misc charge.
       userId:
         type: integer
         description: The ID of the user.
@@ -25,7 +28,8 @@ definitions:
               description: The quantity of the item.
     example:
       paymentMethodId: "pm_card_visa"
-      totalPrice: 177.09
+      totalPrice: 198.49
+      pointsRedeemed: 0
       userId: 9
       cartItems:
         - serviceListingId: 10

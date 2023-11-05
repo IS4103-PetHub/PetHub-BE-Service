@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Nov 03 2023 15:49:34 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Nov 05 2023 21:51:41 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -207,11 +207,14 @@ model CommissionRule {
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
   invoiceId  Int      @id @default(autoincrement())
-  totalPrice Float // The total price of the time of transaction
+  totalPrice Float // The total price considering cart item prices only
+  miscCharge Float // The total price * miscChargeRate
   createdAt  DateTime @default(now())
   paymentId  String   @unique // to be obtained from Stripe transaction
 
-  miscCharge Float // to account for tax/stripe_charge etc
+  pointsRedeemed  Int // final misc charge after deducting points
+  finalMiscCharge Float // final misc charge after deducting points
+  finalTotalPrice Float // totalPrice + finalMiscCharge
 
   // For invoice PDF (consolidated)
   attachmentKey String
@@ -339,6 +342,7 @@ model ServiceListing {
   attachmentKeys    String[]
   attachmentURLs    String[]
   dateCreated       DateTime  @default(now())
+  listingTime       DateTime  @default(now())
   lastUpdated       DateTime?
   duration          Int?
   defaultExpiryDays Int // Number of days from purchase for the default expiry
@@ -567,6 +571,7 @@ model PetOwner {
   lastName      String
   contactNumber String
   dateOfBirth   DateTime
+  points        Int      @default(0)
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique

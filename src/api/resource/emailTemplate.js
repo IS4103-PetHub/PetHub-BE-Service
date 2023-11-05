@@ -123,9 +123,13 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
     - Payment ID: ${invoice.paymentId}
 
     Billing Details:
-    - Subtotal: $${invoice.totalPrice - invoice.miscCharge}
-    - Tax (7%): $${invoice.miscCharge}
-    - Total Amount: $${invoice.totalPrice}
+    - Subtotal: $${invoice.totalPrice}
+    - Misc Charge (before points redemption) (7%): $${invoice.miscCharge}
+
+    - Points Redeemed: $${invoice.pointsRedeemed}
+    - Misc Charge (after points redemption) (7%): $${invoice.finalMiscCharge}
+    
+    - Total Amount: $${invoice.finalTotalPrice}
 
     You can view your order details and track the delivery status by clicking the following link: ${link}
 
@@ -247,7 +251,7 @@ exports.CreateNewInternalUser = (name, email, password) => {
     Regards,
     The PetHub Team
   `;
-} 
+}
 
 exports.payoutPBEmail = (name) => {
   return `Dear ${name},

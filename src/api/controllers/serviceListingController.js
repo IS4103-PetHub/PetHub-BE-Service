@@ -237,8 +237,7 @@ exports.getServiceListingByCategory = async (req, res, next) => {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
 
-    const serviceListings =
-      await ServiceListingService.getServiceListingByCategory(category);
+    const serviceListings = await ServiceListingService.getServiceListingByCategory(category);
     res.status(200).json(serviceListings);
   } catch (error) {
     next(error);
