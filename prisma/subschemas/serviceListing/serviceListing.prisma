@@ -5,6 +5,7 @@ import {OrderItem, Invoice} from "../finance/transactions"
 import { OrderItem } from "../finance/transactions"
 import { PetOwner } from "../user/user"
 import { ReviewReportReason } from "../enums/reviewEnums"
+import { ServiceListing } from "../../schema"
 
 model ServiceListing {
   serviceListingId  Int       @id @default(autoincrement())
@@ -38,6 +39,16 @@ model ServiceListing {
   reviews          Review[]
   overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
+  Bump             Bump[]
+}
+
+model Bump {
+  bumpId           Int            @id @default(autoincrement())
+  dateCreated      DateTime       @default(now())
+  amountCharged    Float          @default(5)
+  paymentId        String         @unique // to be obtained from Stripe transaction
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // m-n relation type between Tag and ServiceListing: implicit

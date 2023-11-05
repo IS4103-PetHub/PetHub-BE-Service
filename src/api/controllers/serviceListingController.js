@@ -347,3 +347,24 @@ exports.deleteServiceListing = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.bumpServiceListing = async (req, res, next) => {
+  try {
+    const serviceListingId = req.params.id;
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
+
+    const payload = req.body
+    const validationResult = ServiceListingValidations.isValidBumpServiceListingPayload(payload);
+    if (!validationResult.isValid) {
+      res.status(400).send({ message: validationResult.message });
+      return;
+    }
+
+    const newBump = await ServiceListingService.bumpServiceListing(Number(serviceListingId), payload);
+    res.status(200).json(newBump);
+  } catch (error) {
+    next(error);
+  }
+};

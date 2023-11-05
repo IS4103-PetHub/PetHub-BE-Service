@@ -8,7 +8,7 @@ router.get("/health-check", async (req, res, next) => {
   res.send({ message: "Ok service lising api is working 🚀" });
 });
 
-const storage = multer.memoryStorage(); 
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // CREATE AND UPDATE
@@ -26,8 +26,10 @@ router.get("/get-featured-listings", serviceListingController.getFeaturedListing
 router.get("/get-recommended-listings/:id", serviceListingController.getRecommendedListings);
 router.get("/:id", serviceListingController.getServiceListingById);
 
-
 // DELETE [Add logic to check for existing connections when order management is completed]
 router.delete('/:id', serviceListingController.deleteServiceListing);
+
+// Bump Service Listing 
+router.patch("/:id/bump", serviceListingController.bumpServiceListing);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Nov 05 2023 21:51:41 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Nov 05 2023 23:14:48 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -366,6 +366,16 @@ model ServiceListing {
   reviews          Review[]
   overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
+  Bump             Bump[]
+}
+
+model Bump {
+  bumpId           Int            @id @default(autoincrement())
+  dateCreated      DateTime       @default(now())
+  amountCharged    Float          @default(5)
+  paymentId        String         @unique // to be obtained from Stripe transaction
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
