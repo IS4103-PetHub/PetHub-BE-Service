@@ -36,6 +36,83 @@ definitions:
       items:
         type: any
 
+  Summary:
+    type: object
+    properties:
+      totalTransactionAmount:
+        type: number
+      totalCommissionEarned:
+        type: number
+      last30DaysTransactionAmount:
+        type: number
+      last30DaysCommissionEarned:
+        type: number
+
+  PetBusinessByOrders:
+    type: object
+    properties:
+      petBusinessId:
+        type: integer
+      totalAmount:
+        type: number
+      totalCommission:
+        type: number
+      orderItemCount:
+        type: integer
+      companyName:
+        type: string
+      businessType:
+        type: string
+      userEmail:
+        type: string
+      dateJoined:
+        type: string
+        format: date
+
+  PetBusinessBySales:
+    type: object
+    properties:
+      petBusinessId:
+        type: integer
+      totalAmount:
+        type: number
+      totalCommission:
+        type: number
+      orderItemCount:
+        type: integer
+      companyName:
+        type: string
+      businessType:
+        type: string
+      userEmail:
+        type: string
+      dateJoined:
+        type: string
+        format: date
+
+  MonthlyData:
+    type: array
+    items:
+      type: array
+      items:
+        type: any
+
+  TransactionsByCategory:
+    type: object
+    properties:
+      Category:
+        type: string
+      Transactions:
+        type: integer
+
+  CommissionByCategory:
+    type: object
+    properties:
+      Category:
+        type: string
+      Commission:
+        type: number
+
 paths:
   /api/chart/pet-business-sales/data/{petBusinessId}:
     get:
@@ -154,3 +231,172 @@ paths:
                     - ["Jan 2024", null, 1913]                          
       tags:
         - Charts
+  
+  /api/chart/revenue-tracking/data:
+    get:
+      summary: Get Revenue Tracking Data
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              summary:
+                $ref: '#/definitions/Summary'
+              lists:
+                type: object
+                properties:
+                  byOrderCount:
+                    type: object
+                    properties:
+                      allTimeTop5PetBusinessByOrders:
+                        type: array
+                        items:
+                          $ref: '#/definitions/PetBusinessByOrders'
+                      top5PetBusinessWithin30DaysByOrders:
+                        type: array
+                        items:
+                          $ref: '#/definitions/PetBusinessByOrders'
+                  bySaleAmount:
+                    type: object
+                    properties:
+                      allTimeTop5PetBusinessBySales:
+                        type: array
+                        items:
+                          $ref: '#/definitions/PetBusinessBySales'
+                      top5PetBusinessWithin30DaysBySales:
+                        type: array
+                        items:
+                          $ref: '#/definitions/PetBusinessBySales'
+              charts:
+                type: object
+                properties:
+                  areaChart:
+                    type: object
+                    properties:
+                      monthlyData:
+                        $ref: '#/definitions/MonthlyData'
+                  pieChart:
+                    type: object
+                    properties:
+                      transactionsByCategory:
+                        type: array
+                        items:
+                          $ref: '#/definitions/TransactionsByCategory'
+                      commissionByCategory:
+                        type: array
+                        items:
+                          $ref: '#/definitions/CommissionByCategory'
+          content:
+            application/json:
+              example: 
+                summary:
+                  totalTransactionAmount: 4155
+                  totalCommissionEarned: 290.85
+                  last30DaysTransactionAmount: 2130
+                  last30DaysCommissionEarned: 149.1
+                lists:
+                  byOrderCount:
+                    allTimeTop5PetBusinessByOrders:
+                      - petBusinessId: 2
+                        totalAmount: 780
+                        totalCommission: 54.6
+                        orderItemCount: 31
+                        companyName: "Smith's Pet Shop"
+                        businessType: "SERVICE"
+                        userEmail: "jane.smith@example.com"
+                        dateJoined: "05-11-2023"
+                      - petBusinessId: 1
+                        totalAmount: 540
+                        totalCommission: 37.8
+                        orderItemCount: 30
+                        companyName: "John's Company"
+                        businessType: "SERVICE"
+                        userEmail: "john.doe@example.com"
+                        dateJoined: "05-11-2023"
+                    top5PetBusinessWithin30DaysByOrders:
+                      - petBusinessId: 3
+                        totalAmount: 400
+                        totalCommission: 28
+                        orderItemCount: 18
+                        companyName: "Mike's Pet Business"
+                        businessType: "SERVICE"
+                        userEmail: "mike.petbiz@example.com"
+                        dateJoined: "05-11-2023"
+                      - petBusinessId: 1
+                        totalAmount: 355
+                        totalCommission: 24.85
+                        orderItemCount: 18
+                        companyName: "John's Company"
+                        businessType: "SERVICE"
+                        userEmail: "john.doe@example.com"
+                        dateJoined: "05-11-2023"
+                  bySaleAmount:
+                    allTimeTop5PetBusinessBySales:
+                      - petBusinessId: 2
+                        totalAmount: 780
+                        totalCommission: 54.6
+                        orderItemCount: 31
+                        companyName: "Smith's Pet Shop"
+                        businessType: "SERVICE"
+                        userEmail: "jane.smith@example.com"
+                        dateJoined: "05-11-2023"
+                      - petBusinessId: 3
+                        totalAmount: 615
+                        totalCommission: 43.05
+                        orderItemCount: 24
+                        companyName: "Mike's Pet Business"
+                        businessType: "SERVICE"
+                        userEmail: "mike.petbiz@example.com"
+                        dateJoined: "05-11-2023"
+                  top5PetBusinessWithin30DaysBySales:
+                      - petBusinessId: 3
+                        totalAmount: 400
+                        totalCommission: 28
+                        orderItemCount: 18
+                        companyName: "Mike's Pet Business"
+                        businessType: "SERVICE"
+                        userEmail: "mike.petbiz@example.com"
+                        dateJoined: "05-11-2023"
+                      - petBusinessId: 1
+                        totalAmount: 355
+                        totalCommission: 24.85
+                        orderItemCount: 18
+                        companyName: "John's Company"
+                        businessType: "SERVICE"
+                        userEmail: "john.doe@example.com"
+                        dateJoined: "05-11-2023"
+                charts:
+                  areaChart:
+                    monthlyData:
+                      - ["Month", "Transactions", "Commission Earned"]
+                      - ["Dec 2022", 300, 21]
+                      - ["Jan 2023", 570, 39.9]
+                      - ["Feb 2023", 565, 39.55]
+                      - ["Mar 2023", 80, 5.6]
+                      - ["Apr 2023", 265, 18.55]
+                      - ["May 2023", 170, 11.9]
+                      - ["Jun 2023", 100, 7]
+                      - ["Jul 2023", 515, 36.05]
+                      - ["Aug 2023", 310, 21.7]
+                      - ["Sep 2023", 170, 11.9]
+                      - ["Oct 2023", 3085, 215.95]
+                      - ["Nov 2023", 455, 31.85]
+                  pieChart:
+                    transactionsByCategory:
+                      - ["Category", "Transactions"]
+                      - ["VETERINARY", 1730]
+                      - ["PET_GROOMING", 3065]
+                      - ["PET_BOARDING", 1615]
+                      - ["DINING", 140]
+                      - ["PET_RETAIL", 400]
+                    commissionByCategory:
+                      - ["Category", "Commission"]
+                      - ["VETERINARY", 121.1]
+                      - ["PET_GROOMING", 214.55]
+                      - ["PET_BOARDING", 113.05]
+                      - ["DINING", 9.8]
+                      - ["PET_RETAIL", 28]
+      tags:
+        - Charts
+     
