@@ -1,5 +1,6 @@
 const commissionRules = [
-    { commissionRuleId: 1, name: "Default", commissionRate: 0.01 },
+    { commissionRuleId: 1, name: "Default", commissionRate: 0.07 },
+    { commissionRuleId: 2, name: "SuperBusiness", commissionRate: 0.05 },
 ];
 
 

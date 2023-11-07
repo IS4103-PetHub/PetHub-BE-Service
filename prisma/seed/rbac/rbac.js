@@ -42,6 +42,10 @@ const permissions = [
     // Review
     { code: "WRITE_REPORTED_REVIEWS", name: "Write Reported Reviews", description: "Permission to write Reported Reviews" },
     { code: "READ_REPORTED_REVIEWS", name: "Read Reported Reviews", description: "Permission to read Reported Reviews" },
+    
+    // Article
+    { code: "WRITE_ARTICLES", name: "Write Articles", description: "Permission to write Articles" },
+    { code: "READ_ARTICLES", name: "Read Articles", description: "Permission to read Articles" },
 ];
 
 // Root Administrator User Data

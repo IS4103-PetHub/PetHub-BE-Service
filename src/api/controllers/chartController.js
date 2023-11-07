@@ -1,5 +1,6 @@
 const BaseValidations = require("../validations/baseValidation");
 const BusinessSalesService = require("../services/petBusinessSales/businessSalesService");
+const RevenueTrackingService = require("../services/finance/revenueTrackingService");
 const AdminDashboardService = require("../services/dashboard/adminDashboardService");
 const PetBusinessDashboardService = require("../services/dashboard/petbusinessDashboardService");
 const constants = require("../../constants/common");
@@ -15,6 +16,15 @@ exports.getPetBusinessSalesData = async (req, res, next) => {
 
     const petBusinessSalesData = await BusinessSalesService.getPetBusinessData(Number(petBusinessId));
     res.status(200).json(petBusinessSalesData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getRevenueTrackingData = async (req, res, next) => {
+  try {
+    const revenueTrackingData = await RevenueTrackingService.getRevenueTrackingData();
+    res.status(200).json(revenueTrackingData);
   } catch (error) {
     next(error);
   }
