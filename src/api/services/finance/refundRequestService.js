@@ -112,8 +112,6 @@ class RefundRequestService {
                 return dateA - dateB;
             });
 
-            console.log("filtered", filteredRefundRequests)
-
             return filteredRefundRequests;
         } catch (error) {
             if (error instanceof CustomError) throw error;
