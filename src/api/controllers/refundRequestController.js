@@ -91,3 +91,47 @@ exports.getRefundRequestById = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.getRefundRequestByPetBusinessId = async (req, res, next) => {
+    try {
+        const petBusinessId = req.params.petBusinessId; // must be valid number
+        if (!(await baseValidations.isValidInteger(petBusinessId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const statusFilters = req.query.statusFilter;
+        let statusFilterArray = undefined;
+        if (statusFilters) {
+            if (!refundRequestValidation.validateStatusFilters(statusFilters)) return res.status(400).json({ message: "invalid statusFilter query" })
+            statusFilterArray = statusFilters.split(',');
+        }
+
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+        if (startDate && endDate) {
+            if (!(baseValidations.dateTimeValidation(startDate) && baseValidations.dateTimeValidation(endDate)))
+                return res.status(400).json({ message: "invalid start and end Date" })
+            if (new Date(startDate) > new Date(endDate))
+                return res.status(400).json({ message: "start date must be before end date" })
+        }
+
+        const serviceListingFilters = req.query.serviceListingFilters;
+        let serviceListingFilterArray = undefined;
+        if (serviceListingFilters) {
+            // validate 
+            if (!(refundRequestValidation.validateNumberList(serviceListingFilters)))
+                return res.status(400).json({ message: "invalid serviceListingFilter query" })
+            serviceListingFilterArray = serviceListingFilters.split(',');
+        }
+
+        const refundRequests = await refundRequestService.getRefundRequestByPetBusinessId(
+            Number(petBusinessId),
+            statusFilterArray,
+            startDate,
+            endDate,
+            serviceListingFilterArray)
+        res.status(200).json(refundRequests)
+    } catch (error) {
+        next(error)
+    }
+}
