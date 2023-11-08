@@ -4,7 +4,15 @@ const { seedCommissionRule } = require("./finance/commissionRules.js");
 const { seedUser } = require("./user/user.js");
 const { seedBusinessData } = require("./serviceListing/serviceListing.js");
 const { seedCalendarGroup } = require("./calendarGroup/calendarGroup.js");
-const { seedInvoicesAndOrders } = require("./orders/orders.js");
+const {
+  seedInvoicesAndOrders,
+  distributeOrderItems,
+  countBrackets,
+  seedBookings,
+  seedFulfillment,
+  seedRefunds,
+  seedReviews,
+} = require("./orders/orders.js");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -20,8 +28,15 @@ async function main() {
   console.log("Seeding business data...");
   await seedBusinessData(prisma);
   console.log("Seeding invoices and order items...");
-  await seedInvoicesAndOrders(prisma);
+  const orderItems = await seedInvoicesAndOrders(prisma);
   console.log("Seeding bookings for the above calendar groups...");
+  const funPackUpdatedWithBooking = await seedBookings(prisma, orderItems);
+  console.log("Seeding fulfilled orders (claim voucher)...");
+  const funPackUpdatedWithFulfillment = await seedFulfillment(prisma, funPackUpdatedWithBooking);
+  console.log("Seeding refunded orders...");
+  const funPackUpdatedWithRefunds = await seedRefunds(prisma, funPackUpdatedWithFulfillment);
+  console.log("Seeding reviewed orders...");
+  const funPackUpdatedWithReviews = await seedReviews(prisma, funPackUpdatedWithRefunds);
   await prisma.$disconnect(); // Disconnect from the database after seeding is done
   console.log("Main seeding completed!");
 }
