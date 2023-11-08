@@ -188,8 +188,8 @@ exports.getAllTimeTopNBySales = async (petBusinessId, n) => {
       serviceListingId: listing.serviceListingId,
       title: listing.title,
       category: listing.category,
+      totalOrders: listing.OrderItem.length,
       totalSales: listing.basePrice * listing.OrderItem.length,
-      orderItemCount: listing.OrderItem.length,
     }));
 
     // Sort by total sales in descending order
