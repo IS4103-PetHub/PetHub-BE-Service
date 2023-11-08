@@ -390,7 +390,7 @@ paths:
                       - ["PET_BOARDING", 113.05]
                       - ["DINING", 9.8]
                       - ["PET_RETAIL", 28]
-                    commissionByBusinessTypes:
+                    commissionByBusinessType:
                       - ["Business Type", "Transactions"]
                       - ["HEALTHCARE", 160.09]
                       - ["FNB", 26.81]
