@@ -383,13 +383,6 @@ paths:
                       - ["Oct 2023", 3085, 215.95]
                       - ["Nov 2023", 455, 31.85]
                   pieChart:
-                    transactionsByCategory:
-                      - ["Category", "Transactions"]
-                      - ["VETERINARY", 1730]
-                      - ["PET_GROOMING", 3065]
-                      - ["PET_BOARDING", 1615]
-                      - ["DINING", 140]
-                      - ["PET_RETAIL", 400]
                     commissionByCategory:
                       - ["Category", "Commission"]
                       - ["VETERINARY", 121.1]
@@ -397,6 +390,11 @@ paths:
                       - ["PET_BOARDING", 113.05]
                       - ["DINING", 9.8]
                       - ["PET_RETAIL", 28]
+                    commissionByBusinessTypes:
+                      - ["Business Type", "Transactions"]
+                      - ["HEALTHCARE", 160.09]
+                      - ["FNB", 26.81]
+                      - ["SERVICE", 124.88]
       tags:
         - Charts
      
