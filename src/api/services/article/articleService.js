@@ -26,14 +26,48 @@ class ArticleService {
     async getArticleById(articleId) {
         try {
             const article = await prisma.article.findUnique({
-                where: {articleId},
+                where: { articleId },
                 include: {
                     tags: true
                 }
             })
             if (!article) throw new CustomError("article not found", 404)
+
+            const selectedTags = article.tags;
+            const selectedTagsFilter = selectedTags.map((tag) => (tag.tagId))
+
+            const selectedCategories = article.category
+
+            const recommendedServiceListings = await prisma.serviceListing.findMany({
+                where: {
+                    AND: [
+                        {
+                            tags: {
+                                some: {
+                                    tagId: {
+                                        in: selectedTagsFilter,
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            category: {
+                                in: selectedCategories,
+                            },
+                        },
+                    ],
+                },
+                take: 6,
+                orderBy: {
+                    tags: {
+                        _count: 'desc',
+                    },
+                }
+            });
+
+            article.recommendedServices = recommendedServiceListings
             return article
-        } catch(error) {
+        } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ArticleError(error);
         }
@@ -90,7 +124,7 @@ class ArticleService {
             }
 
             const updatedArticle = await prisma.article.update({
-                where: {articleId},
+                where: { articleId },
                 data: {
                     articleType: articlePayload.articleType,
                     title: articlePayload.title,
@@ -121,9 +155,9 @@ class ArticleService {
         try {
             await this.deleteFilesOfAnArticle(articleId)
             await prisma.article.delete({
-                where: {articleId}
+                where: { articleId }
             });
-        } catch(error) {
+        } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ArticleError(error);
         }
@@ -132,9 +166,9 @@ class ArticleService {
     async deleteFilesOfAnArticle(articleId) {
         try {
             const article = await prisma.article.findUnique({
-                where: {articleId}
+                where: { articleId }
             })
-    
+
             if (!article) {
                 throw new CustomError("article not found", 404)
             }
@@ -142,8 +176,8 @@ class ArticleService {
         } catch (error) {
             if (error instanceof CustomError) {
                 throw error;
-              }
-              throw new ArticleError(error);
+            }
+            throw new ArticleError(error);
         }
     }
 
