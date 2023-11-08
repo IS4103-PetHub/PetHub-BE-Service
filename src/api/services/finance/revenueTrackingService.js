@@ -33,7 +33,7 @@ exports.getRevenueTrackingData = async () => {
         },
         pieChart: {
           commissionByCategory: dataByTypes.commissionByCategory,
-          commissionByBusinessTypes: dataByTypes.commissionByBusinessType,
+          commissionByBusinessType: dataByTypes.commissionByBusinessType,
         }
       },
     };
