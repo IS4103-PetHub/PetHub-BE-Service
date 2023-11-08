@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Fri Nov 03 2023 15:49:34 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Wed Nov 08 2023 23:29:56 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -83,6 +83,9 @@ model Article {
   //img
   attachmentKeys String[]
   attachmentUrls String[]
+
+  tags     Tag[]
+  category Category[]
 
   createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
   updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
@@ -374,6 +377,7 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article         Article[]
 }
 
 model FeaturedListingSet {

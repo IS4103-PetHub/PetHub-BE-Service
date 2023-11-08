@@ -1,4 +1,4 @@
-const {ArticleType} = require('@prisma/client')
+const { ArticleType, Category } = require('@prisma/client')
 const Joi = require("joi")
 
 exports.validateArticleType = (type) => {
@@ -37,10 +37,27 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
             .required()
             .regex(/^\d+$/, 'numeric')
             .messages({
-              'string.empty': 'Internal user ID must not be empty.',
-              'string.pattern.base': 'Internal user ID must be a numeric string.',
+                'string.empty': 'Internal user ID must not be empty.',
+                'string.pattern.base': 'Internal user ID must be a numeric string.',
             }),
-        
+        tagIds: Joi.array()
+            .items(
+                Joi.string()
+                    .trim()
+                    .regex(/^\d+$/, 'numeric')
+                    .message({
+                        'string.pattern.base': 'Tag ID must be a numeric string.',
+                    })
+            ),
+        category: Joi.array()
+            .items(
+                Joi.string()
+                    .valid(...Object.values(Category))
+                    .messages({
+                        'any.only': 'Invalid category value.',
+                    })
+            ),
+
     })
 
     const { error } = schema.validate(payload, { convert: false });

@@ -5,6 +5,7 @@ import {OrderItem, Invoice} from "../finance/transactions"
 import { OrderItem } from "../finance/transactions"
 import { PetOwner } from "../user/user"
 import { ReviewReportReason } from "../enums/reviewEnums"
+import { Article } from "..\..\schema"
 
 model ServiceListing {
   serviceListingId  Int       @id @default(autoincrement())
@@ -49,6 +50,7 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article Article[]
 }
 
 model FeaturedListingSet {
