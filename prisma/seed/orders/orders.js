@@ -10,11 +10,11 @@ const reviewService = require("../../../src/api/services/serviceListing/reviewSe
 const serviceListingService = require("../../../src/api/services/serviceListing/serviceListingService");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
-const NUM_INVOICES = 40;
+const NUM_INVOICES = 60;
 const NUM_CART_ITEMS = 3;
 const CURRENT_DATE = new Date();
-const NUM_VOUCHERS_TO_CLAIM = 250; //fulfilled orders
-const NUM_REVIEWS = 240;
+const NUM_VOUCHERS_TO_CLAIM = 400; //fulfilled orders
+const NUM_REVIEWS = 380;
 const NUM_PENDING_REFUNDS = 5;
 
 const JOHNS_SERVICELISTINGS = [
