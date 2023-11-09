@@ -10,9 +10,12 @@ const reviewService = require("../../../src/api/services/serviceListing/reviewSe
 const serviceListingService = require("../../../src/api/services/serviceListing/serviceListingService");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
-const NUM_INVOICES = 20;
+const NUM_INVOICES = 40;
 const NUM_CART_ITEMS = 3;
 const CURRENT_DATE = new Date();
+const NUM_VOUCHERS_TO_CLAIM = 250; //fulfilled orders
+const NUM_REVIEWS = 240;
+const NUM_PENDING_REFUNDS = 5;
 
 const JOHNS_SERVICELISTINGS = [
   {
@@ -374,57 +377,6 @@ async function simulateCreateReview(prisma, payload, orderItem) {
   }
 }
 
-// ============================== Helper functions ============================== //
-
-// CREATE CHECKOUT SEED PAYLOADS
-let checkoutPayloads = [];
-for (let i = 0; i < NUM_INVOICES; i++) {
-  checkoutPayloads.push(createCheckoutPayload(NUM_CART_ITEMS));
-}
-
-async function seedInvoicesAndOrders(prisma) {
-  /*
-    Save the original console.log and override it to do nothing,
-    this is because we want to avoid bombing the terminal from the console.logs in the downstream functions
-  */
-  let orderItems = [];
-
-  const originalLog = console.log;
-  console.log = () => {};
-
-  for (const [index, payload] of checkoutPayloads.entries()) {
-    try {
-      const confirmedInvoice = await simulateCheckout(payload);
-      const confirmedInvoiceLastMonth = await simulateCheckout(payload, true);
-
-      // Include invoice to OI but remove circular ref
-      const addInvoiceToOrderItems = (orderItems, invoice) => {
-        return orderItems.map((item) => {
-          return {
-            ...item,
-            invoice: {
-              ...invoice,
-              orderItems: undefined,
-            },
-          };
-        });
-      };
-
-      orderItems.push(...addInvoiceToOrderItems(confirmedInvoice.orderItems, confirmedInvoice));
-      orderItems.push(
-        ...addInvoiceToOrderItems(confirmedInvoiceLastMonth.orderItems, confirmedInvoiceLastMonth)
-      );
-    } catch (error) {
-      console.log = originalLog; // Restore console.log so I can print the shortened log below
-      console.log(`Error seeding invoices and orders for payload at index ${index}.`);
-      console.log = () => {}; // Override console.log to do nothing again
-    }
-  }
-  console.log = originalLog; // Restore console.log after the loop
-
-  return orderItems.flat();
-}
-
 function distributeOrderItems(orderItems) {
   const orderItemVarietyFunPack = {
     pendingBooking: [],
@@ -459,7 +411,7 @@ function distributeOrderItems(orderItems) {
         break;
     }
   }
-  countBrackets(orderItemVarietyFunPack);
+  // countBrackets(orderItemVarietyFunPack);
   return orderItemVarietyFunPack;
 }
 
@@ -511,18 +463,70 @@ function validateAndDistributeOrderItems(orderItemVarietyFunPack) {
       orderItemVarietyFunPack[statusKey].push(...itemsToReallocate[statusKey]);
     }
   }
-  countBrackets(orderItemVarietyFunPack);
+  // countBrackets(orderItemVarietyFunPack);
   return orderItemVarietyFunPack;
 }
 
 function countBrackets(orderItemVarietyFunPack) {
-  console.log("\nCounting brackets...");
+  console.log("\nCounting brackets...\n");
   for (const status in orderItemVarietyFunPack) {
     if (orderItemVarietyFunPack.hasOwnProperty(status)) {
       const count = orderItemVarietyFunPack[status].length;
       console.log(`${status}: ${count} item(s)`);
     }
   }
+  console.log("\nEnd Count\n");
+}
+
+// ============================== Helper functions ============================== //
+
+// CREATE CHECKOUT SEED PAYLOADS
+let checkoutPayloads = [];
+for (let i = 0; i < NUM_INVOICES; i++) {
+  checkoutPayloads.push(createCheckoutPayload(NUM_CART_ITEMS));
+}
+
+async function seedInvoicesAndOrders(prisma) {
+  /*
+    Save the original console.log and override it to do nothing,
+    this is because we want to avoid bombing the terminal from the console.logs in the downstream functions
+  */
+  let orderItems = [];
+
+  const originalLog = console.log;
+  console.log = () => {};
+
+  for (const [index, payload] of checkoutPayloads.entries()) {
+    try {
+      const confirmedInvoice = await simulateCheckout(payload);
+      const confirmedInvoiceLastMonth = await simulateCheckout(payload, true);
+
+      // Include invoice to OI but remove circular ref
+      const addInvoiceToOrderItems = (orderItems, invoice) => {
+        return orderItems.map((item) => {
+          return {
+            ...item,
+            invoice: {
+              ...invoice,
+              orderItems: undefined,
+            },
+          };
+        });
+      };
+
+      orderItems.push(...addInvoiceToOrderItems(confirmedInvoice.orderItems, confirmedInvoice));
+      orderItems.push(
+        ...addInvoiceToOrderItems(confirmedInvoiceLastMonth.orderItems, confirmedInvoiceLastMonth)
+      );
+    } catch (error) {
+      console.log = originalLog; // Restore console.log so I can print the shortened log below
+      console.log(`Error seeding invoices and orders for payload at index ${index}.`);
+      console.log = () => {}; // Override console.log to do nothing again
+    }
+  }
+  console.log = originalLog; // Restore console.log after the loop
+
+  return orderItems.flat();
 }
 
 async function seedBookings(prisma, orderItems) {
@@ -578,9 +582,8 @@ async function seedFulfillment(prisma, funPack) {
   let orderItemVarietyFunPack = funPack;
 
   const pendingFulfillmentItems = orderItemVarietyFunPack.pendingFulfillment;
-  const maxFulfillmentCount = 30;
 
-  for (let i = 0; i < Math.min(maxFulfillmentCount, pendingFulfillmentItems.length); i++) {
+  for (let i = 0; i < Math.min(NUM_VOUCHERS_TO_CLAIM, pendingFulfillmentItems.length); i++) {
     try {
       const item = pendingFulfillmentItems[i];
       await prisma.orderItem.update({
@@ -607,8 +610,7 @@ async function seedFulfillment(prisma, funPack) {
 async function seedRefunds(prisma, funPack) {
   let orderItemVarietyFunPack = funPack;
 
-  // 5 items only
-  const itemsForRefund = orderItemVarietyFunPack.pendingFulfillment.slice(0, 5);
+  const itemsForRefund = orderItemVarietyFunPack.pendingFulfillment.slice(0, NUM_PENDING_REFUNDS);
   const reasons =
     "I recently purchased the Deluxe Pet Bed for my senior Labrador, " +
     "and it did not meet our expectations. The fabric tore within a week, " +
@@ -683,7 +685,7 @@ async function seedRefunds(prisma, funPack) {
 async function seedReviews(prisma, funPack) {
   const orderItemVarietyFunPack = funPack;
 
-  const itemsForReview = orderItemVarietyFunPack.fulfilled.slice(0, 20);
+  const itemsForReview = orderItemVarietyFunPack.fulfilled.slice(0, NUM_REVIEWS);
 
   for (const item of itemsForReview) {
     const rating = getRandomRating();
@@ -719,6 +721,64 @@ async function seedReviews(prisma, funPack) {
       console.error(error);
     }
   }
+
+  // print info on review aggregation
+  try {
+    const topReviewedServiceListings = await prisma.review.groupBy({
+      by: ["serviceListingId"],
+      _count: {
+        serviceListingId: true,
+      },
+      orderBy: {
+        _count: {
+          serviceListingId: "desc",
+        },
+      },
+      take: 3,
+    });
+
+    const topServiceListingsWithDetails = await Promise.all(
+      topReviewedServiceListings.map(async (listing) => {
+        const serviceListing = await prisma.serviceListing.findUnique({
+          where: { serviceListingId: listing.serviceListingId },
+          select: {
+            title: true,
+            petBusiness: {
+              select: {
+                companyName: true,
+                user: {
+                  select: {
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        return {
+          title: serviceListing.title,
+          petBusinessName: serviceListing.petBusiness.companyName,
+          petBusinessEmail: serviceListing.petBusiness.user.email,
+          reviewsCount: listing._count.serviceListingId,
+        };
+      })
+    );
+
+    console.log("Top 3 most reviewed service listings:");
+    topServiceListingsWithDetails.forEach((listing, index) => {
+      console.log(
+        `${index + 1}: ${listing.title} by: ${listing.petBusinessName} with email: ${
+          listing.petBusinessEmail
+        } - Review Count: ${listing.reviewsCount}`
+      );
+    });
+  } catch (error) {
+    console.error("Failed to aggregate top reviewed service listings:", error);
+  }
+
+  // print log of overview of all orderItems
+  countBrackets(orderItemVarietyFunPack);
 
   return validateAndDistributeOrderItems(orderItemVarietyFunPack);
 }
