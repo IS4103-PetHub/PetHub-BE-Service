@@ -40,7 +40,10 @@ class StripeService {
       });
       return refund;
     } catch (error) {
-      throw new Error('Partial refund failed: ' + error.message);
+      // Commented out propagation of error, as currently this will not work with seeded orders as the paymentIntentId is mocked during seeding, no stripe was used.
+      // TODO: Revert changes before submitting code 
+      console.log("Error during partial refund:", error.message);
+      // throw new Error('Partial refund failed: ' + error.message);
     }
   }
 

@@ -219,7 +219,9 @@ class RefundRequestService {
             // If price is 0, immediately refund without using Stripe
             if (orderItem.itemPrice != 0) {
                 const refundData = await stripeService.issuePartialRefund(orderItem.invoice.paymentId, orderItem.itemPrice)
-                stripeRefundId = refundData.id;
+                // Commented out propagation of error in issuePartialRefund then mock the stripRefundId for seeded orders (refundData will be undefined)
+                // TODO: Revert changes before submitting code 
+                stripeRefundId = refundData ? refundData.id : "Mock stripe refund";
             }
 
             const approvedRefundRequest = await prisma.$transaction(async (prismaClient) => {
