@@ -1,12 +1,13 @@
 const { OrderItemStatus, RefundStatus } = require("@prisma/client");
 const BookingService = require("../../../src/api/services/appointments/bookingService");
 const TransactionService = require("../../../src/api/services/finance/transactionService");
-const RefundRequestService = require("../../../src/api/services/finance/refundRequestService");
 const petOwnerService = require("../../../src/api/services/user/petOwnerService");
 const { v4: uuidv4 } = require("uuid");
 const CalendarGroupService = require("../../../src/api/services/appointments/calendarGroupService");
 const { getRandomPastDate } = require("../../../src/utils/date");
 const refundRequestService = require("../../../src/api/services/finance/refundRequestService");
+const reviewService = require("../../../src/api/services/serviceListing/reviewService");
+const serviceListingService = require("../../../src/api/services/serviceListing/serviceListingService");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
 const NUM_INVOICES = 20;
@@ -278,6 +279,101 @@ async function simulateCheckout(data, lastMonth = false) {
   return await TransactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId); // returns invoice obj
 }
 
+// Helper function to get a random element from an array
+const getRandomElement = (array) => array[Math.floor(Math.random() * array.length)];
+
+const getRandomRating = () => {
+  const ratings = [1, 2, 3, 4, 4, 5, 5, 5]; // Higher chances for 4 and 5s LOL
+  return getRandomElement(ratings);
+};
+
+// Sample data for titles, comments, and image URLs
+const reviewTitles = [
+  "Not Satisfied",
+  "Could be better",
+  "Disappointed",
+  "Alright",
+  "This item has exceeded by expectations",
+];
+
+const reviewComments = [
+  "Expected more from this product",
+  "Not worth the price",
+  "Expected more from this product",
+  "Meh its alright I guess",
+  "I recently purchased the 'SnugglePaws Deluxe Pet Bed' from the 'Cozy Critters Emporium', and I have to say, it has been a game-changer for my little Beagle, Benny! From the moment I unwrapped the bed, Benny was drawn to the plush, velvety fabric, and the generous padding that just molds around his body. It's been a couple of weeks now, and Benny has never looked so peaceful during his naps. I've noticed he's more energetic during our walks, and I'm convinced it's because he's getting quality rest. The bed has held up beautifully despite Benny's occasional digging ritual before he settles down. It's been through the wash a few times and has maintained its shape and softness, which honestly has surprised me, considering how many beds we've gone through before.",
+];
+
+const reviewImages = [
+  {
+    url: "https://i.insider.com/5d289d6921a86120285e5e24?width=700",
+    name: "dog_review_1",
+  },
+  {
+    url: "https://www.vetmed.com.au/wp-content/uploads/2019/03/How-to-Choose-Right-Vet-Clinic-for-Your-Multi-Breeds-Pets.jpg",
+    name: "dog_review_2",
+  },
+  {
+    url: "https://img1.wsimg.com/isteam/ip/3b648486-0d2e-4fcd-8deb-ddb6ce935eb3/blob-0010.png",
+    name: "dog_review_3",
+  },
+];
+
+const getRandomReviewImages = () => {
+  const numberOfImages = Math.floor(Math.random() * 4); // 0 to 3 images
+  const selectedImages = [];
+  for (let i = 0; i < numberOfImages; i++) {
+    selectedImages.push(getRandomElement(reviewImages));
+  }
+  return selectedImages;
+};
+
+async function simulateCreateReview(prisma, payload, orderItem) {
+  try {
+    if (orderItem.status !== OrderItemStatus.FULFILLED) console.log("WARNING: Order item is not fulfilled");
+    if (!orderItem.dateFulfilled) console.log("WARNING: Order item does not have a dateFulfilled");
+
+    // Simulate the date of review creation as 3 days after the order fulfillment
+    const simulatedDateCreated = new Date(orderItem.dateFulfilled);
+    simulatedDateCreated.setDate(simulatedDateCreated.getDate() + 3);
+
+    const serviceListingId = orderItem.serviceListingId;
+    const serviceListing = await serviceListingService.getServiceListingById(serviceListingId);
+
+    let newRating;
+    if (serviceListing.reviews.length != 0 && serviceListing.overallRating != 0) {
+      const currentTotalRating = serviceListing.reviews.length * serviceListing.overallRating;
+      newRating = (currentTotalRating + Number(payload.rating)) / (serviceListing.reviews.length + 1);
+    } else {
+      newRating = Number(payload.rating);
+    }
+
+    const simulatedReview = await prisma.review.create({
+      data: {
+        title: payload.title,
+        comment: payload.comment,
+        rating: payload.rating,
+        attachmentKeys: payload.attachmentKeys,
+        attachmentURLs: payload.attachmentURLs,
+        orderItemId: orderItem.orderItemId,
+        serviceListingId: orderItem.serviceListingId,
+        dateCreated: simulatedDateCreated,
+      },
+    });
+
+    await prisma.serviceListing.update({
+      where: { serviceListingId },
+      data: {
+        overallRating: newRating,
+      },
+    });
+
+    return simulatedReview;
+  } catch (error) {
+    console.error("Failed to simulate review creation:", error);
+  }
+}
+
 // ============================== Helper functions ============================== //
 
 // CREATE CHECKOUT SEED PAYLOADS
@@ -457,14 +553,16 @@ async function seedBookings(prisma, orderItems) {
       if (!selectedTimeSlot) continue;
 
       try {
-        await BookingService.createBooking(
+        const booking = await BookingService.createBooking(
           9,
           serviceListing.calendarGroup,
           item.orderItemId,
           selectedTimeSlot.startTime,
           selectedTimeSlot.endTime
         );
-        item.status = OrderItemStatus.PENDING_FULFILLMENT; // Update the status only of the order item locally
+        // update local state
+        item.status = OrderItemStatus.PENDING_FULFILLMENT;
+        item.booking = booking;
       } catch (error) {
         console.log("Error creating booking", error);
       }
@@ -494,7 +592,9 @@ async function seedFulfillment(prisma, funPack) {
           dateFulfilled: item.invoice.createdAt,
         },
       });
-      item.status = OrderItemStatus.FULFILLED; // Update the status only of the order item locally
+      // update local state
+      item.status = OrderItemStatus.FULFILLED;
+      item.dateFulfilled = item.invoice.createdAt;
     } catch (error) {
       console.error(`Error fulfilling order item`, error);
     }
@@ -518,69 +618,107 @@ async function seedRefunds(prisma, funPack) {
   let refundRequestIds = [];
   const currentDate = new Date();
 
-  for (const item of itemsForRefund) {
-    // Set dateFulfilled such that it falls within the allowed holding period
-    const dateFulfilledWithinHoldingPeriod = new Date();
-    dateFulfilledWithinHoldingPeriod.setDate(currentDate.getDate() - 8);
-    item.dateFulfilled = dateFulfilledWithinHoldingPeriod;
+  try {
+    for (const item of itemsForRefund) {
+      // Set dateFulfilled such that it falls within the allowed holding period
+      const dateFulfilledWithinHoldingPeriod = new Date();
+      dateFulfilledWithinHoldingPeriod.setDate(currentDate.getDate() - 8);
+      item.dateFulfilled = dateFulfilledWithinHoldingPeriod;
 
-    // Update the DB
-    await prisma.orderItem.update({
-      where: { orderItemId: item.orderItemId },
-      data: { dateFulfilled: item.dateFulfilled },
-    });
+      // Update the DB
+      await prisma.orderItem.update({
+        where: { orderItemId: item.orderItemId },
+        data: { dateFulfilled: item.dateFulfilled },
+      });
 
-    const refundRequest = await refundRequestService.createRefundRequest({
-      orderItemId: item.orderItemId,
-      reason: reasons,
-    });
-    refundRequestIds.push(refundRequest.refundRequestId);
-  }
-
-  // Approve the refund for the first item and update status locally
-  if (refundRequestIds.length > 0) {
-    // approve without the service to avoid the stripe stuff
-    approvalResponse = await prisma.refundRequest.update({
-      where: {
-        refundRequestId: refundRequestIds[0],
-      },
-      data: {
-        status: RefundStatus.APPROVED,
-        comment: "Approved as the reason given is valid.",
-        processedAt: new Date(),
-      },
-    });
-    await prisma.orderItem.update({
-      where: {
-        orderItemId: approvalResponse.orderItemId,
-      },
-      data: {
-        status: OrderItemStatus.REFUNDED,
-      },
-    });
-    let itemToApprove = itemsForRefund.find((item) => item.orderItemId === approvalResponse.orderItemId);
-    if (itemToApprove) {
-      itemToApprove.status = OrderItemStatus.REFUNDED;
+      const refundRequest = await refundRequestService.createRefundRequest({
+        orderItemId: item.orderItemId,
+        reason: reasons,
+      });
+      // update local state
+      item.RefundRequest = refundRequest;
+      refundRequestIds.push(refundRequest.refundRequestId);
     }
-  }
 
-  // Reject the refund for the second item and update status locally
-  if (refundRequestIds.length > 1) {
-    const rejectionResponse = await refundRequestService.rejectRefundRequest(refundRequestIds[1], {
-      comment: "Rejected refund request due to policy constraints.",
-    });
+    // Approve the refund for the first item and update status locally
+    if (refundRequestIds.length > 0) {
+      // approve without the service to avoid the stripe stuff
+      approvalResponse = await prisma.refundRequest.update({
+        where: {
+          refundRequestId: refundRequestIds[0],
+        },
+        data: {
+          status: RefundStatus.APPROVED,
+          comment: "Approved as the reason given is valid.",
+          processedAt: new Date(),
+        },
+      });
+      await prisma.orderItem.update({
+        where: {
+          orderItemId: approvalResponse.orderItemId,
+        },
+        data: {
+          status: OrderItemStatus.REFUNDED,
+        },
+      });
+      let itemToApprove = itemsForRefund.find((item) => item.orderItemId === approvalResponse.orderItemId);
+      if (itemToApprove) {
+        itemToApprove.status = OrderItemStatus.REFUNDED;
+      }
+    }
+
+    // Reject the refund for the second item and update status locally
+    if (refundRequestIds.length > 1) {
+      const rejectionResponse = await refundRequestService.rejectRefundRequest(refundRequestIds[1], {
+        comment: "Rejected refund request due to policy constraints.",
+      });
+    }
+  } catch (error) {
+    console.error(`Error seeding refunds`, error);
   }
 
   return validateAndDistributeOrderItems(orderItemVarietyFunPack);
 }
 
 async function seedReviews(prisma, funPack) {
-  let orderItemVarietyFunPack = funPack;
+  const orderItemVarietyFunPack = funPack;
 
-  // 20 items for now, later go and increase the number of invoices and IOs, increase fulfilled orders, then can increase this also
-  const itemsForRefund = orderItemVarietyFunPack.pendingFulfillment.slice(0, 20);
+  const itemsForReview = orderItemVarietyFunPack.fulfilled.slice(0, 20);
 
-  // create here (some got image some no image, diff titles and comment, some got reply some no reply, some got likes some no likes)
+  for (const item of itemsForReview) {
+    const rating = getRandomRating();
+    const title = reviewTitles[rating - 1];
+    const comment = reviewComments[rating - 1];
+    const images = getRandomReviewImages();
+
+    const payload = {
+      title: title,
+      comment: comment,
+      rating,
+      attachmentKeys: images.map((img) => img.name),
+      attachmentURLs: images.map((img) => img.url),
+    };
+
+    try {
+      // Skip the time checks and just create the review (3 days after each item's fulfillment date)
+      const newReview = await simulateCreateReview(prisma, payload, item);
+      // update local state
+      item.review = newReview;
+
+      // 50% chance for a reply
+      if (Math.random() < 0.5) {
+        const updatedReview = await prisma.review.update({
+          where: { reviewId: newReview.reviewId },
+          data: {
+            reply: "Thank you for your feedback! But we are not accepting feedback at the moment.",
+            replyDate: new Date(),
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return validateAndDistributeOrderItems(orderItemVarietyFunPack);
 }
