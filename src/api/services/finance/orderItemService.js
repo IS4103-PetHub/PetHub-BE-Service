@@ -117,7 +117,8 @@ class OrderItemService {
                             }
                         },
                     },
-                    review: true
+                    review: true,
+                    RefundRequest: true,
                 },
             });
 
@@ -158,7 +159,8 @@ class OrderItemService {
                                     },
                                 },
                             },
-                            review: true
+                            review: true,
+                            RefundRequest: true,
                         },
                     },
                     PetOwner: {
@@ -234,7 +236,8 @@ class OrderItemService {
                                     }
                                 },
                             },
-                            review: true
+                            review: true,
+                            RefundRequest: true,
                         },
                     },
                 },

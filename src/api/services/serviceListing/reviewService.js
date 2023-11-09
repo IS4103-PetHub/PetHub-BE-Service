@@ -427,8 +427,10 @@ class ReviewService {
             // FE lib expects list of list, first list is the header
             return [
                 ["Month", "Average rating"],
-                ...Array.from(result).map(([month, { sum, count }]) => [month, sum / count]).reverse(), // reverse data coz so months are in ascending order
-            ];
+                ...Array.from(result)
+                  .sort((a, b) => this.monthToNumber(a[0]) - this.monthToNumber(b[0])) // Sort by month number
+                  .map(([month, { sum, count }]) => [month, sum / count]),
+              ];
     
         } catch (error) {
             if (error instanceof CustomError) {
@@ -476,10 +478,12 @@ class ReviewService {
             // FE lib expects list of list, first list is the header
             return [
                 ["Month", "5 Paw", "4 Paw", "3 Paw", "2 Paw", "1 Paw"],
-                ...Array.from(ratingsDistribution).map(([month, data]) => [
+                ...Array.from(ratingsDistribution)
+                  .sort((a, b) => this.monthToNumber(a[0]) - this.monthToNumber(b[0])) // Sort by month number
+                  .map(([month, data]) => [
                     month, data["5 Paw"], data["4 Paw"], data["3 Paw"], data["2 Paw"], data["1 Paw"]
-                ]).reverse(), // reverse data coz so months are in ascending order
-            ];
+                  ]),
+              ];
     
         } catch (error) {
             if (error instanceof CustomError) {
@@ -531,6 +535,11 @@ class ReviewService {
             }
             throw new ReviewError(error);
         }
+    }
+
+    monthToNumber(month) {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return monthNames.indexOf(month);
     }
 }
 
