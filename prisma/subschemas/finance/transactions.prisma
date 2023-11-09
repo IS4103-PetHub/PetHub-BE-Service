@@ -6,11 +6,14 @@ import { Review } from "../serviceListing/serviceListing"
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
   invoiceId  Int      @id @default(autoincrement())
-  totalPrice Float // The total price of the time of transaction
+  totalPrice Float // The total price considering cart item prices only
+  miscCharge Float // The total price * miscChargeRate
   createdAt  DateTime @default(now())
   paymentId  String   @unique // to be obtained from Stripe transaction
 
-  miscCharge Float // to account for tax/stripe_charge etc
+  pointsRedeemed  Int // final misc charge after deducting points
+  finalMiscCharge Float // final misc charge after deducting points
+  finalTotalPrice Float // totalPrice + finalMiscCharge
 
   // For invoice PDF (consolidated)
   attachmentKey String

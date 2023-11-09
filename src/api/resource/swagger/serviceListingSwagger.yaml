@@ -184,6 +184,15 @@ definitions:
         items:
           type: string
 
+  BumpServiceListingReqest:
+    type: object
+    required:
+      - paymentMethodId
+    properties:
+      paymentMethodId:
+        type: string
+        description: payment method id.
+
 paths:
   /api/service-listings/health-check:
     get:
@@ -365,6 +374,31 @@ paths:
       responses:
         200:
           description: Service listing deleted successfully
+      tags:
+        - Service Listing
+
+  /api/service-listings/{id}/bump:
+    patch:
+      summary: Bump a service listing by ID
+      parameters:
+        - in: path
+          name: id
+          description: The ID of the service listing to bump.
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        description: bump service listing request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/BumpServiceListingReqest"
+            example:
+              paymentMethodId: "pm_card_visa"
+      responses:
+        200:
+          description: Service listing details
       tags:
         - Service Listing
 

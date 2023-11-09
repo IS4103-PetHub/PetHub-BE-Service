@@ -52,6 +52,7 @@ model PetOwner {
   lastName      String
   contactNumber String
   dateOfBirth   DateTime
+  points        Int      @default(0)
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
