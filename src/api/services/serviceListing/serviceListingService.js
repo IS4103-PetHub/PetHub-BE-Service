@@ -7,6 +7,8 @@ const EmailService = require("../emailService");
 const s3ServiceInstance = require("../s3Service");
 const { getAllAddressesForPetBusiness } = require("../user/addressService");
 const { getHottestListingsInATimePeriod, getFeaturedListingsForTimePeriod, getFeaturedListingSetsByDateRange, } = require("./featuredListingService");
+const { v4: uuidv4 } = require("uuid"); // uncomment to test without stripe service 
+const stripeServiceInstance = require("../stripeService");
 
 
 exports.createServiceListing = async (data) => {
@@ -630,6 +632,43 @@ exports.deleteFilesOfAServiceListing = async (serviceListingId) => {
     if (error instanceof CustomError) {
       throw error;
     }
+    throw new ServiceListingError(error);
+  }
+};
+
+exports.bumpServiceListing = async (id, data) => {
+  try {
+    const serviceListing = await this.getServiceListingById(id)
+
+    // Complete stripe payment to obtain paymentIntentId; throws error if payment fails
+    const DEFAULT_BUMP_PRICE = 5
+    const paymentIntentId = await stripeServiceInstance.processPayment(
+      data.paymentMethodId,
+      DEFAULT_BUMP_PRICE,
+      serviceListing.petBusiness.user.email // to confirm @wenxin
+    );
+    // const paymentIntentId = uuidv4(); // uncomment to test without stripe
+
+    const newBump = prisma.$transaction(async (prismaClient) => {
+      const createdBump = await prismaClient.bump.create({
+        data: {
+          paymentId: paymentIntentId,
+          serviceListingId: serviceListing.serviceListingId
+        },
+        include: { serviceListing: true },
+      });
+
+      await prismaClient.serviceListing.update({
+        where: { serviceListingId: serviceListing.serviceListingId },
+        data: { listingTime: new Date() },
+      });
+
+      return createdBump;
+    }); // end of transaction
+
+    return newBump;
+  } catch (error) {
+    console.error("Error bumping service listing:", error);
     throw new ServiceListingError(error);
   }
 };

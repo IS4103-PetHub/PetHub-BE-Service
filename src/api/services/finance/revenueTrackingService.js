@@ -8,7 +8,7 @@ exports.getRevenueTrackingData = async () => {
     const top5 = await this.getTopNPetBusinessesWithinDateRange(5);
     const top5Within30Days = await this.getTopNPetBusinessesWithinDateRange(5, 30);
     const monthlyData = await this.getMonthlyData();
-    const dataByCategory = await this.getDataByCategory();
+    const dataByTypes = await this.getDataByTypes();
 
     const revenueTrackingData = {
       summary: {
@@ -32,8 +32,8 @@ exports.getRevenueTrackingData = async () => {
           monthlyData: monthlyData,
         },
         pieChart: {
-          transactionsByCategory: dataByCategory.transactionsByCategory,
-          commissionByCategory: dataByCategory.commissionByCategory,
+          commissionByCategory: dataByTypes.commissionByCategory,
+          commissionByBusinessType: dataByTypes.commissionByBusinessType,
         }
       },
     };
@@ -260,16 +260,30 @@ exports.getMonthlyData = async () => {
   }
 };
 
-exports.getDataByCategory = async () => {
+exports.getDataByTypes = async () => {
   try {
     const payoutInvoices = await prisma.payoutInvoice.findMany({
+      where: {
+        petBusiness: {
+          NOT: {
+            businessType: null, // Ensure that the PB's application is approved
+          },
+        },
+      },
       include: {
         orderItems: true,
+        petBusiness: {
+          select: {
+            companyName: true,
+            businessType: true,
+            businessEmail: true,
+          },
+        },
       },
     });
 
-    let categoryToTransactions = new Map(); // category : total transactions
-    let categoryToCommission = new Map(); // category : total commission 
+    let categoryToCommission = new Map(); // category : total commission
+    let businessTypeToCommission = new Map(); // businessType : total commission
 
     for (const invoice of payoutInvoices) {
       for (const orderItem of invoice.orderItems) {
@@ -279,17 +293,9 @@ exports.getDataByCategory = async () => {
           },
         });
         const categoryName = serviceListing.category;
-
-        if (categoryToTransactions.has(categoryName)) {
-          categoryToTransactions.set(
-            categoryName,
-            categoryToTransactions.get(categoryName) + orderItem.itemPrice
-          );
-        } else {
-          categoryToTransactions.set(categoryName, orderItem.itemPrice);
-        }
-
+        const businessType = invoice.petBusiness.businessType;
         const commissionAmount = orderItem.itemPrice * orderItem.commissionRate;
+
         if (categoryToCommission.has(categoryName)) {
           categoryToCommission.set(
             categoryName,
@@ -298,22 +304,33 @@ exports.getDataByCategory = async () => {
         } else {
           categoryToCommission.set(categoryName, commissionAmount);
         }
+
+        if (businessTypeToCommission.has(businessType)) {
+          businessTypeToCommission.set(
+            businessType,
+            businessTypeToCommission.get(businessType) + commissionAmount
+          );
+        } else {
+          businessTypeToCommission.set(businessType, commissionAmount);
+        }
+
       }
     }
-    const transactionsByCategory = [["Category", "Transactions"]];
-    for (const [category, transactions] of categoryToTransactions) {
-      transactionsByCategory.push([category, transactions]);
-    }
-
+    
     const commissionByCategory = [["Category", "Commission"]];
     for (const [category, commission] of categoryToCommission) {
       commissionByCategory.push([category, parseFloat(commission.toFixed(2))]);
     }
-
-    return { transactionsByCategory, commissionByCategory };
+  
+    const commissionByBusinessType = [["Business Type", "Commission"]];
+    for (const [businessType, commission] of businessTypeToCommission) {
+      commissionByBusinessType.push([businessType, parseFloat(commission.toFixed(2))]);
+    }
+    
+    return { commissionByCategory, commissionByBusinessType };
 
   } catch (error) {
-    console.error("Error fetching data by category:", error);
-    throw new CustomError("Error fetching data by category");
+    console.error("Error fetching data by category and business type:", error);
+    throw new CustomError("Error fetching data by category and business type");
   }
 };

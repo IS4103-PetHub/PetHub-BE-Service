@@ -13,6 +13,7 @@ const petOwnerSelectFields = {
   lastName: true,
   contactNumber: true,
   dateOfBirth: true,
+  points: true,
   userId: true,
   user: {
     select: {
@@ -185,7 +186,7 @@ class PetOwnerService extends BaseUserService {
           404
         );
       }
-      const petOwnerWithListings =  await prisma.petOwner.findUnique({
+      const petOwnerWithListings = await prisma.petOwner.findUnique({
         where: { userId },
         include: {
           favouriteListings: {
@@ -207,7 +208,7 @@ class PetOwnerService extends BaseUserService {
       });
 
       return filteredListings
-      
+
     } catch (error) {
       console.error("Error during view all favourite listings:", error);
       if (error instanceof CustomError) throw error;

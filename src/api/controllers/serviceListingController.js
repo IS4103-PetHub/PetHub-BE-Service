@@ -237,8 +237,7 @@ exports.getServiceListingByCategory = async (req, res, next) => {
       return res.status(400).json({ message: errorMessages.INVALID_CATEGORY });
     }
 
-    const serviceListings =
-      await ServiceListingService.getServiceListingByCategory(category);
+    const serviceListings = await ServiceListingService.getServiceListingByCategory(category);
     res.status(200).json(serviceListings);
   } catch (error) {
     next(error);
@@ -344,6 +343,27 @@ exports.deleteServiceListing = async (req, res, next) => {
 
     await ServiceListingService.deleteServiceListing(Number(serviceListingId), callee);
     res.status(200).json({ message: "Service listing deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.bumpServiceListing = async (req, res, next) => {
+  try {
+    const serviceListingId = req.params.id;
+    if (!(await BaseValidations.isValidInteger(serviceListingId))) {
+      return res.status(400).json({ message: errorMessages.INVALID_ID });
+    }
+
+    const payload = req.body
+    const validationResult = ServiceListingValidations.isValidBumpServiceListingPayload(payload);
+    if (!validationResult.isValid) {
+      res.status(400).send({ message: validationResult.message });
+      return;
+    }
+
+    const newBump = await ServiceListingService.bumpServiceListing(Number(serviceListingId), payload);
+    res.status(200).json(newBump);
   } catch (error) {
     next(error);
   }

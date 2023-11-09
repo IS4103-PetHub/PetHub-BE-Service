@@ -253,7 +253,7 @@ function createCheckoutPayload(numCartItems) {
   return {
     paymentMethodId: "pm_card_visa",
     totalPrice: calculateTotalPrice(cartItems),
-    userId: 9, 
+    userId: 9,
     cartItems: cartItems,
   };
 }
@@ -265,14 +265,21 @@ function createCheckoutPayload(numCartItems) {
 async function simulateCheckout(data, lastMonth = false) {
   const user = await petOwnerService.getUserById(data.userId);
   const { invoice, orderItems } = await TransactionService.buildTransaction(data.cartItems);
+
+  // assumes pointsRedeemed is 
+  const pointsRedeemed = 0
+  invoice.finalMiscCharge = invoice.miscCharge - (pointsRedeemed / 100)
+  invoice.pointsRedeemed = pointsRedeemed
+  invoice.finalTotalPrice = invoice.totalPrice + invoice.finalMiscCharge
+
   const paymentIntentId = uuidv4();
   if (lastMonth) {
     // Seed data within the past month for dashboarding and analysis (featured listings) purposes
     invoice.createdAt = getRandomPastDate(CURRENT_DATE, 30);
   } else {
     // Seed data within the past year
-    invoice.createdAt = getRandomPastDate(CURRENT_DATE, 365); 
-  }  
+    invoice.createdAt = getRandomPastDate(CURRENT_DATE, 365);
+  }
   return await TransactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId); // returns invoice obj
 }
 
@@ -292,7 +299,7 @@ async function seedInvoicesAndOrders(prisma) {
   let orderItems = [];
 
   const originalLog = console.log;
-  console.log = () => {};
+  console.log = () => { };
 
   for (const [index, payload] of checkoutPayloads.entries()) {
     try {
@@ -303,7 +310,7 @@ async function seedInvoicesAndOrders(prisma) {
     } catch (error) {
       console.log = originalLog; // Restore console.log so I can print the shortened log below
       console.log(`Error seeding invoices and orders for payload at index ${index}.`);
-      console.log = () => {}; // Override console.log to do nothing again
+      console.log = () => { }; // Override console.log to do nothing again
     }
   }
   console.log = originalLog; // Restore console.log after the loop

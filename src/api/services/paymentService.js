@@ -12,23 +12,35 @@ class PaymentService {
 
   async checkout(data) {
     try {
-      const user = await petOwnerService.getUserById(data.userId) // throws error if not pet owner
-
       // 1) Payment service builds transaction which returns invoice and orderItems
       const { invoice, orderItems } = await transactionService.buildTransaction(data.cartItems)
 
-      // 2) if computed total price != amount given by payload throw error
-      if (invoice.totalPrice != data.totalPrice) throw new CustomError(`Bad Request: amount specified (${data.totalPrice}) is incorrect; computed total: ${invoice.totalPrice}`, 400);
 
-      // 3) complete stripe payment to obtain paymentIntentId; throws error if payment fails
+      // 2) process points redemption
+      const miscChargeInCents = invoice.miscCharge * 100
+      const pointsRedeemed = data.pointsRedeemed >= miscChargeInCents ? miscChargeInCents : data.pointsRedeemed;
+      const user = await petOwnerService.getUserById(data.userId) // throws error if not pet owner
+      if (user.points < pointsRedeemed) {
+        throw new CustomError("User does not have sufficient points to redeem", 404);
+      }
+      invoice.finalMiscCharge = invoice.miscCharge - (pointsRedeemed / 100)
+      invoice.pointsRedeemed = pointsRedeemed
+      invoice.finalTotalPrice = invoice.totalPrice + invoice.finalMiscCharge
+
+      // 3) if computed total price != amount given by payload throw error
+      if (invoice.finalTotalPrice != data.totalPrice) {
+        throw new CustomError(`Bad Request: amount specified (${data.totalPrice}) is incorrect; computed total: ${invoice.finalTotalPrice}`, 400);
+      }
+
+      // 4) complete stripe payment to obtain paymentIntentId; throws error if payment fails
       const paymentIntentId = await stripeServiceInstance.processPayment(
         data.paymentMethodId,
-        invoice.totalPrice,
+        invoice.finalTotalPrice,
         user.email
       );
       // const paymentIntentId = uuidv4(); // uncomment to test without stripe
 
-      // 4) Once Payment service confirms payment, payment service must confirm the transaction with the paymentIntentId
+      // 5) Once Payment service confirms payment, payment service must confirm the transaction with the paymentIntentId
       const confirmedInvoice = await transactionService.confirmTransaction(invoice, orderItems, paymentIntentId, user.userId)
 
       await emailService.sendEmail(

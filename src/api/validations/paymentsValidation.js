@@ -30,6 +30,14 @@ exports.isValidCheckoutPayload = (payload) => {
                 'number.precision': 'totalPrice can have up to 2 decimal places.',
                 'number.empty': 'totalPrice is required.'
             }),
+        pointsRedeemed: Joi.number()
+            .integer()
+            .min(0)
+            .required()
+            .messages({
+                'number.base': `pointsRedeemed must be a number.`,
+                'number.min': `pointsRedeemed must be an integer >= 0.`
+            }),
         userId: baseValidation.integerValidation('userId').required(),
         cartItems: Joi.array()
             .items(cartItemValidation())
