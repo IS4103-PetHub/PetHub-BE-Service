@@ -8,6 +8,7 @@ model Article {
     articleType ArticleType
     title       String
     content     String
+    isPinned    Boolean     @default(false)
 
     createdByUserId Int
     updatedByUserId Int?
@@ -18,8 +19,8 @@ model Article {
     attachmentKeys String[]
     attachmentUrls String[]
 
-    tags Tag[]
-    category            Category[]
+    tags        Tag[]
+    category    Category[]
 
     createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
     updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])

@@ -1,14 +1,6 @@
-/*
-  Warnings:
-
-  - A unique constraint covering the columns `[stripeRefundId]` on the table `RefundRequest` will be added. If there are existing duplicate values, this will fail.
-
-*/
 -- AlterTable
-ALTER TABLE "Article" ADD COLUMN     "category" "Category"[];
-
--- AlterTable
-ALTER TABLE "RefundRequest" ADD COLUMN     "stripeRefundId" TEXT;
+ALTER TABLE "Article" ADD COLUMN     "category" "Category"[],
+ADD COLUMN     "isPinned" BOOLEAN NOT NULL DEFAULT false;
 
 -- CreateTable
 CREATE TABLE "_ArticleToTag" (
@@ -21,9 +13,6 @@ CREATE UNIQUE INDEX "_ArticleToTag_AB_unique" ON "_ArticleToTag"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ArticleToTag_B_index" ON "_ArticleToTag"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "RefundRequest_stripeRefundId_key" ON "RefundRequest"("stripeRefundId");
 
 -- AddForeignKey
 ALTER TABLE "_ArticleToTag" ADD CONSTRAINT "_ArticleToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "Article"("articleId") ON DELETE CASCADE ON UPDATE CASCADE;

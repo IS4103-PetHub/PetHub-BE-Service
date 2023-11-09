@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Nov 08 2023 23:29:56 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Fri Nov 10 2023 00:45:36 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -74,6 +74,7 @@ model Article {
   articleType ArticleType
   title       String
   content     String
+  isPinned    Boolean     @default(false)
 
   createdByUserId Int
   updatedByUserId Int?
