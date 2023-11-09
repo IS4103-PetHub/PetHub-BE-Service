@@ -185,12 +185,12 @@ exports.getAllServiceListings = async () => {
 };
 
 // Function will return all service listings that can be accessed by pet owners (customers) and booked.
-// 3 types of listings:
+// Criteria:
 // - PB that created this listing has an 'ACTIVE' account status
 // - SL must be VALID. Conditions: 
 //     - for SLs that requiresBookings, the CG and duration is NOT null
 //     - SL's lastPossibleDate >= current date 
-// - In the future, if we choose to allow PB to "deactivate" their service listings, we can edit this method to only include service listings that have 'ACTIVE' state
+// Sorted by listingTime in descending order
 exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, limit) => {
   try {
     const currentDate = new Date();
@@ -219,9 +219,11 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
           gte: currentDate, // Filter listings with lastPossibleDate >= current date
         },
       },
+      orderBy: {
+        listingTime: 'desc', // Sort by listingTime in descending order (latest first)
+      },
     });
     const filteredListings = exports.filterValidListingsForPetOwners(serviceListings, categories, tags, limit);
-    filteredListings.sort((a, b) => b.dateCreated - a.dateCreated);
     return filteredListings
 
   } catch (error) {
@@ -550,6 +552,38 @@ exports.getOrCreateFeaturedListings = async (startDate, endDate, numListings = 6
     // If no existing sets are found, create and return new sets
     const createdSetsMap = await getFeaturedListingsForTimePeriod(currentDate, startDate, endDate, numListings);
     return createdSetsMap;
+  } catch (error) {
+    console.error("Error getting featured listings:", error);
+    throw new CustomError(error);
+  }
+};
+
+// This method will return the 6 most recently bumped listings, bumped within the last week, sorted by bumped time (the equivalent field is listingTime)
+exports.getBumpedListings = async (numListings = 6) => {
+  try {
+    const currentDate = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+    const bumpedListings = await prisma.serviceListing.findMany({
+      where: {
+        listingTime: {
+          gte: oneWeekAgo,
+          lte: currentDate,
+        },
+        NOT: {
+          listingTime: {
+            equals: prisma.serviceListing.fields.dateCreated, // Newly created listings will not push down the bumped listings in this list
+          },
+        },
+      },
+      orderBy: {
+        listingTime: 'desc',
+      },
+      take: numListings,
+    });
+  
+    return bumpedListings;
   } catch (error) {
     console.error("Error getting featured listings:", error);
     throw new CustomError(error);
