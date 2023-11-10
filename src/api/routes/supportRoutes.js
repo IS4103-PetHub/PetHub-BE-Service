@@ -21,5 +21,9 @@ router.get("", supportController.getAllSupportTickets);
 router.get("/:supportTicketId", supportController.getSupportTicketById)
 router.get("/:userId/user", supportController.getSupportTicketByUserId)
 
+router.put("/close-unresolved/:supportTicketId", supportController.closeUnresolveSupportTicket)
+router.put("/close-resolved/:supportTicketId", supportController.closeResolveSupportTicket)
+router.put("/reopen-unresolved/:supportTicketId", supportController.reopenSupportTicket)
+
 
 module.exports = router;

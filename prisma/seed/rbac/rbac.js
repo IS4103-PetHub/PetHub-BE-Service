@@ -46,6 +46,10 @@ const permissions = [
     // Article
     { code: "WRITE_ARTICLES", name: "Write Articles", description: "Permission to write Articles" },
     { code: "READ_ARTICLES", name: "Read Articles", description: "Permission to read Articles" },
+
+    // Support
+    { code: "WRITE_SUPPORTS", name: "Write Supports", description: "Permission to write Supports" },
+    { code: "READ_SUPPORTS", name: "Read Supports", description: "Permission to read Supports" },
 ];
 
 // Root Administrator User Data

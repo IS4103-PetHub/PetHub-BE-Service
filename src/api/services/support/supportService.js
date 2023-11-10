@@ -4,6 +4,7 @@ const SupportTicketError = require("../../errors/supportTicketError")
 const petOwnerService = require("../user/petOwnerService")
 const petBusinessService = require("../user/petBusinessService");
 const { baseUserServiceInstance } = require("../user/baseUserService");
+const { SupportTicketStatus } = require('@prisma/client')
 
 class SupportService {
     async createPOSupportTicket(petOwnerId, data) {
@@ -130,6 +131,15 @@ class SupportService {
                 let currAttachmentKeys = [...supportTicket.attachmentKeys, ...data.attachmentKeys];
                 let currAttachmentURLs = [...supportTicket.attachmentURLs, ...data.attachmentURLs];
 
+                if(user.accountType == "INTERNAL_USER" && supportTicket.status == "PENDING") {
+                    await prismaClient.supportTicket.update({
+                        where: { supportTicketId: supportTicketId },
+                        data: {
+                            status: "IN_PROGRESS"
+                        }
+                    })
+                }
+
                 await prismaClient.supportTicket.update({
                     where: { supportTicketId: supportTicketId },
                     data: {
@@ -146,6 +156,28 @@ class SupportService {
             if (error instanceof CustomError) throw error;
             throw new SupportTicketError(error);
 
+        }
+    }
+
+    async updateSupportTicketStatus(supportTicketId, status) {
+        try {
+            const supportTicket = await this.getSupportTicketById(supportTicketId);
+
+            if(status == "PENDING" && supportTicket.status != "CLOSED_UNRESOLVED") {
+                throw new CustomError("Only able to reopen tickets that are closed and unresolved", 400)
+            }
+
+            const updateSupportTicket = await prisma.supportTicket.update({
+                where: {supportTicketId: supportTicketId},
+                data: {
+                    status: status
+                }
+            })
+            return updateSupportTicket;
+
+        } catch(error) {
+            if (error instanceof CustomError) throw error;
+            throw new SupportTicketError(error);
         }
     }
 
