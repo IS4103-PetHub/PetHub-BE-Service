@@ -12,5 +12,6 @@ router.delete("/:refundRequestId", refundRequestController.cancelRefundRequest)
 router.patch("/reject/:refundRequestId", refundRequestController.rejectRefundRequest)
 router.patch("/approve/:refundRequestId", refundRequestController.approveRefundRequest)
 router.get("/:refundRequestId", refundRequestController.getRefundRequestById)
+router.get('/pet-businesses/:petBusinessId', refundRequestController.getRefundRequestByPetBusinessId);
 
 module.exports = router;
