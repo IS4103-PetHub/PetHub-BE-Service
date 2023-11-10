@@ -58,8 +58,30 @@ class SupportService {
             const supportTicket = await prisma.supportTicket.findUnique({
                 where: { supportTicketId: supportTicketId },
                 include: {
-                    petOwner: true,
-                    petBusiness: true,
+                    petOwner: {
+                        include: {
+                            user: {
+                                select: {
+                                    userId: true,
+                                    email: true,
+                                    accountType: true,
+                                    accountStatus: true,
+                                },
+                            }
+                        }
+                    },
+                    petBusiness: {
+                        include: {
+                            user: {
+                                select: {
+                                    userId: true,
+                                    email: true,
+                                    accountType: true,
+                                    accountStatus: true,
+                                },
+                            }
+                        }
+                    },
                     comments: true
                 }
             })
