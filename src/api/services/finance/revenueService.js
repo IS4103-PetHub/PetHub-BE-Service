@@ -1,6 +1,6 @@
 
 const transactionConstants = require("../../../constants/transactions");
-const stripeService = require('../stripeService')
+const stripeServiceInstance = require('../stripeService')
 const { v4: uuidv4 } = require("uuid"); // uncomment to test without stripe service 
 const prisma = require('../../../../prisma/prisma');
 const petBusinessService = require('../../services/user/petBusinessService')
@@ -103,22 +103,25 @@ class RevenueService {
         return payoutInvoices
     }
 
-
     async processPayout(petBusiness, payoutInvoice) {
-        const paymentMethodId = 'pm_card_visa' // TODO: remove if unecessary
-        const fromEmail = transactionConstants.PETHUB_STRIPE_HOLDING_ACCT_EMAIL // TODO: remove if unnecessary
-        const toEmail = petBusiness.user.email // TODO: use PB stripe account? 
-        // TODO: replace uuid with stripeService....
-        const paymentIntentId = uuidv4(); // uncomment to test without stripe
-        payoutInvoice.paymentId = paymentIntentId
-
-        return payoutInvoice
+        try {
+            const payoutTransaction = await stripeServiceInstance.payExpressAccount(
+                payoutInvoice.paidOutAmount,
+                petBusiness.stripeAccountId,
+            );          
+          payoutInvoice.paymentId = payoutTransaction.id    
+          return payoutInvoice;
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
     }
-
 
     async createPayoutInvoice(payoutInvoiceData, petBusinessId) {
         try {
             const payoutInvoice = await prisma.$transaction(async (prismaClient) => {
+
+                // If you want to keep testing payout API without marking the status after each call, comment this block out
                 for (const orderItemId of payoutInvoiceData.orderItems) {
                     await prismaClient.orderItem.update({
                         where: { orderItemId: orderItemId },
@@ -147,7 +150,7 @@ class RevenueService {
             return payoutInvoice;
         } catch (error) {
             console.error(error);
-            throw error; // You might want to handle this error more gracefully in a real application.
+            throw error; 
         }
     }
 

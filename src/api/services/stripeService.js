@@ -40,7 +40,10 @@ class StripeService {
       });
       return refund;
     } catch (error) {
-      throw new Error('Partial refund failed: ' + error.message);
+      // Commented out propagation of error, as currently this will not work with seeded orders as the paymentIntentId is mocked during seeding, no stripe was used.
+      // TODO: Revert changes before submitting code 
+      console.log("Error during partial refund:", error.message);
+      // throw new Error('Partial refund failed: ' + error.message);
     }
   }
 
@@ -52,6 +55,22 @@ class StripeService {
       return refundDetails;
     } catch (error) {
       throw new Error('Obtaining of refund details failed: ' + error.message);
+    }
+  }
+  
+  async payExpressAccount(amount, expressAccountId, currency = 'sgd') {
+    try {
+      const payout = await stripe.transfers.create({
+        amount: this.dollarToCents(amount),  // Amount in cents
+        currency: currency,
+        destination: expressAccountId,
+        source_type: "card"
+      });
+      
+      return payout;
+    } catch (error) {
+      console.error('Payment to Express account failed:', error);
+      throw error;
     }
   }
 

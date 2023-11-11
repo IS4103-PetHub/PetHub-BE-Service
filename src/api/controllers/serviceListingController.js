@@ -320,6 +320,15 @@ exports.getFeaturedListings = async (req, res, next) => {
   }
 };
 
+exports.getBumpedListings = async (req, res, next) => {
+  try {
+    const bumpedListings = await ServiceListingService.getBumpedListings();
+    res.status(200).json(bumpedListings);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteServiceListing = async (req, res, next) => {
   try {
     const serviceListingId = req.params.id;
