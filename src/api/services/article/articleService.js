@@ -13,7 +13,13 @@ class ArticleService {
             const articles = await prisma.article.findMany({
                 where: { articleType: articleType },
                 include: {
-                    tags: true
+                    tags: true,
+                    createdBy: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
                 }
             })
             return articles
@@ -28,7 +34,13 @@ class ArticleService {
             const article = await prisma.article.findUnique({
                 where: { articleId },
                 include: {
-                    tags: true
+                    tags: true,
+                    createdBy: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
                 }
             })
             if (!article) throw new CustomError("article not found", 404)
@@ -90,6 +102,7 @@ class ArticleService {
                     articleType: articlePayload.articleType,
                     title: articlePayload.title,
                     content: articlePayload.content,
+                    isPinned: articlePayload.isPinned === "true",
                     attachmentKeys: articlePayload.attachmentKeys,
                     attachmentUrls: articlePayload.attachmentUrls,
                     createdBy: {
@@ -129,6 +142,7 @@ class ArticleService {
                     articleType: articlePayload.articleType,
                     title: articlePayload.title,
                     content: articlePayload.content,
+                    isPinned: articlePayload.isPinned === "true",
                     attachmentKeys: articlePayload.attachmentKeys,
                     attachmentUrls: articlePayload.attachmentUrls,
                     dateUpdated: new Date(),

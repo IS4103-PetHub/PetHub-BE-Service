@@ -32,6 +32,10 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
             .required(),
         file: Joi.any()
             .optional(),
+        isPinned: Joi.string()
+            .trim()
+            .valid('true', 'false')
+            .optional(),
         internalUserId: Joi.string()
             .trim()
             .required()
