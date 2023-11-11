@@ -573,6 +573,7 @@ async function seedBusinessData(prisma) {
       requiresBooking: data.requiresBooking,
       dateCreated: getRandomPastDate(CURRENT_DATE, 14), // get a random date between the current date and a date 2 weeks ago
       lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 0-4 weeks from the current date
+      listingTime: getRandomPastDate(CURRENT_DATE, 14), // lisitng was bumped between (dateCreated and current_dates)
       defaultExpiryDays: data.defaultExpiryDays,
       tags: {
         connect: data.tagIds,
@@ -609,6 +610,15 @@ async function seedBusinessData(prisma) {
         break;
       default:
         break;
+    }
+    
+    // This is to test the bumped listings carousell
+    // These listings have the most recent listingTime as they are "just" (most newly) created, but even with the most recent listingTime,
+    // It shouldnt aappear in the bumped listings carousell as only bumped listings should appear in that carousell
+    // These should appear at the top of the marketplace (AKA View all listings page)
+    if (data.id % 5 == 0) {
+      createObject.dateCreated = CURRENT_DATE; 
+      createObject.listingTime = CURRENT_DATE; 
     }
 
     // Check if data.calendarGroupId exists before adding it to createObject
