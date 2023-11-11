@@ -18,6 +18,7 @@ const petBusinessSelectFields = {
   businessEmail: true,
   businessDescription: true,
   businessAddresses: true,
+  stripeAccountId: true,
   petBusinessApplication: {
     select: {
       petBusinessApplicationId: true,
