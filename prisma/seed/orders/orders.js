@@ -16,6 +16,7 @@ const CURRENT_DATE = new Date();
 const NUM_VOUCHERS_TO_CLAIM = 400; //fulfilled orders
 const NUM_REVIEWS = 380;
 const NUM_PENDING_REFUNDS = 5;
+const NUM_EXPIRED = 15;
 
 const JOHNS_SERVICELISTINGS = [
   {
@@ -673,6 +674,7 @@ async function seedRefunds(prisma, funPack) {
       let itemToApprove = itemsForRefund.find((item) => item.orderItemId === approvalResponse.orderItemId);
       if (itemToApprove) {
         itemToApprove.status = OrderItemStatus.REFUNDED;
+        orderItemVarietyFunPack.refunded.push(itemToApprove);
       }
     }
 
@@ -784,10 +786,34 @@ async function seedReviews(prisma, funPack) {
     console.error("Failed to aggregate top reviewed service listings:", error);
   }
 
+  return validateAndDistributeOrderItems(orderItemVarietyFunPack);
+}
+
+async function seedExpired(prisma, funPack) {
+  let orderItemVarietyFunPack = funPack;
+
+  const itemsToExpire = orderItemVarietyFunPack.pendingFulfillment.slice(0, NUM_EXPIRED);
+  const currentDate = new Date();
+  try {
+    for (const item of itemsToExpire) {
+      // Update the DB
+      await prisma.orderItem.update({
+        where: { orderItemId: item.orderItemId },
+        data: { 
+          expiryDate: currentDate,
+          status: OrderItemStatus.EXPIRED, 
+        },
+      });
+      orderItemVarietyFunPack.expired.push(item);
+    }
+  } catch (error) {
+    console.error(`Error seeding expired order items`, error);
+  }
+
   // print log of overview of all orderItems
   countBrackets(orderItemVarietyFunPack);
-
   return validateAndDistributeOrderItems(orderItemVarietyFunPack);
+
 }
 
 module.exports = {
@@ -798,4 +824,5 @@ module.exports = {
   seedFulfillment,
   seedRefunds,
   seedReviews,
+  seedExpired,
 };

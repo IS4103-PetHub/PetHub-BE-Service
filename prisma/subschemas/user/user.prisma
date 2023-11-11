@@ -76,6 +76,7 @@ model PetBusiness {
   businessEmail          String?
   businessDescription    String?
   websiteURL             String?
+  stripeAccountId        String?
   businessAddresses      Address[]
   // ------------------------------------------------ Section End ------------------------------------------------ //
   serviceListings        ServiceListing[]
@@ -139,6 +140,7 @@ model PetBusinessApplication {
   businessType             BusinessType
   businessEmail            String
   businessDescription      String
+  stripeAccountId          String                    @default("") 
   businessAddresses        Address[]
   websiteURL               String?
   attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 

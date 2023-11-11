@@ -9,6 +9,7 @@ const {
   seedInvoicesAndOrders,
   distributeOrderItems,
   countBrackets,
+  seedExpired,
   seedBookings,
   seedFulfillment,
   seedRefunds,
@@ -38,6 +39,8 @@ async function main() {
   const funPackUpdatedWithRefunds = await seedRefunds(prisma, funPackUpdatedWithFulfillment);
   console.log("Seeding reviewed orders...");
   const funPackUpdatedWithReviews = await seedReviews(prisma, funPackUpdatedWithRefunds);
+  console.log("Seeding expired orders...");
+  const funPackUpdatedWithExpired = await seedExpired(prisma, funPackUpdatedWithReviews);
   console.log("Seeding payout invoices...");
   await seedPayout(prisma);
   await prisma.$disconnect(); // Disconnect from the database after seeding is done
