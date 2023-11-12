@@ -53,14 +53,10 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
                         'string.pattern.base': 'Tag ID must be a numeric string.',
                     })
             ),
-        category: Joi.array()
-            .items(
-                Joi.string()
-                    .valid(...Object.values(Category))
-                    .messages({
-                        'any.only': 'Invalid category value.',
-                    })
-            ),
+        category: Joi.string()
+            .trim()
+            .valid('PET_GROOMING', 'DINING', 'VETERINARY', 'PET_RETAIL', 'PET_BOARDING')
+            .required(),
 
     })
 

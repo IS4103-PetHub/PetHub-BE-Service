@@ -1,7 +1,7 @@
 import { ArticleType } from "../enums/articleEnums"
 import { InternalUser } from "../user/user"
 import { Tag } from "..\serviceListing\serviceListing"
-import { Category, FeaturedListingCategoryEnum } from "..\enums\businessLogicEnums"
+import { Category, Category, FeaturedListingCategoryEnum } from "..\enums\businessLogicEnums"
 
 model Article {
     articleId   Int         @id @default(autoincrement())
@@ -20,7 +20,7 @@ model Article {
     attachmentUrls String[]
 
     tags        Tag[]
-    category    Category[]
+    category    Category
 
     createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
     updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])

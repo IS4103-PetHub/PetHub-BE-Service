@@ -48,11 +48,11 @@ class ArticleService {
             const selectedTags = article.tags;
             const selectedTagsFilter = selectedTags.map((tag) => (tag.tagId))
 
-            const selectedCategories = article.category
+            const selectedCategory = article.category
 
             const recommendedServiceListings = await prisma.serviceListing.findMany({
                 where: {
-                    AND: [
+                    OR: [
                         {
                             tags: {
                                 some: {
@@ -63,9 +63,7 @@ class ArticleService {
                             },
                         },
                         {
-                            category: {
-                                in: selectedCategories,
-                            },
+                            category: selectedCategory,
                         },
                     ],
                 },
@@ -89,12 +87,9 @@ class ArticleService {
         try {
             const internalUser = await InternalUserService.getUserById(internalUserId) // validate userid
 
-            let tagIdsArray = [], categoryArray = [];
+            let tagIdsArray = [];
             if (articlePayload.tagIds) {
                 tagIdsArray = articlePayload.tagIds.map((id) => ({ tagId: Number(id) }));
-            }
-            if (articlePayload.category) {
-                categoryArray = articlePayload.category
             }
 
             const newArticle = await prisma.article.create({
@@ -113,7 +108,7 @@ class ArticleService {
                     tags: {
                         connect: tagIdsArray
                     },
-                    category: categoryArray
+                    category: articlePayload.category
                 }
             })
 
@@ -128,12 +123,9 @@ class ArticleService {
         try {
             const internalUser = await InternalUserService.getUserById(internalUserId) // validate userid
 
-            let tagIdsArray = [], categoryArray = [];
+            let tagIdsArray = [];
             if (articlePayload.tagIds) {
                 tagIdsArray = articlePayload.tagIds.map((id) => ({ tagId: Number(id) }));
-            }
-            if (articlePayload.category) {
-                categoryArray = articlePayload.category
             }
 
             const updatedArticle = await prisma.article.update({
@@ -155,7 +147,7 @@ class ArticleService {
                         set: [],
                         connect: tagIdsArray
                     },
-                    category: categoryArray
+                    category: articlePayload.category
                 }
             })
             return updatedArticle
