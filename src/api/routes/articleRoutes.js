@@ -12,6 +12,7 @@ const upload = multer({ storage: storage, limits: { fieldSize: 1024 * 1024 * 20 
 
 function registerArticleRoutes(controller) {
     router.get(`/`, controller.getAllArticle);
+    router.get(`/pinned`, controller.getAllPinnedArticles);
     router.get(`/:id`, controller.getArticleById);
     router.delete(`/:id`, controller.deleteArticle);
     router.post(`/`, upload.array('file'), controller.createArticle);

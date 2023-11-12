@@ -12,6 +12,9 @@ class ArticleService {
         try {
             const articles = await prisma.article.findMany({
                 where: { articleType: articleType },
+                orderBy: {
+                    dateCreated: 'desc' 
+                },
                 include: {
                     tags: true,
                     createdBy: {
@@ -29,6 +32,38 @@ class ArticleService {
                 }
             })
             return articles
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ArticleError(error);
+        }
+    }
+
+    async getAllPinnedArticles() {
+        try {
+            const pinnedArticles = await prisma.article.findMany({
+                where: {
+                    isPinned: true
+                },
+                orderBy: {
+                    dateCreated: 'desc'
+                },
+                include: {
+                    tags: true,
+                    createdBy: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    },
+                    updatedBy: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
+                }
+            });
+            return pinnedArticles;
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ArticleError(error);
