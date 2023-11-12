@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Nov 05 2023 23:14:48 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sat Nov 11 2023 19:14:03 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -605,6 +605,7 @@ model PetBusiness {
   businessEmail          String?
   businessDescription    String?
   websiteURL             String?
+  stripeAccountId        String?
   businessAddresses      Address[]
   // ------------------------------------------------ Section End ------------------------------------------------ //
   serviceListings        ServiceListing[]
@@ -668,6 +669,7 @@ model PetBusinessApplication {
   businessType             BusinessType
   businessEmail            String
   businessDescription      String
+  stripeAccountId          String?
   businessAddresses        Address[]
   websiteURL               String?
   attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 

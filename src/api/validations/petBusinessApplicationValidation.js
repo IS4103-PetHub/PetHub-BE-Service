@@ -1,6 +1,6 @@
 const { BusinessType, BusinessApplicationStatus } = require("@prisma/client");
 
-exports.mandatoryFields = ["businessEmail", "businessDescription", "petBusinessId", "businessType"];
+exports.mandatoryFields = ["businessEmail", "businessDescription", "petBusinessId", "businessType", "stripeAccountId"];
 
 exports.isValidBusinessType = (strData) => {
   return Object.values(BusinessType).includes(strData);

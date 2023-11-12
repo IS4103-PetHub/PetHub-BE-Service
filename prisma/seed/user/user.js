@@ -1,8 +1,20 @@
 const { AccountStatus, AccountType, BusinessType, BusinessApplicationStatus, PetType, Gender } = require("@prisma/client");
 const bcrypt = require("bcryptjs"); // bcrypt for password hashing
+const { v4: uuidv4 } = require("uuid");
+const { getRandomPastDate } = require("../../../src/utils/date");
 
 // USE COMMON PASSWORD
 const commonPassword = 'password123'
+const CURRENT_DATE = new Date();
+
+// DO NOT CHANGE, linked to our stripe test payout accounts
+const stripeTestAccountIds = [
+  "acct_1OB7qmPMnZYzJNe3",
+  "acct_1OB7iDPA5ssnbcAF",
+  "acct_1OB7hYPKgqNObxzo",
+  "acct_1OB7dSPGwFafsnuT",
+  "acct_1OAvdiPKLRmbl1xg"
+]
 
 // ADDRESS SEED DATA
 const addresses = [
@@ -95,6 +107,7 @@ const petBusinesses = [
     websiteURL: "https://www.johnDoe.com",
     businessEmail: "biz1@example.com",
     businessType: BusinessType.SERVICE,
+    stripeAccountId: stripeTestAccountIds[0],
     commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
@@ -102,6 +115,7 @@ const petBusinesses = [
       websiteURL: "https://www.johnDoe.com",
       businessDescription: "This was my business description before I changed it",
       applicationStatus: BusinessApplicationStatus.APPROVED,
+      stripeAccountId: stripeTestAccountIds[0],
       lastUpdated: new Date(),
     },
   },
@@ -117,6 +131,7 @@ const petBusinesses = [
     websiteURL: "https://www.janeSmithMOW.com",
     businessEmail: "janeSmithPet@gmail.com",
     businessType: BusinessType.HEALTHCARE,
+    stripeAccountId: stripeTestAccountIds[1],
     commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "HEALTHCARE",
@@ -124,6 +139,7 @@ const petBusinesses = [
       websiteURL: "https://www.google.com",
       businessDescription: "This was my business description before I changed it",
       applicationStatus: BusinessApplicationStatus.APPROVED,
+      stripeAccountId: stripeTestAccountIds[1],
       lastUpdated: new Date(),
     },
   },
@@ -139,6 +155,7 @@ const petBusinesses = [
     businessEmail: "mikePets@gmail.com",
     websiteURL: "https://www.mikePetBiz.com",
     businessType: BusinessType.SERVICE,
+    stripeAccountId: stripeTestAccountIds[2],
     commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "SERVICE",
@@ -146,6 +163,7 @@ const petBusinesses = [
       websiteURL: "https://www.mikePetBiz.com",
       businessDescription: "This was my business description before I changed it",
       applicationStatus: BusinessApplicationStatus.APPROVED,
+      stripeAccountId: stripeTestAccountIds[2],
       lastUpdated: new Date(),
     },
   },
@@ -161,6 +179,7 @@ const petBusinesses = [
     websiteURL: "https://www.susanAnimal.com",
     businessEmail: "susanLovesDogs@hotmail.com",
     businessType: BusinessType.FNB,
+    stripeAccountId: stripeTestAccountIds[3],
     commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "FNB",
@@ -168,6 +187,7 @@ const petBusinesses = [
       websiteURL: "https://www.susanAnimal.com",
       businessDescription: "This was my business description before I changed it",
       applicationStatus: BusinessApplicationStatus.APPROVED,
+      stripeAccountId: stripeTestAccountIds[3],
       lastUpdated: new Date(),
     },
   },
@@ -183,6 +203,7 @@ const petBusinesses = [
     websiteURL: "https://www.google.com",
     businessEmail: "linensoda@gmail.com",
     businessType: BusinessType.HEALTHCARE,
+    stripeAccountId: stripeTestAccountIds[4],
     commissionRuleId: 1,
     petBusinessApplication: {
       businessType: "HEALTHCARE",
@@ -190,6 +211,7 @@ const petBusinesses = [
       websiteURL: "https://www.google.com",
       businessDescription: "This was my business description before I changed it",
       applicationStatus: BusinessApplicationStatus.APPROVED,
+      stripeAccountId: stripeTestAccountIds[4],
       lastUpdated: new Date(),
     },
   },
@@ -209,6 +231,7 @@ const nonActivePetBusinesses = [
       businessType: "SERVICE",
       businessEmail: "biz6@example.com",
       websiteURL: "https://www.google.com",
+      stripeAccountId: uuidv4(),
       businessDescription:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
       lastUpdated: new Date(),
@@ -230,6 +253,7 @@ const nonActivePetBusinesses = [
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
       businessAddresses: [{ addressId: 11 }, { addressId: 12 }],
       adminRemarks: ["Your business description is wonky."],
+      stripeAccountId: uuidv4(),
       applicationStatus: BusinessApplicationStatus.REJECTED,
       lastUpdated: new Date(),
     },
@@ -462,8 +486,6 @@ const pets = [
 ];
 
 
-
-
 async function seedUser(prisma) {
 
   const oneYearFromToday = new Date();
@@ -490,6 +512,7 @@ async function seedUser(prisma) {
         password: await bcrypt.hash(pb.password, 10),
         accountType: AccountType.PET_BUSINESS,
         accountStatus: AccountStatus.ACTIVE,
+        dateCreated: getRandomPastDate(CURRENT_DATE, 365),
         petBusiness: {
           create: {
             companyName: pb.companyName,
@@ -501,6 +524,7 @@ async function seedUser(prisma) {
             businessEmail: pb.businessEmail,
             businessDescription: pb.businessDescription,
             businessType: pb.businessType,
+            stripeAccountId: pb.stripeAccountId,
             websiteURL: pb.websiteURL,
             commissionRuleId: 1,
             petBusinessApplication: {
