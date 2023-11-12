@@ -19,6 +19,12 @@ class ArticleService {
                             firstName: true,
                             lastName: true,
                         }
+                    },
+                    updatedBy: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
                     }
                 }
             })
@@ -36,6 +42,12 @@ class ArticleService {
                 include: {
                     tags: true,
                     createdBy: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    },
+                    updatedBy: {
                         select: {
                             firstName: true,
                             lastName: true,
