@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sat Nov 11 2023 19:14:03 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Nov 12 2023 20:39:26 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -67,6 +67,9 @@ model Booking {
   pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
   OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
   orderItemId Int       @unique
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 model Article {
@@ -242,6 +245,9 @@ model PayoutInvoice {
   orderItems  OrderItem[]
   userId      Int
   petBusiness PetBusiness @relation(fields: [userId], references: [userId])
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 enum OrderItemStatus {
@@ -284,6 +290,9 @@ model OrderItem {
   payoutInvoiceInvoiceId Int?
 
   review Review?
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 enum RefundStatus {
@@ -312,6 +321,9 @@ model RefundRequest {
 
   petBusinessId Int
   petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId])
+
+  // support
+  supportTickets SupportTicket[]
 }
 
 model PetLostAndFound {
@@ -367,6 +379,9 @@ model ServiceListing {
   overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
   Bump             Bump[]
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 model Bump {
@@ -482,6 +497,29 @@ model SupportTicket {
 
   petBusinessId Int?
   petBusiness   PetBusiness? @relation(fields: [petBusinessId], references: [userId])
+
+  // Service Listing
+  serviceListingId Int?
+  serviceListing   ServiceListing? @relation(fields: [serviceListingId], references: [serviceListingId])
+
+  // orders
+  orderItemId Int?
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [orderItemId])
+
+  // Appointments
+  bookingId Int?
+  booking   Booking? @relation(fields: [bookingId], references: [bookingId])
+
+  // Payments
+  // for PO refer to orderItem's invoice 
+  // for PB's payout related
+  payoutInvoiceId Int?
+  payoutInvoice   PayoutInvoice? @relation(fields: [payoutInvoiceId], references: [invoiceId])
+
+  // Others
+  // refund requests?
+  refundRequestId Int?
+  refundRequest   RefundRequest? @relation(fields: [refundRequestId], references: [refundRequestId])
 }
 
 model Comment {
@@ -669,7 +707,7 @@ model PetBusinessApplication {
   businessType             BusinessType
   businessEmail            String
   businessDescription      String
-  stripeAccountId          String?
+  stripeAccountId          String                    @default("")
   businessAddresses        Address[]
   websiteURL               String?
   attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 

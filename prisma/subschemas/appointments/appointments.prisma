@@ -3,6 +3,7 @@ import { PetBusiness } from "../user/user"
 import { ServiceListing } from "../serviceListing/serviceListing"
 import { OrderItem } from "../finance/transactions"
 import { Pet } from "../user/user"
+import { SupportTicket } from "..\support\support"
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -71,4 +72,7 @@ model Booking {
   pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
   OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
   orderItemId Int       @unique
+
+  // support 
+  supportTickets SupportTicket[]
 }

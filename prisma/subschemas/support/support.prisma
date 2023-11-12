@@ -1,4 +1,6 @@
 import { User, PetOwner, PetBusiness } from "../user/user"
+import { ServiceListing } from "..\serviceListing\serviceListing"
+import { Booking, OrderItem, PayoutInvoice, RefundRequest } from "..\..\schema"
 
 enum SupportTicketStatus {
     PENDING
@@ -45,6 +47,30 @@ model SupportTicket {
 
     petBusinessId Int?
     petBusiness   PetBusiness? @relation(fields: [petBusinessId], references: [userId])
+
+    // Service Listing
+    serviceListingId Int?
+    serviceListing ServiceListing? @relation(fields: [serviceListingId], references: [serviceListingId])
+
+    // orders
+    orderItemId Int?
+    orderItem OrderItem? @relation(fields: [orderItemId], references: [orderItemId])
+
+    // Appointments
+    bookingId Int?
+    booking Booking? @relation(fields: [bookingId], references: [bookingId])
+
+    // Payments
+    // for PO refer to orderItem's invoice 
+    // for PB's payout related
+    payoutInvoiceId Int?
+    payoutInvoice PayoutInvoice? @relation(fields: [payoutInvoiceId], references: [invoiceId])
+
+    // Others
+    // refund requests?
+    refundRequestId Int?
+    refundRequest RefundRequest?  @relation(fields: [refundRequestId], references: [refundRequestId])
+
 }
 
 model Comment {

@@ -2,6 +2,7 @@ import {PetOwner, PetBusiness} from "../user/user"
 import {ServiceListing} from "../serviceListing/serviceListing"
 import {Booking} from "../appointments/appointments"
 import { Review } from "../serviceListing/serviceListing"
+import { SupportTicket } from "..\support\support"
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
@@ -41,6 +42,9 @@ model PayoutInvoice {
   orderItems  OrderItem[]
   userId      Int
   petBusiness PetBusiness @relation(fields: [userId], references: [userId])
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 enum OrderItemStatus {
@@ -83,6 +87,10 @@ model OrderItem {
   payoutInvoiceInvoiceId Int?
 
   review Review?
+
+  // support 
+  supportTickets SupportTicket[]
+
 }
 
 enum RefundStatus {
@@ -111,4 +119,7 @@ model RefundRequest {
 
   petBusinessId Int
   petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId])
+
+  // support
+  supportTickets SupportTicket[]
 }
