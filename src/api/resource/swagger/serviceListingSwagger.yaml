@@ -83,6 +83,7 @@ definitions:
       description: "I love pets"
       basePrice: 40
       dateCreated: "2023-09-09T17:17:16.485Z"
+      listingTime: "2023-11-11T17:17:16.485Z"
       lastUpdated: null
       category: "PET_GROOMING"
       petBusinessId: 3
@@ -562,44 +563,6 @@ paths:
       tags:
         - Service Listing
 
-  /api/service-listings/active:
-    get:
-      summary: Get all service listings available for pet owners. Fill in query params to filter accordingly.
-      parameters:
-        - in: query
-          name: category
-          description: Filter by category
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-            example:
-              - "PET_DINING"
-              - "PET_GROOMING"
-        - in: query
-          name: tag
-          description: Filter by tag
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-            example:
-              - "Free"
-              - "Healthy"
-      responses:
-        200:
-          description: An array of service listings
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/definitions/ServiceListingResponse"
-      tags:
-        - Service Listing
-
   /api/service-listings/filter:
     get:
       summary: Get service listings by filter
@@ -653,41 +616,57 @@ paths:
                   $ref: "#/definitions/ServiceListingResponse"
       tags:
         - Service Listing
-/api/service-listings/active:
-  get:
-    summary: Get all active service listings filtered by Category and tag
-    parameters:
-      - name: category
-        in: query
-        description: IDs of categories
-        required: false
-        schema:
-          type: string
-      - name: tag
-        in: query
-        description: Service listing tags
-        required: false
-        schema:
-          type: string
-      - name: limit
-        in: query
-        description: Maximum number of results to return
-        required: false
-        schema:
-          type: integer
-          format: int32 # Assuming limit is an integer
-    responses:
-      200:
-        description: Successful response
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: "#/definitions/ServiceListingActiveResponse"
-      400:
-        description: Bad request
-      500:
-        description: Internal server error
-    tags:
-      - Service Listing
+  /api/service-listings/active:
+    get:
+      summary: Get all active service listings filtered by Category and tag
+      parameters:
+        - name: category
+          in: query
+          description: IDs of categories
+          required: false
+          schema:
+            type: string
+        - name: tag
+          in: query
+          description: Service listing tags
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int32 # Assuming limit is an integer
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/ServiceListingActiveResponse"
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+      tags:
+        - Service Listing
+
+  /api/service-listings/get-bumped-listings:
+    get:
+      summary: Get the 6 most recently bumped listings, bumped within the last week, sorted by bumped time. Newly created listings that were not bumped are not returned.
+      responses:
+        200:
+          description: An array of service listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/ServiceListingResponse"
+      tags:
+        - Service Listing
+
