@@ -57,6 +57,22 @@ class StripeService {
       throw new Error('Obtaining of refund details failed: ' + error.message);
     }
   }
+  
+  async payExpressAccount(amount, expressAccountId, currency = 'sgd') {
+    try {
+      const payout = await stripe.transfers.create({
+        amount: this.dollarToCents(amount),  // Amount in cents
+        currency: currency,
+        destination: expressAccountId,
+        source_type: "card"
+      });
+      
+      return payout;
+    } catch (error) {
+      console.error('Payment to Express account failed:', error);
+      throw error;
+    }
+  }
 
   // UTILITY FUNCTIONS
 

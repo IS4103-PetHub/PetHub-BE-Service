@@ -8,6 +8,7 @@ definitions:
       - websiteURL
       - petBusinessId
       - businessType
+      - stripeAccountId
     properties:
       businessEmail:
         type: string
@@ -24,6 +25,9 @@ definitions:
       businessType:
         type: string
         description: The business type of the Pet Business.
+      stripeAccountId:
+        type: string
+        description: The stripe account ID of the Pet Business.
       businessAddresses:
         type: array
         items:
@@ -47,6 +51,9 @@ definitions:
       websiteURL:
         type: string
         description: The website URL of the Pet Business.
+      stripeAccountId:
+        type: string
+        description: The stripe account ID of the Pet Business.
       attachments:
         type: array
         items:
@@ -148,6 +155,7 @@ paths:
               websiteURL: "https://www.petgroom.com"
               petBusinessId: 1
               businessType: "SERVICE"
+              stripeAccountId: "8safsd87sd8s1-asOAS1"
               businessAddresses:
                 - addressName: "Main Office"
                   line1: "123 Paws Street"
@@ -172,6 +180,7 @@ paths:
                 businessEmail: example@gmail.com
                 businessDescription: ello there
                 websiteURL: https://www.google.com
+                stripeAccountId: "8safsd87sd8s1-asOAS1"
                 attachments: []
                 applicationStatus: PENDING
                 adminRemarks:
@@ -275,6 +284,7 @@ paths:
                 businessEmail: example@gmail.com
                 businessDescription: ello there
                 websiteURL: https://www.google.com
+                stripeAccountId: "8safsd87sd8s1-asOAS1"
                 attachments: []
                 applicationStatus: PENDING
                 adminRemarks:
@@ -328,6 +338,7 @@ paths:
                 businessEmail: example@gmail.com
                 businessDescription: ello there
                 websiteURL: https://www.google.com
+                stripeAccountId: "8safsd87sd8s1-asOAS1"
                 attachments: []
                 applicationStatus: APPROVED
                 adminRemarks:
@@ -391,6 +402,7 @@ paths:
                 businessEmail: example@gmail.com
                 businessDescription: ello there
                 websiteURL: https://www.google.com
+                stripeAccountId: "8safsd87sd8s1-asOAS1"
                 attachments: []
                 applicationStatus: APPROVED
                 adminRemarks:

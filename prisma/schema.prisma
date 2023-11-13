@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Nov 05 2023 23:14:48 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Sun Nov 12 2023 11:37:49 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -74,6 +74,7 @@ model Article {
   articleType ArticleType
   title       String
   content     String
+  isPinned    Boolean     @default(false)
 
   createdByUserId Int
   updatedByUserId Int?
@@ -83,6 +84,9 @@ model Article {
   //img
   attachmentKeys String[]
   attachmentUrls String[]
+
+  tags     Tag[]
+  category Category
 
   createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
   updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
@@ -388,6 +392,7 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article         Article[]
 }
 
 model FeaturedListingSet {
@@ -605,6 +610,7 @@ model PetBusiness {
   businessEmail          String?
   businessDescription    String?
   websiteURL             String?
+  stripeAccountId        String?
   businessAddresses      Address[]
   // ------------------------------------------------ Section End ------------------------------------------------ //
   serviceListings        ServiceListing[]
@@ -668,6 +674,7 @@ model PetBusinessApplication {
   businessType             BusinessType
   businessEmail            String
   businessDescription      String
+  stripeAccountId          String                    @default("")
   businessAddresses        Address[]
   websiteURL               String?
   attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
