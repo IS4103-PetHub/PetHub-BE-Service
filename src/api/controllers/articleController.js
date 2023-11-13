@@ -18,6 +18,15 @@ exports.getAllArticle = async (req, res, next) => {
     }
 }
 
+exports.getAllPinnedArticles = async (req, res, next) => {
+    try {
+        const articles = await articleService.getAllPinnedArticles()
+        res.status(200).json(articles)
+    } catch (error) {
+        next(error)
+    }
+}
+
 exports.getArticleById = async (req, res, next) => {
     try {
         const articleId = req.params.id;
