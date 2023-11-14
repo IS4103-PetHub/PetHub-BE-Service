@@ -3,6 +3,8 @@ const ArticleError = require("../../errors/articleError");
 const CustomError = require("../../errors/customError");
 const InternalUserService = require('../../services/user/internalUserService');
 const s3ServiceInstance = require("../s3Service");
+const PetOwnerService = require("../../services/user/petOwnerService");
+const petOwnerService = require("../../services/user/petOwnerService");
 
 class ArticleService {
 
@@ -13,10 +15,11 @@ class ArticleService {
             const articles = await prisma.article.findMany({
                 where: { articleType: articleType },
                 orderBy: {
-                    dateCreated: 'desc' 
+                    dateCreated: 'desc'
                 },
                 include: {
                     tags: true,
+                    articleComments: true,
                     createdBy: {
                         select: {
                             firstName: true,
@@ -76,6 +79,7 @@ class ArticleService {
                 where: { articleId },
                 include: {
                     tags: true,
+                    articleComments: true,
                     createdBy: {
                         select: {
                             firstName: true,
@@ -210,6 +214,99 @@ class ArticleService {
             await prisma.article.delete({
                 where: { articleId }
             });
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ArticleError(error);
+        }
+    }
+
+    async createArticleComment(articleId, comment, petOwnerId) {
+        try {
+            // Check that the article exists
+            const article = await this.getArticleById(articleId);
+
+            const articleComment = await prisma.articleComment.create({
+                data: {
+                    comment: comment,
+                    articleId: article.articleId,
+                    petOwnerId: petOwnerId,
+                },
+            })
+            return articleComment;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ArticleError(error)
+        }
+    }
+
+    async updateArticleComment(articleCommentId, comment, petOwnerId) {
+        try {
+            // Check that the article comment exists
+            const articleComment = await prisma.articleComment.findUnique({
+                where: { articleCommentId }
+            })
+            if (!articleComment) throw new CustomError("Article comment not found", 404);
+
+            // Check there the article comment belongs to the caller
+            if (articleComment.petOwnerId !== petOwnerId) {
+                throw new CustomError("You are not the owner of this article comment!", 403);
+            }
+
+            const updatedArticleComment = await prisma.articleComment.update({
+                where: { articleCommentId: articleCommentId },
+                data: {
+                    comment: comment,
+                    dateUpdated: new Date(),
+                }
+            })
+            return updatedArticleComment;
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ArticleError(error)
+        }
+    }
+
+    async deleteArticleComment(articleCommentId, petOwnerId) {
+        try {
+            // Check that the article comment exists
+            const articleComment = await prisma.articleComment.findUnique({
+                where: { articleCommentId }
+            })
+            if (!articleComment) throw new CustomError("Article comment not found", 404);
+
+            // Check there the article comment belongs to the caller
+            if (articleComment.petOwnerId !== petOwnerId) {
+                throw new CustomError("You are not the owner of this article comment!", 403);
+            }
+
+            await prisma.articleComment.delete({
+                where: { articleCommentId }
+            })
+        } catch (error) {
+            if (error instanceof CustomError) throw error;
+            throw new ArticleError(error)
+        }
+    }
+
+    // Gets a list of articleCommentIds that belong to a specific article for a specific petowner if any
+    async getArticleCommentsByArticleIdAndPetOwnerId(articleId, petOwnerId) {
+        try {
+            // Check that the article exists
+            const article = await this.getArticleById(articleId);
+
+            // Validate that petOwner exists
+            const petOwner = await petOwnerService.getUserById(petOwnerId);
+
+            const articleComments = await prisma.articleComment.findMany({
+                where: {
+                    articleId: article.articleId,
+                    petOwnerId: petOwner.userId,
+                },
+                select: {
+                    articleCommentId: true,
+                }
+            });
+            return articleComments.map(comment => comment.articleCommentId);
         } catch (error) {
             if (error instanceof CustomError) throw error;
             throw new ArticleError(error);
