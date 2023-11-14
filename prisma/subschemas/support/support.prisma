@@ -1,6 +1,6 @@
 import { User, PetOwner, PetBusiness } from "../user/user"
 import { ServiceListing } from "..\serviceListing\serviceListing"
-import { Booking, OrderItem, PayoutInvoice, RefundRequest } from "..\..\schema"
+import { Booking, Invoice, OrderItem, PayoutInvoice, RefundRequest } from "..\..\schema"
 
 enum SupportTicketStatus {
     PENDING
@@ -16,6 +16,7 @@ enum SupportCategoryEnum {
     APPOINTMENTS
     PAYMENTS
     ACCOUNTS
+    REFUNDS
     OTHERS
 }
 
@@ -70,6 +71,10 @@ model SupportTicket {
     // refund requests?
     refundRequestId Int?
     refundRequest RefundRequest?  @relation(fields: [refundRequestId], references: [refundRequestId])
+
+    // Invoice
+    invoiceId Int?
+    invoice Invoice? @relation(fields: [invoiceId], references: [invoiceId])
 
 }
 

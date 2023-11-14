@@ -3,6 +3,7 @@ import {ServiceListing} from "../serviceListing/serviceListing"
 import {Booking} from "../appointments/appointments"
 import { Review } from "../serviceListing/serviceListing"
 import { SupportTicket } from "..\support\support"
+import { SupportTicket } from "..\..\schema"
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
 model Invoice {
@@ -23,6 +24,8 @@ model Invoice {
   orderItems     OrderItem[]
   PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
+
+  supportTicket SupportTicket[]
 }
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes

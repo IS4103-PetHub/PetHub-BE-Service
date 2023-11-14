@@ -52,6 +52,16 @@ class SupportService {
                 }
             }
 
+            // validate if PO owns the invoice
+            if(data.invoiceId) {
+                const invoice = await prisma.invoice.findUnique({
+                    where: {invoiceId: Number(data.invoiceId)}
+                })
+                if(invoice.petOwnerUserId != petOwnerId) {
+                    throw new CustomError("Unable to create support ticket for a invoice that do not belong to the user", 400)
+                }
+            }
+
 
             const supportTicket = await prisma.supportTicket.create({
                 data: {
@@ -87,6 +97,12 @@ class SupportService {
                     ...(data.refundRequestId && {
                         refundRequest: {
                             connect: { refundRequestId: parseInt(data.refundRequestId, 10) },
+                        },
+                    }),
+                    // Connect Invoice if it exists
+                    ...(data.invoiceId && {
+                        invoice: {
+                            connect: { invoiceId: parseInt(data.invoiceId, 10) },
                         },
                     }),
                 },

@@ -151,13 +151,17 @@ paths:
                   required: false
                 bookingId:
                   type: integer
-                  example: 789
+                  example: 1
                   required: 1
                 payoutInvoiceId:
                   type: integer
                   example: 1
                   required: false
                 refundRequestId:
+                  type: integer
+                  example: 1
+                  required: false
+                invoiceId:
                   type: integer
                   example: 1
                   required: false

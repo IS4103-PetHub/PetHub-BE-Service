@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Sun Nov 12 2023 20:39:26 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Wed Nov 15 2023 00:22:56 GMT+0800 (GMT+08:00)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -226,6 +226,8 @@ model Invoice {
   orderItems     OrderItem[]
   PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
+
+  supportTicket SupportTicket[]
 }
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
@@ -466,6 +468,7 @@ enum SupportCategoryEnum {
   APPOINTMENTS
   PAYMENTS
   ACCOUNTS
+  REFUNDS
   OTHERS
 }
 
@@ -520,6 +523,10 @@ model SupportTicket {
   // refund requests?
   refundRequestId Int?
   refundRequest   RefundRequest? @relation(fields: [refundRequestId], references: [refundRequestId])
+
+  // Invoice
+  invoiceId Int?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [invoiceId])
 }
 
 model Comment {
