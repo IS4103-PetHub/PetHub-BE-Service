@@ -181,3 +181,31 @@ exports.payoutOrderItems = async (req, res, next) => {
         next(error)
     }
 }
+
+exports.getPetBusinessPayoutInvoice = async (req, res, next) => {
+    try {
+        const petBusinessId = req.params.petBusinessId
+        if (!await baseValidations.isValidInteger(petBusinessId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID} petBusinessId` });
+        }
+
+        const payoutInvoices = await revenueService.getPayoutInvoiceByPB(Number(petBusinessId))
+        res.status(200).json(payoutInvoices)
+    } catch(error) {
+        next(error)
+    }
+}
+
+exports.getPayoutInvoiceById = async (req, res, next) => {
+    try {
+        const payoutInvoiceId = req.params.payoutInvoiceId;
+        if (!await baseValidations.isValidInteger(payoutInvoiceId)) {
+            return res.status(400).json({ message: `${errorMessages.INVALID_ID} payoutInvoiceId` });
+        }
+
+        const payoutInvoice = await revenueService.getPayoutInvoiceById(Number(payoutInvoiceId));
+        res.status(200).json(payoutInvoice)
+    } catch(error) {
+        next(error)
+    }
+}

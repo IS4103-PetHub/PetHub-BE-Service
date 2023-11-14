@@ -189,6 +189,37 @@ class RevenueService {
             throw new OrderItemsError(error);
         }
     }
+
+    async getPayoutInvoiceByPB(PetBusinessId) {
+        try {
+            const payouts = await prisma.payoutInvoice.findMany({
+                where: {
+                    userId: PetBusinessId
+                }
+            })
+            return payouts
+        } catch(error) {
+            console.error(error);
+            throw error; 
+        }
+    }
+
+    async getPayoutInvoiceById(payoutInvoiceId) {
+        try {
+            const payoutInvoice = await prisma.payoutInvoice.findUnique({
+                where: {
+                    invoiceId: payoutInvoiceId
+                },
+                include: {
+                    orderItems: true
+                }
+            })
+            return payoutInvoice
+        } catch(error) {
+            console.error(error);
+            throw error; 
+        }
+    }
 }
 
 module.exports = new RevenueService();

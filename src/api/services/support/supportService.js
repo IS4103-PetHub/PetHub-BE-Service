@@ -162,7 +162,7 @@ class SupportService {
             // validate if Payout is for the PB
             if(data.payoutInvoiceId) {
                 const payout = await prisma.payoutInvoice.findUnique({
-                    where: {payoutInvoiceId: Number(data.payoutInvoiceId)}
+                    where: {invoiceId: Number(data.payoutInvoiceId)}
                 })
                 if(payout.userId != petBusinessId) {
                     throw new CustomError("Unable to create support ticket for a payout that do not belong to the user", 400)
@@ -212,7 +212,7 @@ class SupportService {
                     // Connect payoutInvoiceId if it exists
                     ...(data.payoutInvoiceId && {
                         payoutInvoice: {
-                            connect: { payoutInvoiceId: parseInt(data.payoutInvoiceId, 10) },
+                            connect: { invoiceId: parseInt(data.payoutInvoiceId, 10) },
                         },
                     }),
                     // Connect refundRequestId if it exists
@@ -265,10 +265,68 @@ class SupportService {
                     comments: true,
                     // Include related entities only if their IDs exist
                     serviceListing: true,
-                    orderItem: true,
-                    booking: true,
+                    orderItem: {
+                        include: {
+                            invoice: {
+                                include: {
+                                    PetOwner: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                            contactNumber: true,
+                                            user: {
+                                                select: {
+                                                    email: true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    booking: {
+                        include: {
+                            OrderItem: {
+                                include: {
+                                    invoice: {
+                                        include: {
+                                            PetOwner: {
+                                                select: {
+                                                    firstName: true,
+                                                    lastName: true,
+                                                    contactNumber: true,
+                                                    user: {
+                                                        select: {
+                                                            email: true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     payoutInvoice: true,
-                    refundRequest: true,
+                    refundRequest: {
+                        include: {
+                            petOwner: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                    contactNumber: true,
+                                    user: {
+                                        select: {
+                                            email: true
+                                        }
+                                    }
+                                }
+                            },
+                            orderItem: true
+                        }
+                    },
                 },
             });
             return supportTicket
