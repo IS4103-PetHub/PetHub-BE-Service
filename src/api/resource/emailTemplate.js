@@ -111,6 +111,14 @@ exports.deleteServiceListingEmail = (name, postTitle) => {
 };
 
 exports.checkoutSuccessEmail = (name, invoice, link) => {
+  let pointsRedeemedSection =
+    invoice.pointsRedeemed !== 0
+      ? `
+    Points Redeemed: ${invoice.pointsRedeemed}
+    Misc Charge (after points redemption) (7%): $${invoice.finalMiscCharge}
+    `
+      : "";
+
   return `
     Dear ${name},
 
@@ -125,10 +133,7 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
     Billing Details:
     - Subtotal: $${invoice.totalPrice}
     - Misc Charge (before points redemption) (7%): $${invoice.miscCharge}
-
-    - Points Redeemed: $${invoice.pointsRedeemed}
-    - Misc Charge (after points redemption) (7%): $${invoice.finalMiscCharge}
-    
+    ${pointsRedeemedSection}
     - Total Amount: $${invoice.finalTotalPrice}
 
     You can view your order details and track the delivery status by clicking the following link: ${link}
@@ -211,8 +216,8 @@ exports.AccountEmailVerificationEmail = (name, link) => {
 
     Regards,
     The PetHub Team  
-  `
-}
+  `;
+};
 
 exports.ConfirmationEmailVerificationEmail = (name) => {
   return `
@@ -227,7 +232,7 @@ exports.ConfirmationEmailVerificationEmail = (name) => {
     Regards,
     The PetHub Team
   `;
-}
+};
 
 exports.CreateNewInternalUser = (name, email, password) => {
   return `
@@ -251,7 +256,7 @@ exports.CreateNewInternalUser = (name, email, password) => {
     Regards,
     The PetHub Team
   `;
-}
+};
 
 exports.payoutPBEmail = (name) => {
   return `Dear ${name},
@@ -270,4 +275,4 @@ exports.payoutPBEmail = (name) => {
   
   Regards,
   The PetHub Team`;
-}
+};
