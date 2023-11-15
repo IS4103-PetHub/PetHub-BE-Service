@@ -14,6 +14,7 @@ function registerArticleRoutes(controller) {
     // Article
     router.get(`/`, controller.getAllArticle);
     router.get(`/pinned`, controller.getAllPinnedArticles);
+    router.get('/latest-announcement', controller.getLatestAnnouncementArticle);
     router.get(`/:id`, controller.getArticleById);
     router.delete(`/:id`, controller.deleteArticle);
     router.post(`/`, upload.array('file'), controller.createArticle);
@@ -21,8 +22,8 @@ function registerArticleRoutes(controller) {
     
     // Article Comments
     router.post(`/:id/comments`, controller.createArticleComment);
-    router.put(`/:id/comments/:commentId`, controller.updateArticleComment);
-    router.delete(`/:id/comments/:commentId`, controller.deleteArticleComment);
+    router.put(`/comments/:commentId`, controller.updateArticleComment);
+    router.delete(`/comments/:commentId`, controller.deleteArticleComment);
     router.get(`/:id/comments`, controller.getArticleCommentsByArticleIdAndPetOwnerId);
 }
 

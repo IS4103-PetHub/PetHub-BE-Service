@@ -34,8 +34,8 @@ model ArticleComment {
     dateUpdated         DateTime?
 
     articleId           Int
-    Article             Article @relation(fields: [articleId], references: [articleId], onDelete: Cascade, onUpdate: Cascade)
+    article             Article @relation(fields: [articleId], references: [articleId], onDelete: Cascade, onUpdate: Cascade)
 
     petOwnerId          Int
-    PetOwner            PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+    petOwner            PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }
