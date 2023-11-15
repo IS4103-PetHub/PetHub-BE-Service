@@ -15,6 +15,7 @@ const {
   seedRefunds,
   seedReviews,
 } = require("./orders/orders.js");
+const { seedPetLostAndFound } = require("./user/petLostAndFound.js");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -43,6 +44,8 @@ async function main() {
   const funPackUpdatedWithExpired = await seedExpired(prisma, funPackUpdatedWithReviews);
   console.log("Seeding payout invoices...");
   await seedPayout(prisma);
+  console.log("Seeding pet lost and found...");
+  await seedPetLostAndFound(prisma);
   await prisma.$disconnect(); // Disconnect from the database after seeding is done
   console.log("Main seeding completed!");
 }

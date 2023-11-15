@@ -667,4 +667,4 @@ function generateRandomPetOwnerIds(count, min, max) {
   return Array.from(randomIds);
 }
 
-module.exports = { serviceListings, tags, seedBusinessData };
+module.exports = { serviceListings, tags, seedBusinessData, remoteImageUrlToFile };
