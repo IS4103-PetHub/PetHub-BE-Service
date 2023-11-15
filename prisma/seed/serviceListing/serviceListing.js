@@ -663,4 +663,4 @@ function generateRandomPetOwnerIds(count, min, max) {
 }
 
 
-module.exports = { serviceListings, tags, seedBusinessData };
+module.exports = { serviceListings, tags, seedBusinessData, remoteImageUrlToFile };
