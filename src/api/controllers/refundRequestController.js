@@ -76,6 +76,19 @@ exports.approveRefundRequest = async (req, res, next) => {
     }
 }
 
+exports.reopenRefundRequests = async (req, res, next) => {
+    try {
+        const refundRequestId = req.params.refundRequestId;
+        if (!(await baseValidations.isValidInteger(refundRequestId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+        const reopenRefundRequest = await refundRequestService.reopenRefundRequest(Number(refundRequestId))
+        res.status(200).json(reopenRefundRequest)
+    } catch(error) {
+        next(error)
+    }
+}
+
 
 
 exports.getRefundRequestById = async (req, res, next) => {

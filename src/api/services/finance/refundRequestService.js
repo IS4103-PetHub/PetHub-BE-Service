@@ -247,6 +247,32 @@ class RefundRequestService {
         }
     };
 
+    async reopenRefundRequest(refundRequestId) {
+        try {
+            const refundRequest = await this.getRefundRequestById(refundRequestId);
+    
+            if (refundRequest.status != RefundStatus.CANCELLED && refundRequest.status != RefundStatus.REJECTED) {
+                throw new CustomError(`Refund request cannot be reopened as it is in ${refundRequest.status} state`, 400);
+            }
+    
+            const updatedRefundRequest = await prisma.refundRequest.update({
+                where: {
+                    refundRequestId: refundRequestId
+                },
+                data: {
+                    status: RefundStatus.PENDING,
+                    comment: null,
+                    processedAt: null,
+                },
+            });
+    
+            return updatedRefundRequest
+        } catch(error) {
+            if (error instanceof CustomError) throw error;
+            throw new RefundRequestError(error);
+        }
+    }
+
     filterRefundRequests(refundRequests, filters) {
         const {
             petBusinessFilter,
