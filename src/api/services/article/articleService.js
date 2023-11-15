@@ -127,42 +127,46 @@ class ArticleService {
       const selectedCategory = article.category;
 
       // Fetch SLs that match the selected category
-      let categoryMatchedListings = await prisma.serviceListing.findMany({
-        where: {
-          category: selectedCategory,
-          petBusiness: {
-            user: {
-              accountStatus: "ACTIVE", // pet business cannot be an inactive or pending user
-            },
-          },
-          lastPossibleDate: {
-            gte: new Date(), // Filter listings with lastPossibleDate >= current date
-          },
-        },
-        include: {
-          tags: true,
-          petBusiness: {
-            select: {
-              companyName: true,
-            },
-          },
-        },
-      });
+      let recommendedListings = [];
+      let categoryMatchedListings;
+      let tagMatchedListings;
 
-      // Sort category matched SLs by the number of matching tags
-      categoryMatchedListings.sort((a, b) => {
-        const aTagMatchCount = a.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
-        const bTagMatchCount = b.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
-        return bTagMatchCount - aTagMatchCount;
-      });
-
-      // ONLY if less than 6 category matched listings, get SLs with matching tags (but not same category)
-      if (categoryMatchedListings.length < 6) {
-        const tagMatchedListings = await prisma.serviceListing.findMany({
+      if (selectedCategory !== null) {
+        categoryMatchedListings = await prisma.serviceListing.findMany({
           where: {
-            category: {
-              not: selectedCategory,
+            category: selectedCategory,
+            petBusiness: {
+              user: {
+                accountStatus: "ACTIVE", // pet business cannot be an inactive or pending user
+              },
             },
+            lastPossibleDate: {
+              gte: new Date(), // Filter listings with lastPossibleDate >= current date
+            },
+          },
+          include: {
+            tags: true,
+            petBusiness: {
+              select: {
+                companyName: true,
+              },
+            },
+          },
+        });
+
+        // Sort category matched SLs by the number of matching tags
+        categoryMatchedListings.sort((a, b) => {
+          const aTagMatchCount = a.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
+          const bTagMatchCount = b.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
+          return bTagMatchCount - aTagMatchCount;
+        });
+      }
+
+      // ONLY if less than 6 category matched listings (or category is null), get SLs with matching tags (but not same category if exists)
+      if (!selectedCategory || categoryMatchedListings.length < 6) {
+        tagMatchedListings = await prisma.serviceListing.findMany({
+          where: {
+            ...(selectedCategory !== null && { category: { not: selectedCategory } }),
             tags: {
               some: {
                 tagId: {
@@ -187,12 +191,26 @@ class ArticleService {
           const bTagMatchCount = b.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
           return bTagMatchCount - aTagMatchCount;
         });
-
-        // Combine SLs and take top 6
-        categoryMatchedListings = [...categoryMatchedListings, ...tagMatchedListings].slice(0, 6);
       }
 
-      article.recommendedServices = categoryMatchedListings;
+      // Combine SLs and take top 6
+      if (
+        categoryMatchedListings &&
+        Array.isArray(categoryMatchedListings) &&
+        categoryMatchedListings.length > 0
+      ) {
+        recommendedListings.push(...categoryMatchedListings);
+      }
+      if (tagMatchedListings && Array.isArray(tagMatchedListings) && tagMatchedListings.length > 0) {
+        recommendedListings.push(...tagMatchedListings);
+      }
+
+      console.log("category", categoryMatchedListings);
+      console.log("tags", tagMatchedListings);
+      // Take top 6 from the combined array
+      recommendedListings = recommendedListings.slice(0, 6);
+
+      article.recommendedServices = recommendedListings;
       return article;
     } catch (error) {
       if (error instanceof CustomError) throw error;
