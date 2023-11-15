@@ -124,35 +124,75 @@ class ArticleService {
 
       const selectedTags = article.tags;
       const selectedTagsFilter = selectedTags.map((tag) => tag.tagId);
-
       const selectedCategory = article.category;
 
-      const recommendedServiceListings = await prisma.serviceListing.findMany({
+      // Fetch SLs that match the selected category
+      let categoryMatchedListings = await prisma.serviceListing.findMany({
         where: {
-          OR: [
-            {
-              tags: {
-                some: {
-                  tagId: {
-                    in: selectedTagsFilter,
-                  },
-                },
-              },
+          category: selectedCategory,
+          petBusiness: {
+            user: {
+              accountStatus: "ACTIVE", // pet business cannot be an inactive or pending user
             },
-            {
-              category: selectedCategory,
-            },
-          ],
+          },
+          lastPossibleDate: {
+            gte: new Date(), // Filter listings with lastPossibleDate >= current date
+          },
         },
-        take: 6,
-        orderBy: {
-          tags: {
-            _count: "desc",
+        include: {
+          tags: true,
+          petBusiness: {
+            select: {
+              companyName: true,
+            },
           },
         },
       });
 
-      article.recommendedServices = recommendedServiceListings;
+      // Sort category matched SLs by the number of matching tags
+      categoryMatchedListings.sort((a, b) => {
+        const aTagMatchCount = a.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
+        const bTagMatchCount = b.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
+        return bTagMatchCount - aTagMatchCount;
+      });
+
+      // ONLY if less than 6 category matched listings, get SLs with matching tags (but not same category)
+      if (categoryMatchedListings.length < 6) {
+        const tagMatchedListings = await prisma.serviceListing.findMany({
+          where: {
+            category: {
+              not: selectedCategory,
+            },
+            tags: {
+              some: {
+                tagId: {
+                  in: selectedTagsFilter,
+                },
+              },
+            },
+          },
+          include: {
+            tags: true,
+            petBusiness: {
+              select: {
+                companyName: true,
+              },
+            },
+          },
+        });
+
+        // Sort tag matched SLs by the number of matching tags
+        tagMatchedListings.sort((a, b) => {
+          const aTagMatchCount = a.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
+          const bTagMatchCount = b.tags.filter((tag) => selectedTagsFilter.includes(tag.tagId)).length;
+          return bTagMatchCount - aTagMatchCount;
+        });
+
+        // Combine SLs and take top 6
+        categoryMatchedListings = [...categoryMatchedListings, ...tagMatchedListings].slice(0, 6);
+      }
+
+      article.recommendedServices = categoryMatchedListings;
       return article;
     } catch (error) {
       if (error instanceof CustomError) throw error;
