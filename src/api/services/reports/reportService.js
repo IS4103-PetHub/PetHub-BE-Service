@@ -22,19 +22,18 @@ const { pet } = require("../../../../prisma/prisma");
 const petBusinessService = require("../user/petBusinessService");
 
 class ReportService {
-  constructor() { }
+  constructor() {}
 
   async generatePayoutInvoice(payoutInvoice, orderItems) {
     try {
-
       let data = {};
-      const petBusiness = await petBusinessService.getUserById(payoutInvoice.userId)
-      
-      data.orderItems = JSON.parse(JSON.stringify(orderItems))
-      data.payoutInvoice = JSON.parse(JSON.stringify(payoutInvoice))
-      data.petBusiness = petBusiness
+      const petBusiness = await petBusinessService.getUserById(payoutInvoice.userId);
 
-      let doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true })
+      data.orderItems = JSON.parse(JSON.stringify(orderItems));
+      data.payoutInvoice = JSON.parse(JSON.stringify(payoutInvoice));
+      data.petBusiness = petBusiness;
+
+      let doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true });
       // header
       invoiceGeneratePetBusinessHeaderInfo(doc, payoutInvoice.paymentId, data);
       invoiceGeneratePethubImage(doc);
@@ -66,8 +65,7 @@ class ReportService {
         ],
         "invoices"
       );
-
-    } catch(error) {
+    } catch (error) {
       if (error instanceof CustomError) throw error;
       throw new ReportError(error);
     }
@@ -81,9 +79,7 @@ class ReportService {
       if (singleItem) {
         // deep copy so we don't mess with the original order item (just in case another service passes in an object not to be mutated)
         data = JSON.parse(JSON.stringify(orderItems[0]));
-        // Calculate misc fee and total price
-        data.miscCharge = Math.round(orderItems[0].itemPrice * constants.MISC_CHARGE_PCT * 100) / 100;
-        data.totalPrice = orderItems[0].itemPrice + data.miscCharge;
+        data.finalTotalPrice = orderItems[0].itemPrice;
       } else {
         data = JSON.parse(JSON.stringify(invoice)); // deep copy so we don't mess with the original invoice
       }
@@ -99,8 +95,8 @@ class ReportService {
       invoiceGenerateCustomerInfo(doc, data);
 
       // main content
-      let yEndPosition = invoiceGenerateItems(doc, data, singleItem ? true : false);
-      invoiceGenerateTotals(doc, data, yEndPosition + 40);
+      let yEndPosition = invoiceGenerateItems(doc, data, singleItem);
+      invoiceGenerateTotals(doc, data, yEndPosition + 40, singleItem);
 
       // footer
       invoiceGenerateFooter(

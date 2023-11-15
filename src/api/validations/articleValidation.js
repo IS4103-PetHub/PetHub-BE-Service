@@ -56,8 +56,6 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
         category: Joi.string()
             .trim()
             .valid('PET_GROOMING', 'DINING', 'VETERINARY', 'PET_RETAIL', 'PET_BOARDING')
-            .required(),
-
     })
 
     const { error } = schema.validate(payload, { convert: false });
@@ -67,6 +65,24 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
     }
 
     return { isValid: true };
+}
 
+exports.validateArticleCommentPayload = (payload) => {
+    const schema = Joi.object({
+        comment: Joi.string()
+            .trim()
+            .min(1)
+            .required()
+            .messages({
+                'string.empty': 'Comment cannot be empty.',
+                'string.min': 'Comment must contain at least 1 character.',
+            }),
+    })
 
+    const { error } = schema.validate(payload, { convert: false });
+    if (error) {
+        console.log(error);
+        return { isValid: false, message: error.details[0].message };
+    }
+    return { isValid: true };
 }
