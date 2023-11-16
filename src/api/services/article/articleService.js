@@ -205,8 +205,6 @@ class ArticleService {
         recommendedListings.push(...tagMatchedListings);
       }
 
-      console.log("category", categoryMatchedListings);
-      console.log("tags", tagMatchedListings);
       // Take top 6 from the combined array
       recommendedListings = recommendedListings.slice(0, 6);
 

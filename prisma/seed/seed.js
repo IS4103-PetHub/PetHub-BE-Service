@@ -16,6 +16,7 @@ const {
   seedReviews,
 } = require("./orders/orders.js");
 const { seedPetLostAndFound } = require("./user/petLostAndFound.js");
+const { seedArticles } = require("./article/article.js");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -30,6 +31,8 @@ async function main() {
   await seedCalendarGroup();
   console.log("Seeding business data...");
   await seedBusinessData(prisma);
+  console.log("Seeding articles...");
+  await seedArticles(prisma);
   console.log("Seeding invoices and order items...");
   const orderItems = await seedInvoicesAndOrders(prisma);
   console.log("Seeding bookings for the above calendar groups...");
