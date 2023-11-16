@@ -31,6 +31,8 @@ async function main() {
   await seedCalendarGroup();
   console.log("Seeding business data...");
   await seedBusinessData(prisma);
+  console.log("Seeding articles...");
+  await seedArticles(prisma);
   console.log("Seeding invoices and order items...");
   const orderItems = await seedInvoicesAndOrders(prisma);
   console.log("Seeding bookings for the above calendar groups...");
@@ -47,8 +49,6 @@ async function main() {
   await seedPayout(prisma);
   console.log("Seeding pet lost and found...");
   await seedPetLostAndFound(prisma);
-  console.log("Seeding articles...");
-  await seedArticles(prisma);
   await prisma.$disconnect(); // Disconnect from the database after seeding is done
   console.log("Main seeding completed!");
 }
