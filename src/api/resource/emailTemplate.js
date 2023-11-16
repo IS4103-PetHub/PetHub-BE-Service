@@ -111,6 +111,14 @@ exports.deleteServiceListingEmail = (name, postTitle) => {
 };
 
 exports.checkoutSuccessEmail = (name, invoice, link) => {
+  let pointsRedeemedSection =
+    invoice.pointsRedeemed !== 0
+      ? `
+    Points Redeemed: ${invoice.pointsRedeemed}
+    Misc Charge (after points redemption) (7%): $${invoice.finalMiscCharge}
+    `
+      : "";
+
   return `
     Dear ${name},
 
@@ -125,10 +133,7 @@ exports.checkoutSuccessEmail = (name, invoice, link) => {
     Billing Details:
     - Subtotal: $${invoice.totalPrice}
     - Misc Charge (before points redemption) (7%): $${invoice.miscCharge}
-
-    - Points Redeemed: $${invoice.pointsRedeemed}
-    - Misc Charge (after points redemption) (7%): $${invoice.finalMiscCharge}
-    
+    ${pointsRedeemedSection}
     - Total Amount: $${invoice.finalTotalPrice}
 
     You can view your order details and track the delivery status by clicking the following link: ${link}
@@ -211,8 +216,8 @@ exports.AccountEmailVerificationEmail = (name, link) => {
 
     Regards,
     The PetHub Team  
-  `
-}
+  `;
+};
 
 exports.ConfirmationEmailVerificationEmail = (name) => {
   return `
@@ -227,7 +232,7 @@ exports.ConfirmationEmailVerificationEmail = (name) => {
     Regards,
     The PetHub Team
   `;
-}
+};
 
 exports.CreateNewInternalUser = (name, email, password) => {
   return `
@@ -251,7 +256,7 @@ exports.CreateNewInternalUser = (name, email, password) => {
     Regards,
     The PetHub Team
   `;
-}
+};
 
 exports.payoutPBEmail = (name) => {
   return `Dear ${name},
@@ -270,4 +275,70 @@ exports.payoutPBEmail = (name) => {
   
   Regards,
   The PetHub Team`;
-}
+};
+
+exports.RefundRequestCreatedEmail = (refundRequest) => {
+  const floatPrice = parseFloat(refundRequest.orderItem.itemPrice).toFixed(2);
+  return `
+    Dear ${refundRequest.petBusiness.companyName},
+
+    A customer has submitted a refund request with the following details
+
+    - Customer ID: ${refundRequest.petOwnerId}
+    - Order Item ID: ${refundRequest.orderItemId}
+    - Item Name: ${refundRequest.orderItem.itemName}
+    - Amount: $${floatPrice}
+    
+    - Reason: ${refundRequest.reason}
+    
+    We kindly request that you review this refund application at your earliest convenience and proceed with either approval or rejection based on your assessment. 
+    
+    Prompt handling of this request will ensure continued customer satisfaction and maintain the quality of service we strive for at PetHub.
+
+    Regards,
+    The PetHub Team
+  `;
+};
+
+exports.RefundRequestRejectedEmail = (refundRequest) => {
+  const floatPrice = parseFloat(refundRequest.orderItem.itemPrice).toFixed(2);
+  return `
+    Dear ${refundRequest.petOwner.lastName} Team,
+
+    Greetings from PetHub! We regret to inform you that the your refund request has been rejected based on the following details:
+
+    - Item Name: ${refundRequest.orderItem.itemName}
+    - Requested Refund Amount: $${floatPrice}
+    - Reason for Rejection: ${refundRequest.comment}
+
+    We understand that this may be disappointing. If you have any further questions or believe additional discussion is warranted, please do not hesitate to contact us.
+
+    Thank you for your understanding, and we hope to continue serving your pet needs in the future.
+
+    Warm regards,
+    The PetHub Team
+  `;
+};
+
+exports.RefundRequestApprovedEmail = (refundRequest) => {
+  const floatPrice = parseFloat(refundRequest.orderItem.itemPrice).toFixed(2);
+  return `
+    Dear ${refundRequest.petOwner.lastName},
+
+    Greetings from PetHub! We are reaching out to you regarding your recent refund request for the following item:
+
+    - Item Name: ${refundRequest.orderItem.itemName}
+    - Requested Refund Amount: $${floatPrice}
+
+    We are pleased to inform you that your request has been accepted. Your refund is being processed and should be processed using your original payment method soon.
+
+    Comments or Additional Information: ${refundRequest.comment}
+
+    We appreciate your business and are committed to ensuring your satisfaction. If you have any further questions or need assistance, please feel free to reach out to us.
+
+    Thank you for choosing PetHub.
+
+    Best regards,
+    The PetHub Team
+  `;
+};

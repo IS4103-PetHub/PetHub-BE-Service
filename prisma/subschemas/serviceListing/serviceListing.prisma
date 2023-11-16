@@ -6,6 +6,7 @@ import { OrderItem } from "../finance/transactions"
 import { PetOwner } from "../user/user"
 import { ReviewReportReason } from "../enums/reviewEnums"
 import { ServiceListing } from "../../schema"
+import { Article } from "..\..\schema"
 import { SupportTicket } from "..\support\support"
 
 model ServiceListing {
@@ -66,6 +67,7 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article Article[]
 }
 
 model FeaturedListingSet {

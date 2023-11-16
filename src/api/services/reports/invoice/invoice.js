@@ -40,12 +40,12 @@ function generateTableRow(doc, y, item, itemName, voucherCode, itemPrice) {
 
 function generatePayoutTableRow(doc, y, item, itemName, quantity, itemPrice, totalPrice) {
   doc
-  .fontSize(8)
-  .text(item, PAGE_MARGIN, y)
-  .text(itemName, 130, y)
-  .text(quantity, 300, y,)
-  .text(itemPrice, 355, y, { width: 90, align: "right" })
-  .text(totalPrice, 445, y, { width: 90, align: "right" });
+    .fontSize(8)
+    .text(item, PAGE_MARGIN, y)
+    .text(itemName, 130, y)
+    .text(quantity, 300, y)
+    .text(itemPrice, 355, y, { width: 90, align: "right" })
+    .text(totalPrice, 445, y, { width: 90, align: "right" });
 }
 
 function generateTableHeader(doc, baseYValue, removeVoucherCode = false) {
@@ -89,9 +89,7 @@ function generatePetBusinessHeaderInfo(doc, paymentId, data) {
     .text(`${data.petBusiness.websiteURL}`)
     .text(`${data.petBusiness.businessAddresses[0].addressName}`)
     .text(`${data.petBusiness.businessAddresses[0].line1}`)
-    .text(data.petBusiness.businessAddresses[0].line2 
-      ? `${data.petBusiness.businessAddresses[0].line2}`
-      : ``)
+    .text(data.petBusiness.businessAddresses[0].line2 ? `${data.petBusiness.businessAddresses[0].line2}` : ``)
     .text(`Singapore ${data.petBusiness.businessAddresses[0].postalCode}`)
     .moveDown();
 }
@@ -127,7 +125,7 @@ function generateCustomerInfo(doc, data) {
     .text("Order Date:", colOneXValue, baseYValue)
     .text(formatDate(new Date()), colTwoXValue, baseYValue)
     .text("Total Paid:", colOneXValue, baseYValue + lineBreakYValue)
-    .text(formatCurrency(data.totalPrice), colTwoXValue, baseYValue + lineBreakYValue);
+    .text(formatCurrency(data.finalTotalPrice), colTwoXValue, baseYValue + lineBreakYValue);
 
   doc
     .text(`${data.petOwner.firstName} ${data.petOwner.lastName}`, colThreeXValue, baseYValue)
@@ -213,7 +211,7 @@ function generatePayoutItems(doc, data) {
   let yPosition = baseYValue;
   let pageItemCount = 0;
 
-  generatePayoutTableHeader(doc, baseYValue)
+  generatePayoutTableHeader(doc, baseYValue);
 
   const groupedOrderItems = {};
   data.orderItems.forEach((item) => {
@@ -226,7 +224,7 @@ function generatePayoutItems(doc, data) {
     groupedOrderItems[serviceListingId].push(item);
   });
 
-  let i = 0
+  let i = 0;
   for (const serviceListingId in groupedOrderItems) {
     if (groupedOrderItems.hasOwnProperty(serviceListingId)) {
       yPosition += 30;
@@ -243,12 +241,12 @@ function generatePayoutItems(doc, data) {
         pageItemCount = 1;
         isFirstPage = false;
       }
-      
+
       const orderItems = groupedOrderItems[serviceListingId];
       const serviceListingName = orderItems[0].itemName; // Assuming all items in a group have the same name
       const itemPrice = orderItems[0].itemPrice; // Assuming all items in a group have the same price
       const quantity = orderItems.length;
-  
+
       generatePayoutTableRow(
         doc,
         yPosition,
@@ -265,49 +263,49 @@ function generatePayoutItems(doc, data) {
   return yPosition;
 }
 
-function generateTotals(doc, data, yStartPosition) {
+function generateTotals(doc, data, yStartPosition, isSingleItem) {
   const lineBreakYValue = 20;
 
+  console.log("data", data);
+
   doc.font("Helvetica-Bold");
+  !isSingleItem && generateTableRow(doc, yStartPosition, "", "", "Subtotal", formatCurrency(data.totalPrice));
+  !isSingleItem &&
+    generateTableRow(
+      doc,
+      yStartPosition + lineBreakYValue,
+      "",
+      "",
+      "Miscellaneous fee",
+      formatCurrency(data.miscCharge)
+    );
+  !isSingleItem &&
+    data.pointsRedeemed !== 0 &&
+    generateTableRow(
+      doc,
+      yStartPosition + 2 * lineBreakYValue,
+      "",
+      "",
+      "Points offset",
+      `(${data.pointsRedeemed} points) -${formatCurrency(data.pointsRedeemed / 100)}`
+    );
+
   generateTableRow(
     doc,
-    yStartPosition,
-    "",
-    "",
-    "Subtotal",
-    formatCurrency(data.totalPrice - data.miscCharge)
-  );
-  generateTableRow(
-    doc,
-    yStartPosition + lineBreakYValue,
-    "",
-    "",
-    "Miscellaneous fee",
-    formatCurrency(data.miscCharge)
-  );
-  generateTableRow(
-    doc,
-    yStartPosition + 2 * lineBreakYValue,
+    yStartPosition + 3 * lineBreakYValue,
     "",
     "",
     "Amount Paid",
-    formatCurrency(data.totalPrice)
+    formatCurrency(data.finalTotalPrice)
   );
-  generateHr(doc, yStartPosition + 3 * lineBreakYValue, false, true);
-  generateHr(doc, yStartPosition + 3 * lineBreakYValue + 2, false, true);
+  generateHr(doc, yStartPosition + 4 * lineBreakYValue, false, true);
+  generateHr(doc, yStartPosition + 4 * lineBreakYValue + 2, false, true);
 }
 
 function generatePayoutTotals(doc, data, yStartPosition) {
   const lineBreakYValue = 20;
   doc.font("Helvetica-Bold");
-  generateTableRow(
-    doc,
-    yStartPosition,
-    "",
-    "",
-    "Subtotal",
-    formatCurrency(data.payoutInvoice.totalAmount)
-  );
+  generateTableRow(doc, yStartPosition, "", "", "Subtotal", formatCurrency(data.payoutInvoice.totalAmount));
   generateTableRow(
     doc,
     yStartPosition + lineBreakYValue,

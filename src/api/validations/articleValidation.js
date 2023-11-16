@@ -1,4 +1,4 @@
-const {ArticleType} = require('@prisma/client')
+const { ArticleType, Category } = require('@prisma/client')
 const Joi = require("joi")
 
 exports.validateArticleType = (type) => {
@@ -32,15 +32,30 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
             .required(),
         file: Joi.any()
             .optional(),
+        isPinned: Joi.string()
+            .trim()
+            .valid('true', 'false')
+            .optional(),
         internalUserId: Joi.string()
             .trim()
             .required()
             .regex(/^\d+$/, 'numeric')
             .messages({
-              'string.empty': 'Internal user ID must not be empty.',
-              'string.pattern.base': 'Internal user ID must be a numeric string.',
+                'string.empty': 'Internal user ID must not be empty.',
+                'string.pattern.base': 'Internal user ID must be a numeric string.',
             }),
-        
+        tagIds: Joi.array()
+            .items(
+                Joi.string()
+                    .trim()
+                    .regex(/^\d+$/, 'numeric')
+                    .message({
+                        'string.pattern.base': 'Tag ID must be a numeric string.',
+                    })
+            ),
+        category: Joi.string()
+            .trim()
+            .valid('PET_GROOMING', 'DINING', 'VETERINARY', 'PET_RETAIL', 'PET_BOARDING')
     })
 
     const { error } = schema.validate(payload, { convert: false });
@@ -50,6 +65,24 @@ exports.validateCreateAndUpdateArticlePayload = (payload) => {
     }
 
     return { isValid: true };
+}
 
+exports.validateArticleCommentPayload = (payload) => {
+    const schema = Joi.object({
+        comment: Joi.string()
+            .trim()
+            .min(1)
+            .required()
+            .messages({
+                'string.empty': 'Comment cannot be empty.',
+                'string.min': 'Comment must contain at least 1 character.',
+            }),
+    })
 
+    const { error } = schema.validate(payload, { convert: false });
+    if (error) {
+        console.log(error);
+        return { isValid: false, message: error.details[0].message };
+    }
+    return { isValid: true };
 }

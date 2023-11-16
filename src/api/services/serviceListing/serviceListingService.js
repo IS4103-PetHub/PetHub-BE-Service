@@ -343,11 +343,20 @@ exports.getServiceListingByTag = async (id) => {
 
 exports.getServiceListingByPBId = async (id) => {
   try {
+    const currentDate = new Date();
     const serviceListings = await prisma.serviceListing.findMany({
-      where: { petBusinessId: id },
+      where: { 
+        petBusinessId: id,
+        lastPossibleDate: {
+          gte: currentDate, // Filter listings with lastPossibleDate >= current date
+        },
+      },
       include: {
         tags: true,
         addresses: true,
+      },
+      orderBy: {
+        listingTime: 'desc', // Sort by listingTime in descending order (latest first)
       },
     });
     return serviceListings;
@@ -566,6 +575,20 @@ exports.getBumpedListings = async (numListings = 6) => {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
   
     const bumpedListings = await prisma.serviceListing.findMany({
+      include: {
+        tags: true,
+        addresses: true,
+        petBusiness: {
+          select: {
+            companyName: true,
+            user: {
+              select: {
+                accountStatus: true,
+              },
+            },
+          },
+        },
+      },
       where: {
         listingTime: {
           gte: oneWeekAgo,

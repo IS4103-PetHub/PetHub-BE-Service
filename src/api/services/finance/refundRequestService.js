@@ -148,8 +148,26 @@ class RefundRequestService {
                     petBusinessId: orderItem.serviceListing.petBusinessId,
                     reason: data.reason,
                     status: 'PENDING',
-                }
+                },
+                include: {
+                    orderItem: true,
+                    petBusiness: {
+                        select: {
+                            companyName: true,
+                            user: {
+                                select: {
+                                    email: true,
+                                }
+                            }
+                        }
+                    }
+                },
             });
+
+            await emailService.sendEmail(
+                newRefundRequest.petBusiness.user.email,
+                `${newRefundRequest.petBusiness.companyName}, Refund Request Made`,
+                emailTemplate.RefundRequestCreatedEmail(newRefundRequest));
 
             return newRefundRequest;
         } catch (error) {
@@ -197,7 +215,26 @@ class RefundRequestService {
                     comment: data.comment,
                     processedAt: new Date(),
                 },
+                include: {
+                    orderItem: true,
+                    petOwner: {
+                        select: {
+                            lastName: true,
+                            user: {
+                                select: {
+                                    email: true,
+                                }
+                            }
+                        },
+                    },
+                },
             });
+
+            await emailService.sendEmail(
+                updatedRefundRequest.petOwner.user.email,
+                `Refund Request Rejected`,
+                emailTemplate.RefundRequestRejectedEmail(updatedRefundRequest));
+
             return updatedRefundRequest;
         } catch (error) {
             if (error instanceof CustomError) throw error;
@@ -221,7 +258,7 @@ class RefundRequestService {
                 const refundData = await stripeService.issuePartialRefund(orderItem.invoice.paymentId, orderItem.itemPrice)
                 // Commented out propagation of error in issuePartialRefund then mock the stripRefundId for seeded orders (refundData will be undefined)
                 // TODO: Revert changes before submitting code 
-                stripeRefundId = refundData ? refundData.id : "Mock stripe refund";
+                stripeRefundId = refundData ? refundData.id : `Mock stripe refund-${refundRequest.refundRequestId}`;
             }
 
             const approvedRefundRequest = await prisma.$transaction(async (prismaClient) => {
@@ -235,10 +272,27 @@ class RefundRequestService {
                         stripeRefundId: stripeRefundId,
                         processedAt: new Date(),
                     },
+                    include: {
+                        orderItem: true,
+                        petOwner: {
+                            select: {
+                                lastName: true,
+                                user: {
+                                    select: {
+                                        email: true,
+                                    }
+                                }
+                            },
+                        },
+                    },
                 });
-
                 return updatedRefundRequest
             });
+
+            await emailService.sendEmail(
+                approvedRefundRequest.petOwner.user.email,
+                `Refund Request Approved`,
+                emailTemplate.RefundRequestApprovedEmail(approvedRefundRequest));
 
             return approvedRefundRequest;
         } catch (error) {

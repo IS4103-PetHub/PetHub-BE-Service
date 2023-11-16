@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Nov 15 2023 00:22:56 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Wed Nov 15 2023 23:00:04 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -77,18 +77,36 @@ model Article {
   articleType ArticleType
   title       String
   content     String
+  isPinned    Boolean     @default(false)
 
-  createdByUserId Int
-  updatedByUserId Int?
-  dateCreated     DateTime  @default(now())
-  dateUpdated     DateTime?
+  dateCreated DateTime  @default(now())
+  dateUpdated DateTime?
 
-  //img
   attachmentKeys String[]
   attachmentUrls String[]
 
-  createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
-  updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
+  tags            Tag[]
+  category        Category?
+  articleComments ArticleComment[]
+
+  createdByUserId Int
+  updatedByUserId Int?
+  createdBy       InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
+  updatedBy       InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
+}
+
+model ArticleComment {
+  articleCommentId Int    @id @default(autoincrement())
+  comment          String
+
+  dateCreated DateTime  @default(now())
+  dateUpdated DateTime?
+
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [articleId], onDelete: Cascade, onUpdate: Cascade)
+
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 generator client {
@@ -405,6 +423,7 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article         Article[]
 }
 
 model FeaturedListingSet {
@@ -639,6 +658,7 @@ model PetOwner {
   reportReview      ReportReview[]
   likedReview       Review[]
   SupportTicket     SupportTicket[]
+  articleComments   ArticleComment[]
 }
 
 model PetBusiness {

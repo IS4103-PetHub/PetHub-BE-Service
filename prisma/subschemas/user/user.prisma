@@ -1,6 +1,7 @@
 import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus, Gender, PetType} from "../enums/accountEnums"
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
+import {ArticleComment} from "../article/article"
 import {CalendarGroup, Booking} from "../appointments/appointments"
 import { OrderItem, Invoice, RefundRequest, PayoutInvoice} from "../finance/transactions"
 import { CommissionRule } from "../finance/commissions"
@@ -65,6 +66,7 @@ model PetOwner {
   reportReview      ReportReview[]
   likedReview       Review[]
   SupportTicket     SupportTicket[]
+  articleComments   ArticleComment[]
 }
 
 model PetBusiness {
