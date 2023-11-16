@@ -7,19 +7,19 @@ const CURRENT_DATE = new Date();
 const tags = [
   {
     id: 1,
-    name: "Free",
+    name: "Eco-friendly",
   },
   {
     id: 2,
-    name: "Not Free",
+    name: "New",
   },
   {
     id: 3,
-    name: "Healthy",
+    name: "Seasonal",
   },
   {
     id: 4,
-    name: "Training",
+    name: "Exercise",
   },
   {
     id: 5,
@@ -478,7 +478,8 @@ const serviceListings = [
   {
     id: 24,
     title: "Pet Toys and Accessories",
-    description: "Explore a wide range of toys and accessories for your pets. Keep them entertained and happy.",
+    description:
+      "Explore a wide range of toys and accessories for your pets. Keep them entertained and happy.",
     petBusinessId: 4,
     category: "PET_RETAIL",
     defaultExpiryDays: 30,
@@ -511,7 +512,8 @@ const serviceListings = [
   {
     id: 27,
     title: "Pet-Friendly Restaurant",
-    description: "Dine with your pets in our outdoor pet-friendly seating area. A meal for you and your furry companions!",
+    description:
+      "Dine with your pets in our outdoor pet-friendly seating area. A meal for you and your furry companions!",
     petBusinessId: 2,
     category: "DINING",
     defaultExpiryDays: 30,
@@ -533,7 +535,8 @@ const serviceListings = [
   {
     id: 29,
     title: "Pet Apparel and Fashion",
-    description: "Dress up your pets in the latest pet fashion trends. Find the perfect outfit for every occasion.",
+    description:
+      "Dress up your pets in the latest pet fashion trends. Find the perfect outfit for every occasion.",
     petBusinessId: 4,
     category: "PET_RETAIL",
     defaultExpiryDays: 30,
@@ -544,7 +547,8 @@ const serviceListings = [
   {
     id: 30,
     title: "Bird Boarding Services",
-    description: "Safe and comfortable boarding services for your feathered friends while you're on vacation.",
+    description:
+      "Safe and comfortable boarding services for your feathered friends while you're on vacation.",
     petBusinessId: 5,
     category: "PET_BOARDING",
     defaultExpiryDays: 30,
@@ -588,11 +592,12 @@ const serviceListings = [
   {
     id: 34,
     title: "Pet Photography Studio",
-    description: "Capture the beauty and personality of your pets with our professional pet photography services.",
+    description:
+      "Capture the beauty and personality of your pets with our professional pet photography services.",
     petBusinessId: 4,
     category: "PET_RETAIL",
     defaultExpiryDays: 30,
-    basePrice: 18.90,
+    basePrice: 18.9,
     requiresBooking: false,
     url: getRandomImageURLs(birdURLs)
   },
@@ -607,7 +612,7 @@ const serviceListings = [
     requiresBooking: true,
     url: getRandomImageURLs(trainingAllURLs)
   },
-  
+
   // This service listings (id 36-37) have requiresBooking: true but no CG
   // On the customer side, pet owners should not be able to see these listings as this SL is invalid.
   {
@@ -765,14 +770,14 @@ async function seedBusinessData(prisma) {
       default:
         break;
     }
-    
+
     // This is to test the bumped listings carousell
     // These listings have the most recent listingTime as they are "just" (most newly) created, but even with the most recent listingTime,
     // It shouldnt aappear in the bumped listings carousell as only bumped listings should appear in that carousell
     // These should appear at the top of the marketplace (AKA View all listings page)
     if (data.id % 5 == 0) {
-      createObject.dateCreated = CURRENT_DATE; 
-      createObject.listingTime = CURRENT_DATE; 
+      createObject.dateCreated = CURRENT_DATE;
+      createObject.listingTime = CURRENT_DATE;
     }
 
     // Check if data.calendarGroupId exists before adding it to createObject
