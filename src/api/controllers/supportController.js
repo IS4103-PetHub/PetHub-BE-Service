@@ -4,6 +4,7 @@ const baseValidation = require("../validations/baseValidation")
 const supportTicketService = require("../services/support/supportService")
 const constants = require('../../constants/common')
 const errorMessages = constants.errorMessages
+const { SupportTicketStatus } = require('@prisma/client')
 
 
 
@@ -106,4 +107,46 @@ exports.addComment = async (req, res, next) => {
         next(error)
     }
 
+}
+
+exports.closeResolveSupportTicket = async (req, res, next) => {
+    try {
+        const supportTicketId = req.params.supportTicketId;
+        if (!(await baseValidation.isValidInteger(supportTicketId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const updatedStatus = await supportTicketService.updateSupportTicketStatus(Number(supportTicketId), SupportTicketStatus.CLOSED_RESOLVED)
+        res.status(200).json(updatedStatus)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.closeUnresolveSupportTicket = async (req, res, next) => {
+    try {
+        const supportTicketId = req.params.supportTicketId;
+        if (!(await baseValidation.isValidInteger(supportTicketId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const updatedStatus = await supportTicketService.updateSupportTicketStatus(Number(supportTicketId), SupportTicketStatus.CLOSED_UNRESOLVED)
+        res.status(200).json(updatedStatus)
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.reopenSupportTicket = async (req, res, next) => {
+    try {
+        const supportTicketId = req.params.supportTicketId;
+        if (!(await baseValidation.isValidInteger(supportTicketId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        const updatedStatus = await supportTicketService.updateSupportTicketStatus(Number(supportTicketId), SupportTicketStatus.PENDING)
+        res.status(200).json(updatedStatus)
+    } catch(error) {
+        next(error)
+    }
 }

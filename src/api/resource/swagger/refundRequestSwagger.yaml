@@ -117,6 +117,22 @@ paths:
       tags:
         - RefundRequest
 
+  /api/refund-requests/reopen/{refundRequestId}:
+    patch:
+      summary: reopen refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: reopened refund request
+      tags:
+        - RefundRequest
+
   /api/refund-requests/pet-businesses/{petBusinessId}:
     get:
       summary: Get refund requests by pet business ID.

@@ -141,6 +141,30 @@ paths:
                   type: string
                   format: binary
                   required: false
+                serviceListingId:
+                  type: integer
+                  example: 1
+                  required: false
+                orderItemId:
+                  type: integer
+                  example: 1
+                  required: false
+                bookingId:
+                  type: integer
+                  example: 1
+                  required: 1
+                payoutInvoiceId:
+                  type: integer
+                  example: 1
+                  required: false
+                refundRequestId:
+                  type: integer
+                  example: 1
+                  required: false
+                invoiceId:
+                  type: integer
+                  example: 1
+                  required: false
 
       responses:
         200:
@@ -194,6 +218,26 @@ paths:
                 files:
                   type: string
                   format: binary
+                  required: false
+                serviceListingId:
+                  type: integer
+                  example: 1
+                  required: false
+                orderItemId:
+                  type: integer
+                  example: 1
+                  required: false
+                bookingId:
+                  type: integer
+                  example: 789
+                  required: 1
+                payoutInvoiceId:
+                  type: integer
+                  example: 1
+                  required: false
+                refundRequestId:
+                  type: integer
+                  example: 1
                   required: false
 
       responses:

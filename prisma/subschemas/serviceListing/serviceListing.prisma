@@ -7,6 +7,7 @@ import { PetOwner } from "../user/user"
 import { ReviewReportReason } from "../enums/reviewEnums"
 import { ServiceListing } from "../../schema"
 import { Article } from "..\..\schema"
+import { SupportTicket } from "..\support\support"
 
 model ServiceListing {
   serviceListingId  Int       @id @default(autoincrement())
@@ -41,6 +42,10 @@ model ServiceListing {
   overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
   Bump             Bump[]
+
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 model Bump {

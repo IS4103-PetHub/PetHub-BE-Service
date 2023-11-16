@@ -67,6 +67,9 @@ model Booking {
   pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
   OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
   orderItemId Int       @unique
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 model Article {
@@ -241,6 +244,8 @@ model Invoice {
   orderItems     OrderItem[]
   PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
   petOwnerUserId Int
+
+  supportTicket SupportTicket[]
 }
 
 // Note: Invoice must remain immutable as much as possible for accounting purposes
@@ -260,6 +265,9 @@ model PayoutInvoice {
   orderItems  OrderItem[]
   userId      Int
   petBusiness PetBusiness @relation(fields: [userId], references: [userId])
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 enum OrderItemStatus {
@@ -302,6 +310,9 @@ model OrderItem {
   payoutInvoiceInvoiceId Int?
 
   review Review?
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 enum RefundStatus {
@@ -330,6 +341,9 @@ model RefundRequest {
 
   petBusinessId Int
   petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId])
+
+  // support
+  supportTickets SupportTicket[]
 }
 
 model PetLostAndFound {
@@ -385,6 +399,9 @@ model ServiceListing {
   overallRating    Float             @default(0)
   FeaturedListings FeaturedListing[]
   Bump             Bump[]
+
+  // support 
+  supportTickets SupportTicket[]
 }
 
 model Bump {
@@ -470,6 +487,7 @@ enum SupportCategoryEnum {
   APPOINTMENTS
   PAYMENTS
   ACCOUNTS
+  REFUNDS
   OTHERS
 }
 
@@ -501,6 +519,33 @@ model SupportTicket {
 
   petBusinessId Int?
   petBusiness   PetBusiness? @relation(fields: [petBusinessId], references: [userId])
+
+  // Service Listing
+  serviceListingId Int?
+  serviceListing   ServiceListing? @relation(fields: [serviceListingId], references: [serviceListingId])
+
+  // orders
+  orderItemId Int?
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [orderItemId])
+
+  // Appointments
+  bookingId Int?
+  booking   Booking? @relation(fields: [bookingId], references: [bookingId])
+
+  // Payments
+  // for PO refer to orderItem's invoice 
+  // for PB's payout related
+  payoutInvoiceId Int?
+  payoutInvoice   PayoutInvoice? @relation(fields: [payoutInvoiceId], references: [invoiceId])
+
+  // Others
+  // refund requests?
+  refundRequestId Int?
+  refundRequest   RefundRequest? @relation(fields: [refundRequestId], references: [refundRequestId])
+
+  // Invoice
+  invoiceId Int?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [invoiceId])
 }
 
 model Comment {

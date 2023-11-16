@@ -23,6 +23,90 @@ exports.isValidCreateSupportTicketPayload = (payload) => {
             .required(),
         files: Joi.any()
             .optional(),
+        serviceListingId: Joi.string()
+            .pattern(/^\d+$/) // Ensure only digits
+            .custom((value, helpers) => {
+                const numberValue = parseInt(value, 10);
+                if (numberValue <= 0) {
+                    return helpers.error('string.invalid');
+                }
+                return numberValue;
+            })
+            .optional()
+            .messages({
+                'string.pattern.base': 'serviceListingId must be a positive integer.',
+                'string.invalid': 'serviceListingId must be greater than 0.',
+            }),
+        orderItemId: Joi.string()
+            .pattern(/^\d+$/) // Ensure only digits
+            .custom((value, helpers) => {
+                const numberValue = parseInt(value, 10);
+                if (numberValue <= 0) {
+                    return helpers.error('string.invalid');
+                }
+                return numberValue;
+            })
+            .optional()
+            .messages({
+                'string.pattern.base': 'orderItemId must be a positive integer.',
+                'string.invalid': 'orderItemId must be greater than 0.',
+            }),
+        bookingId: Joi.string()
+            .pattern(/^\d+$/) // Ensure only digits
+            .custom((value, helpers) => {
+                const numberValue = parseInt(value, 10);
+                if (numberValue <= 0) {
+                    return helpers.error('string.invalid');
+                }
+                return numberValue;
+            })
+            .optional()
+            .messages({
+                'string.pattern.base': 'bookingId must be a positive integer.',
+                'string.invalid': 'bookingId must be greater than 0.',
+            }),
+        payoutInvoiceId: Joi.string()
+            .pattern(/^\d+$/) // Ensure only digits
+            .custom((value, helpers) => {
+                const numberValue = parseInt(value, 10);
+                if (numberValue <= 0) {
+                    return helpers.error('string.invalid');
+                }
+                return numberValue;
+            })
+            .optional()
+            .messages({
+                'string.pattern.base': 'payoutInvoiceId must be a positive integer.',
+                'string.invalid': 'payoutInvoiceId must be greater than 0.',
+            }),
+        refundRequestId: Joi.string()
+            .pattern(/^\d+$/) // Ensure only digits
+            .custom((value, helpers) => {
+                const numberValue = parseInt(value, 10);
+                if (numberValue <= 0) {
+                    return helpers.error('string.invalid');
+                }
+                return numberValue;
+            })
+            .optional()
+            .messages({
+                'string.pattern.base': 'refundRequestId must be a positive integer.',
+                'string.invalid': 'refundRequestId must be greater than 0.',
+            }),
+        invoiceId: Joi.string()
+            .pattern(/^\d+$/) // Ensure only digits
+            .custom((value, helpers) => {
+                const numberValue = parseInt(value, 10);
+                if (numberValue <= 0) {
+                    return helpers.error('string.invalid');
+                }
+                return numberValue;
+            })
+            .optional()
+            .messages({
+                'string.pattern.base': 'invoiceId must be a positive integer.',
+                'string.invalid': 'invoiceId must be greater than 0.',
+            }),
     });
 
     const { error } = schema.validate(payload, { convert: false });

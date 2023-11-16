@@ -25,6 +25,7 @@ const reviewRoutes = require('./reviewRoutes')
 const chartRoutes = require('./chartRoutes')
 const refundRequest = require('./refundRequestRoutes')
 const supportRoutes = require('./supportRoutes')
+const payoutInvoice = require('./payoutInvoiceRoutes')
 
 // Use route modules
 router.use("/users", userRoutes);
@@ -45,5 +46,6 @@ router.use("/reviews", reviewRoutes);
 router.use("/chart", chartRoutes);
 router.use("/refund-requests", refundRequest);
 router.use("/support-tickets", supportRoutes);
+router.use("/payout-invoice", payoutInvoice)
 
 module.exports = router;
