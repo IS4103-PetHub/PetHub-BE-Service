@@ -473,6 +473,12 @@ class ArticleService {
         },
       });
 
+      await emailService.sendEmail(
+        email,
+        `Pethub - Subscribed to Newsletter`,
+        emailTemplate.SubscribeToNewsletterEmail(email)
+      );
+
       return subscription;
     } catch (error) {
       if (error instanceof CustomError) throw error;
@@ -497,6 +503,12 @@ class ArticleService {
           email: email,
         },
       });
+
+      await emailService.sendEmail(
+        email,
+        `Pethub - Ubsubscribed Newsletter`,
+        emailTemplate.UnsubscribeFromNewsletterEmail(email)
+      );
 
       return { message: "Successfully unsubscribed from the PetHub Newsletter" };
     } catch (error) {
@@ -543,6 +555,13 @@ class ArticleService {
       return htmlString.replace(pattern, "");
     }
 
+    function formatStringToLetterCase(enumString) {
+      return enumString
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
     const { title, content, articleType, tags, category, attachmentUrls, createdBy, dateCreated } = article;
     const coverImageUrl = attachmentUrls.length > 0 ? attachmentUrls[0] : null;
     const authorName = `${createdBy.firstName} ${createdBy.lastName}`;
@@ -562,10 +581,7 @@ class ArticleService {
       : "";
 
     const categoryHtml = category
-      ? `<span style="color: #06c;">${category
-          .replace(/_/g, " ")
-          .toLowerCase()
-          .replace(/\b\w/g, (char) => char.toUpperCase())}</span>`
+      ? `<span style="color: #06c;">${formatStringToLetterCase(category)}</span>`
       : "";
 
     return `
@@ -624,7 +640,7 @@ class ArticleService {
                 <div class="article-header">
                     <h1 class="article-title">${title}</h1>
                     <div class="article-meta">
-                        <div>Type: ${articleType}</div>
+                        <div>Type: ${formatStringToLetterCase(articleType)}</div>
                         <div>Author: ${authorName}</div>
                         <div>Date: ${formattedDateCreated}</div>
                         ${categoryHtml ? `<div>Category: ${categoryHtml}</div>` : ""}

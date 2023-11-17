@@ -379,3 +379,34 @@ exports.ArticleNewsletterEmail = (article, subscriberEmail) => {
     The PetHub Team
   `;
 };
+
+exports.SubscribeToNewsletterEmail = (email) => {
+  return `
+    Dear ${email},
+
+    Thank you for subscribing to PetHub email newsletter.
+
+    Do look forward to all of our future updates on the latest PetHub features, events, tips and tricks, and more!
+    Thank you for being part of the PetHub family. We look forward to engaging with you and providing valuable content to enhance your experience with us.
+
+    You may unsubscribe at any time via this link: http://localhost:3002/unsubscribe-newsletter?email=${email}.
+
+    Best regards,
+    The PetHub Team
+  `;
+};
+
+exports.UnsubscribeFromNewsletterEmail = (email) => {
+  return `
+    Dear ${email},
+
+    We have processed your request to unsubscribe from the PetHub email newsletter. While we're sorry to see you go, we understand that everyone's email preferences and needs change over time.
+
+    We hope we were able to add value during the time you were with us. Remember, you're always welcome back! If you ever wish to receive updates again, just resubscribe on our website – we'd be more than happy to have you.
+
+    Thank you for your time with us, and we wish you all the best. If there's anything we can do for you in the future, don't hesitate to reach out.
+
+    Warm regards,
+    The PetHub Team
+  `;
+};
