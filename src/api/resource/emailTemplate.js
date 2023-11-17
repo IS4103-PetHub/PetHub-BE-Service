@@ -389,3 +389,33 @@ exports.SupportClosedResolved = (name, supportTicket) => {
   `;
 }
 
+exports.AdminDeleteReviewToReviewer = (name, review) => {
+  return `
+    Dear ${name},
+
+    We hope this message finds you well.
+
+    We regret to inform you that your review for "${review.title}" has been removed due to a violation of our community guidelines. We take the quality and appropriateness of reviews seriously to ensure a positive experience for all users.
+
+    If you have any concerns or questions about this action, please feel free to reach out to our support team. We appreciate your understanding and cooperation in maintaining a respectful and constructive environment within our community.
+
+    Best regards,
+    The PetHub Team
+  `;
+}
+
+exports.AdminDeleteReviewToBusiness = (businessName, review) => {
+  return `
+    Dear ${businessName},
+
+    We trust this message finds you well.
+
+    We wanted to inform you that a review for your service listing "${review.serviceListing.title}" has been removed by our admin team. This action was taken due to a violation of our community guidelines.
+
+    Our goal is to maintain a fair and transparent platform for all users. If you have any questions or concerns regarding this, please don't hesitate to contact our support team. We appreciate your understanding and cooperation in upholding the quality of reviews on our platform.
+
+    Best regards,
+    The PetHub Team
+  `;
+}
+
