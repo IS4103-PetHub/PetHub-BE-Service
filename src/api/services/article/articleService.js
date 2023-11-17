@@ -506,7 +506,7 @@ class ArticleService {
 
       await emailService.sendEmail(
         email,
-        `Pethub - Ubsubscribed Newsletter`,
+        `Pethub - Unsubscribed From Newsletter`,
         emailTemplate.UnsubscribeFromNewsletterEmail(email)
       );
 
