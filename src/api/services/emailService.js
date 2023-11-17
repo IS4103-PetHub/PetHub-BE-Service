@@ -56,6 +56,44 @@ class EmailService {
             throw error;
         }
     }
+
+    async sendHTMLEmail(toEmail, title, body, fileName = null, attachmentPath = null) {
+        try {
+            const accessToken = await this.oAuth2Client.getAccessToken();
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    type: 'OAuth2',
+                    user: this.USER_EMAIL,
+                    clientId: this.CLIENT_ID,
+                    clientSecret: this.CLIENT_SECRET,
+                    refreshToken: this.REFRESH_TOKEN,
+                    accessToken: accessToken,
+                },
+            });
+
+            const mailOptions = {
+                from: this.USER_EMAIL,
+                to: toEmail,
+                subject: title,
+                html: body
+            };
+
+            // If provided, attach the file to the email
+            if (attachmentPath && fileName) {
+                mailOptions.attachments = [
+                    {
+                        filename: fileName,
+                        path: attachmentPath
+                    }
+                ];
+            }
+
+            await transporter.sendMail(mailOptions);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new EmailService();

@@ -45,6 +45,27 @@ class S3Service {
     }
   }
 
+  async uploadImgFilesAllTypes(files, folder) {
+    try {
+      const params = files.map((file) => {
+        return {
+          Bucket: this.bucketName,
+          Key: `uploads/${folder}/img/${uuidv4()}-${file.originalname}`,
+          Body: file.buffer,
+          ContentType: "image/*",
+        };
+      });
+      const keys = params.map((param) => param.Key);
+      await Promise.all(
+        params.map((param) => this.s3Service.send(new PutObjectCommand(param)))
+      );
+      return keys;
+    } catch (error) {
+      console.error("Error uploading files from s3 bucket:", error);
+      throw error;
+    }
+  }
+
   async uploadPdfFiles(files, folder) {
     try {
       const params = files.map((file) => {
