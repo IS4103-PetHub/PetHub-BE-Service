@@ -342,3 +342,40 @@ exports.RefundRequestApprovedEmail = (refundRequest) => {
     The PetHub Team
   `;
 };
+
+exports.DeleteArticleCommentEmail = (articleComment) => {
+  return `
+    Dear ${articleComment.petOwner.lastName},
+
+    Greetings from PetHub! We are reaching out to you regarding your following comment:
+
+    - Article: ${articleComment.article.title}
+    - Comment: ${articleComment.comment}
+
+    Your comment was deleted by a PetHub administrator.
+
+    Your comment on the article may have been deleted because it did not adhere to our community guidelines, possibly due to the nature of the content or the manner in which the ideas were expressed. 
+    
+    It could have also been removed if it contained personal information, or off-topic discussions that could detract from the conversation. 
+    
+    We apologize if this was not your intention. We encourage you to review our community guidelines to better understand our policies and expectations.
+
+    Best regards,
+    The PetHub Team
+  `;
+};
+
+exports.ArticleNewsletterEmail = (article, subscriberEmail) => {
+  return `
+    Dear Subscriber,
+
+    A new article has been published on PetHub with the title: ${article.title}. 
+    
+    This article is attached as a PDF for your viewing convenience. You may also visit our website at http://localhost:3002/articles/${article.articleId} to view the article online.
+    
+    You are receiving this email as you have subscribed to the PetHub newsletter. Should you no longer wish to receive emails like these, please unsubscribe from the newsletter using this link: http://localhost:3002/unsubscribe-newsletter/${subscriberEmail}.
+
+    Best regards,
+    The PetHub Team
+  `;
+};

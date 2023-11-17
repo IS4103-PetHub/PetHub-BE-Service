@@ -248,3 +248,35 @@ exports.getLatestAnnouncementArticle = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.subscribeToNewsletter = async (req, res, next) => {
+  try {
+    const payload = req.body;
+    const validationResult = articleValidation.validateNewsletterSubscriptionPayload(payload);
+    if (!validationResult.isValid) {
+      res.status(400).send({ message: validationResult.message });
+      return;
+    }
+
+    const subscription = await articleService.subscribeToNewsletter(payload.email);
+    res.status(201).json(subscription);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.unsubscribeFromNewsletter = async (req, res, next) => {
+  try {
+    const payload = req.body;
+    const validationResult = articleValidation.validateNewsletterSubscriptionPayload(payload);
+    if (!validationResult.isValid) {
+      res.status(400).send({ message: validationResult.message });
+      return;
+    }
+
+    const subscription = await articleService.unsubscribeFromNewsletter(payload.email);
+    res.status(200).json(subscription);
+  } catch (error) {
+    next(error);
+  }
+};

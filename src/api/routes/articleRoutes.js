@@ -17,6 +17,8 @@ function registerArticleRoutes(controller) {
     router.get('/latest-announcement', controller.getLatestAnnouncementArticle);
     router.get(`/:id`, controller.getArticleById);
     router.delete(`/:id`, controller.deleteArticle);
+    router.post(`/subscribe`, controller.subscribeToNewsletter);
+    router.post(`/unsubscribe`, controller.unsubscribeFromNewsletter);
     router.post(`/`, upload.array('file'), controller.createArticle);
     router.put(`/:id`, upload.array('file'), controller.updateArticle);
     

@@ -3,8 +3,10 @@ const ArticleError = require("../../errors/articleError");
 const CustomError = require("../../errors/customError");
 const InternalUserService = require("../../services/user/internalUserService");
 const s3ServiceInstance = require("../s3Service");
-const PetOwnerService = require("../../services/user/petOwnerService");
 const petOwnerService = require("../../services/user/petOwnerService");
+const emailService = require("../emailService");
+const emailTemplate = require("../../resource/emailTemplate");
+const pdf = require("html-pdf");
 
 class ArticleService {
   constructor() {}
@@ -243,6 +245,38 @@ class ArticleService {
           },
           category: articlePayload.category,
         },
+        include: {
+          createdBy: {
+            select: {
+              firstName: true,
+              lastName: true,
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+            },
+          },
+          tags: true,
+        },
+      });
+
+      // Send article to newsletter subscribers after req response so its non-blocking
+      const subscriberEmails = (await prisma.newsletterSubscription.findMany()).map((sub) => sub.email);
+      const pdfBuffer = await this.htmlToPdf(this.createHtmlTemplate(newArticle)); // Construct the HTML template and convert to PDF
+      subscriberEmails.forEach((email) => {
+        emailService
+          .sendEmailWithBufferAttachment(
+            email,
+            `PetHub - ${newArticle.title}`,
+            emailTemplate.ArticleNewsletterEmail(newArticle, email),
+            `${newArticle.title}-article.pdf`, // fileName
+            pdfBuffer,
+            "application/pdf"
+          )
+          .catch((error) => {
+            console.error("Error sending email to:", email, "Error:", error);
+          });
       });
 
       return newArticle;
@@ -353,6 +387,23 @@ class ArticleService {
       // Check that the article comment exists
       const articleComment = await prisma.articleComment.findUnique({
         where: { articleCommentId },
+        include: {
+          petOwner: {
+            select: {
+              lastName: true,
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+            },
+          },
+          article: {
+            select: {
+              title: true,
+            },
+          },
+        },
       });
       if (!articleComment) throw new CustomError("Article comment not found", 404);
 
@@ -364,6 +415,15 @@ class ArticleService {
       await prisma.articleComment.delete({
         where: { articleCommentId },
       });
+
+      // If deletion was performed by an admin, send email to pet owner
+      if (callee.accountType === "INTERNAL_USER") {
+        await emailService.sendEmail(
+          articleComment.petOwner.user.email,
+          `Article Comment Deleted`,
+          emailTemplate.DeleteArticleCommentEmail(articleComment)
+        );
+      }
     } catch (error) {
       if (error instanceof CustomError) throw error;
       throw new ArticleError(error);
@@ -395,6 +455,56 @@ class ArticleService {
     }
   }
 
+  async subscribeToNewsletter(email) {
+    try {
+      const existingSubscription = await prisma.newsletterSubscription.findUnique({
+        where: {
+          email: email,
+        },
+      });
+
+      if (existingSubscription) {
+        throw new CustomError("This email is already subscribed to the PetHub Newsletter", 400);
+      }
+
+      const subscription = await prisma.newsletterSubscription.create({
+        data: {
+          email: email,
+        },
+      });
+
+      return subscription;
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      throw new ArticleError(error);
+    }
+  }
+
+  async unsubscribeFromNewsletter(email) {
+    try {
+      const existingSubscription = await prisma.newsletterSubscription.findUnique({
+        where: {
+          email: email,
+        },
+      });
+
+      if (!existingSubscription) {
+        throw new CustomError("This email is not subscribed to the PetHub Newsletter", 400);
+      }
+
+      await prisma.newsletterSubscription.delete({
+        where: {
+          email: email,
+        },
+      });
+
+      return { message: "Successfully unsubscribed from the PetHub Newsletter" };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      throw new ArticleError(error);
+    }
+  }
+
   async deleteFilesOfAnArticle(articleId) {
     try {
       const article = await prisma.article.findUnique({
@@ -411,6 +521,125 @@ class ArticleService {
       }
       throw new ArticleError(error);
     }
+  }
+
+  // Convert HTML to PDF
+  async htmlToPdf(html) {
+    return new Promise((resolve, reject) => {
+      pdf.create(html).toBuffer((err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffer);
+        }
+      });
+    });
+  }
+
+  // This is for sending the article as HTML to PDF attachment to newsletter subscribers
+  createHtmlTemplate(article) {
+    function removeEmptyParagraphs(htmlString) {
+      const pattern = /<p><br><\/p>/g;
+      return htmlString.replace(pattern, "");
+    }
+
+    const { title, content, articleType, tags, category, attachmentUrls, createdBy, dateCreated } = article;
+    const coverImageUrl = attachmentUrls.length > 0 ? attachmentUrls[0] : null;
+    const authorName = `${createdBy.firstName} ${createdBy.lastName}`;
+    const formattedDateCreated = new Date(dateCreated).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const tagsHtml = tags
+      ? tags
+          .map(
+            (tag) =>
+              `<span style="margin-right: 5px; background-color: #eef; padding: 3px 6px; border-radius: 4px;">${tag.name}</span>`
+          )
+          .join("")
+      : "";
+
+    const categoryHtml = category
+      ? `<span style="color: #06c;">${category
+          .replace(/_/g, " ")
+          .toLowerCase()
+          .replace(/\b\w/g, (char) => char.toUpperCase())}</span>`
+      : "";
+
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 60px;
+                    color: #333;
+                    background-color: #f4f4f4;
+                    line-height: 1.6;
+                    padding-bottom: 40px; /* Added bottom padding */
+                }
+                .container {
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+                .article-header {
+                    margin-bottom: 20px;
+                }
+                .article-title {
+                    color: #444;
+                    margin-bottom: 10px;
+                }
+                .article-meta {
+                    margin-bottom: 15px;
+                    font-size: 0.9em;
+                    color: #666;
+                }
+                .article-cover {
+                    width: 100%; /* Ensure it takes the full width */
+                    height: auto;
+                    margin-bottom: 15px;
+                    display: block; /* Adjust display property */
+                }
+                .article-content {
+                    margin-bottom: 20px;
+                }
+                p {
+                    margin-bottom: 15px;
+                }
+                a {
+                    color: #06c;
+                }
+                .tags {
+                    margin-top: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="article-header">
+                    <h1 class="article-title">${title}</h1>
+                    <div class="article-meta">
+                        <div>Type: ${articleType}</div>
+                        <div>Author: ${authorName}</div>
+                        <div>Date: ${formattedDateCreated}</div>
+                        ${categoryHtml ? `<div>Category: ${categoryHtml}</div>` : ""}
+                    </div>
+                    ${
+                      coverImageUrl
+                        ? `<img src="${coverImageUrl}" class="article-cover" alt="Cover Image">`
+                        : ""
+                    }
+                </div>
+                <div class="article-content">${removeEmptyParagraphs(content)}</div>
+                ${tagsHtml ? `<div class="tags">Tags: ${tagsHtml}</div>` : ""}
+            </div>
+        </body>
+        </html>`;
   }
 }
 
