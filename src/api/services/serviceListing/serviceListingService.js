@@ -171,6 +171,7 @@ exports.getAllServiceListings = async () => {
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
         petBusiness: {
           select: {
             companyName: true,
@@ -198,6 +199,7 @@ exports.getAllServiceListingsAvailableForPetOwners = async (categories, tags, li
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
         petBusiness: {
           select: {
             companyName: true,
@@ -239,6 +241,7 @@ exports.getServiceListingById = async (serviceListingId, showCommissionRule = fa
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
         petBusiness: {
           include: {
             user: {
@@ -307,6 +310,7 @@ exports.getServiceListingByCategory = async (categoryInput) => {
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
         CalendarGroup: true
       },
     });
@@ -331,6 +335,7 @@ exports.getServiceListingByTag = async (id) => {
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
         CalendarGroup: true
       },
     });
@@ -354,6 +359,7 @@ exports.getServiceListingByPBId = async (id) => {
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
       },
       orderBy: {
         listingTime: 'desc', // Sort by listingTime in descending order (latest first)
@@ -401,6 +407,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
         include: {
           tags: true,
           addresses: true,
+          reviews: true,
           petBusiness: {
             select: {
               companyName: true,
@@ -460,6 +467,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
           include: {
             tags: true,
             addresses: true,
+            reviews: true,
             petBusiness: {
               select: {
                 companyName: true,
@@ -492,6 +500,7 @@ exports.getRecommendedListings = async (petOwnerId) => {
         include: {
           tags: true,
           addresses: true,
+          reviews: true,
           petBusiness: {
             select: {
               companyName: true,
@@ -578,6 +587,7 @@ exports.getBumpedListings = async (numListings = 6) => {
       include: {
         tags: true,
         addresses: true,
+        reviews: true,
         petBusiness: {
           select: {
             companyName: true,
