@@ -342,3 +342,50 @@ exports.RefundRequestApprovedEmail = (refundRequest) => {
     The PetHub Team
   `;
 };
+
+exports.SupportClosedUnresolved = (name, supportTicket) => {
+  return `
+    Dear ${name},
+
+    We hope this message finds you well.
+
+    We wanted to inform you that your support ticket regarding ${supportTicket.reason} has been marked as closed due to inactivity. We value your feedback and want to ensure that your concerns are fully addressed.
+
+    If you believe that your issue is not completely resolved or if you have any additional questions, you can easily reopen the support ticket by visiting our support page. Simply log in to your account and navigate to the support section, where you will find your closed tickets. Click on the relevant ticket and use the "Reopen" option to provide any additional comments or information.
+
+    Here are some details from your support ticket:
+
+    Support Ticket ID: ${supportTicket.supportTicketId}
+    Status: ${supportTicket.status}
+    Created At: ${supportTicket.createdAt}
+
+    We appreciate your understanding and cooperation. Thank you for choosing PetHub for your support needs.
+
+    Best regards,
+    The PetHub Team
+  `;
+}
+
+exports.SupportClosedResolved = (name, supportTicket) => {
+  return `
+    Dear ${name},
+
+    We trust this message finds you well.
+
+    We are pleased to inform you that your support ticket regarding ${supportTicket.reason} has been successfully resolved and is now closed. We hope that our assistance met your expectations, and your issue has been completely addressed.
+
+    If you have any further questions or if there's anything else we can assist you with, please don't hesitate to reach out. Your satisfaction is our priority.
+
+    Here are some details from your support ticket:
+
+    Support Ticket ID: ${supportTicket.supportTicketId}
+    Status: ${supportTicket.status}
+    Created At: ${supportTicket.createdAt}
+
+    We appreciate your patience and cooperation throughout this process. Thank you for choosing PetHub for your support needs.
+
+    Best regards,
+    The PetHub Team
+  `;
+}
+
