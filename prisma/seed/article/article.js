@@ -59,7 +59,7 @@ const articleData = [
     content: ARTICLE_3_CONTENT,
     articleType: ArticleType.ANNOUNCEMENTS,
     isPinned: true,
-    dateCreated: new Date("2023-11-16"),
+    dateCreated: new Date(),
     tagIds: [2, 3],
     category: Category.DINING,
     articleComments: ARTICLE_3_COMMENTS,
