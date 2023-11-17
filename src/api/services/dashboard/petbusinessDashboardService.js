@@ -10,6 +10,8 @@ exports.getPBDashboardData = async (petBusinessId) => {
         // number of unreplied reivews?
         const unrepliedReviewCount = await this.getTotalUnrepliedReviews(petBusinessId)
 
+        const remainingAppointments = await this.getRemainingAppointmentToday(petBusinessId)
+
         // count of service listing that requires attention
         const invalidSLCount = await this.getInvalidServiceListings(petBusinessId)
 
@@ -21,6 +23,7 @@ exports.getPBDashboardData = async (petBusinessId) => {
 
         const pbDashboardData = {
             unrepliedReviewCount: unrepliedReviewCount,
+            remainingAppointments: remainingAppointments,
             invalidSLCount: invalidSLCount,
             openRefundRequestsCount: openRefundRequestsCount,
             openSupportRequestsCount: openSupportRequestsCount
@@ -37,6 +40,33 @@ exports.getPBDashboardData = async (petBusinessId) => {
 exports.getNumberOfOrders = async () => {
     // number of orders / number of days past in the month 
     // compare with last months average and output the % difference
+}
+
+exports.getRemainingAppointmentToday = async (petBusinessId) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const totalRemainingAppointment = await prisma.booking.count({
+            where: {
+                serviceListing: {
+                    petBusinessId: petBusinessId,
+                },
+                startTime: {
+                    gte: today,
+                },
+                OrderItem: {
+                    dateFulfilled: null, 
+                },
+            },
+        });
+        
+        return totalRemainingAppointment;
+        
+    } catch(error) {
+        console.error("Error generating remaining appointment count:", error);
+        throw new Error("Error generating remaining appointment count");
+    }
 }
 
 exports.getTotalUnrepliedReviews = async (petBusinessId) => {
