@@ -343,6 +343,28 @@ exports.RefundRequestApprovedEmail = (refundRequest) => {
   `;
 };
 
+exports.DeleteArticleCommentEmail = (articleComment) => {
+  return `
+    Dear ${articleComment.petOwner.lastName},
+
+    Greetings from PetHub! We are reaching out to you regarding your following comment:
+
+    - Article: ${articleComment.article.title}
+    - Comment: ${articleComment.comment}
+
+    Your comment was deleted by a PetHub administrator.
+
+    Your comment on the article may have been deleted because it did not adhere to our community guidelines, possibly due to the nature of the content or the manner in which the ideas were expressed. 
+    
+    It could have also been removed if it contained personal information, or off-topic discussions that could detract from the conversation. 
+    
+    We apologize if this was not your intention. We encourage you to review our community guidelines to better understand our policies and expectations.
+    
+    Best regards,
+    The PetHub Team
+  `;
+};
+
 exports.SupportClosedUnresolved = (name, supportTicket) => {
   return `
     Dear ${name},
@@ -364,7 +386,7 @@ exports.SupportClosedUnresolved = (name, supportTicket) => {
     Best regards,
     The PetHub Team
   `;
-}
+};
 
 exports.SupportClosedResolved = (name, supportTicket) => {
   return `
@@ -387,7 +409,23 @@ exports.SupportClosedResolved = (name, supportTicket) => {
     Best regards,
     The PetHub Team
   `;
-}
+};
+
+exports.SubscribeToNewsletterEmail = (email) => {
+  return `
+    Dear ${email},
+
+    Thank you for subscribing to PetHub email newsletter.
+
+    Do look forward to all of our future updates on the latest PetHub features, events, tips and tricks, and more!
+    Thank you for being part of the PetHub family. We look forward to engaging with you and providing valuable content to enhance your experience with us.
+
+    You may unsubscribe at any time via this link: http://localhost:3002/unsubscribe-newsletter?email=${email}.
+
+    Best regards,
+    The PetHub Team
+  `;
+};
 
 exports.AdminDeleteReviewToReviewer = (name, review) => {
   return `
@@ -402,7 +440,22 @@ exports.AdminDeleteReviewToReviewer = (name, review) => {
     Best regards,
     The PetHub Team
   `;
-}
+};
+
+exports.UnsubscribeFromNewsletterEmail = (email) => {
+  return `
+    Dear ${email},
+
+    We have processed your request to unsubscribe from the PetHub email newsletter. While we're sorry to see you go, we understand that everyone's email preferences and needs change over time.
+
+    We hope we were able to add value during the time you were with us. Remember, you're always welcome back! If you ever wish to receive updates again, just resubscribe on our website – we'd be more than happy to have you.
+
+    Thank you for your time with us, and we wish you all the best. If there's anything we can do for you in the future, don't hesitate to reach out.
+
+    Warm regards,
+    The PetHub Team
+  `;
+};
 
 exports.AdminDeleteReviewToBusiness = (businessName, review) => {
   return `
@@ -417,5 +470,123 @@ exports.AdminDeleteReviewToBusiness = (businessName, review) => {
     Best regards,
     The PetHub Team
   `;
-}
+};
 
+exports.ArticleHTMLBodyTemplateEmail = (
+  title,
+  cleanedContent,
+  authorName,
+  formattedDateCreated,
+  tagsHtml,
+  categoryHtml,
+  coverImageUrl,
+  articleType,
+  articleId,
+  subscriberEmail
+) => {
+  // Conditional sidebar rendering
+  const sidebar = subscriberEmail
+    ? `
+    <div class="sidebar">
+      This article is also attached as a PDF for your viewing convenience. You may also visit our website at <a href="http://localhost:3002/articles/${articleId}" target="_blank">http://localhost:3002/articles/${articleId}</a> to view the article online.
+      <br><br>
+      You are receiving this email as you have subscribed to the PetHub newsletter. Should you no longer wish to receive emails like these, please <a href="http://localhost:3002/unsubscribe-newsletter?email=${subscriberEmail}" target="_blank">unsubscribe</a> from the newsletter.
+    </div>
+  `
+    : "";
+
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        background-color: #e0e0e0; /* Darker background outside the article */
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 600px;
+        background-color: #ffffff; /* White article body */
+        margin: 40px auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar {
+        background-color: #e9ecef;
+        padding: 10px 20px;
+        border-bottom: 2px solid #dee2e6;
+        border-top: 2px solid #dee2e6;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 0.9em;
+      }
+      .article-header {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .article-title {
+        color: #444;
+        margin-bottom: 10px;
+      }
+      .article-meta {
+        margin-bottom: 15px;
+        font-size: 0.9em;
+        color: #666;
+      }
+      .article-cover {
+        width: 100%;
+        height: auto;
+        margin-bottom: 15px;
+      }
+      .article-content {
+        margin-bottom: 20px;
+      }
+      .tags {
+        margin-top: 10px;
+        text-align: center;
+      }
+      .tag {
+        margin-right: 5px;
+        background-color: #eef;
+        padding: 3px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .category {
+        color: #06c;
+        margin-bottom: 10px;
+        display: block;
+      }
+      a {
+        color: #06c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      ${sidebar}
+      <div class="article-header">
+        <h1 class="article-title">${title}</h1>
+        <div class="article-meta">
+          <div>Type: ${articleType}</div>
+          <div>Author: ${authorName}</div>
+          <div>Date: ${formattedDateCreated}</div>
+          ${categoryHtml ? `<div class="category">${categoryHtml}</div>` : ""}
+        </div>
+        ${coverImageUrl ? `<img src="${coverImageUrl}" class="article-cover" alt="Cover Image">` : ""}
+      </div>
+      <div class="article-content">${cleanedContent}</div>
+      <div class="tags">
+        ${tagsHtml ? `Tags: ${tagsHtml}` : ""}
+      </div>
+    </div>
+  </body>
+  </html>
+  `;
+};

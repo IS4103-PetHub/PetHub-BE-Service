@@ -39,3 +39,9 @@ model ArticleComment {
     petOwnerId          Int
     petOwner            PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }
+
+model NewsletterSubscription {
+    newsletterSubscriptionId    Int         @id @default(autoincrement())
+    email                       String      @unique
+    dateSubscribed              DateTime    @default(now())
+}

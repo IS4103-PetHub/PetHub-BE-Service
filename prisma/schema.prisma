@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Wed Nov 15 2023 23:00:04 GMT+0800 (Singapore Standard Time)✨
+//🧩Don't Edit this file.✨Generated in Fri Nov 17 2023 16:30:38 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -107,6 +107,12 @@ model ArticleComment {
 
   petOwnerId Int
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model NewsletterSubscription {
+  newsletterSubscriptionId Int      @id @default(autoincrement())
+  email                    String   @unique
+  dateSubscribed           DateTime @default(now())
 }
 
 generator client {
