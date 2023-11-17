@@ -359,6 +359,29 @@ exports.DeleteArticleCommentEmail = (articleComment) => {
     It could have also been removed if it contained personal information, or off-topic discussions that could detract from the conversation. 
     
     We apologize if this was not your intention. We encourage you to review our community guidelines to better understand our policies and expectations.
+    
+    Best regards,
+    The PetHub Team
+  `;
+};
+
+exports.SupportClosedUnresolved = (name, supportTicket) => {
+  return `
+    Dear ${name},
+
+    We hope this message finds you well.
+
+    We wanted to inform you that your support ticket regarding ${supportTicket.reason} has been marked as closed due to inactivity. We value your feedback and want to ensure that your concerns are fully addressed.
+
+    If you believe that your issue is not completely resolved or if you have any additional questions, you can easily reopen the support ticket by visiting our support page. Simply log in to your account and navigate to the support section, where you will find your closed tickets. Click on the relevant ticket and use the "Reopen" option to provide any additional comments or information.
+
+    Here are some details from your support ticket:
+
+    Support Ticket ID: ${supportTicket.supportTicketId}
+    Status: ${supportTicket.status}
+    Created At: ${supportTicket.createdAt}
+
+    We appreciate your understanding and cooperation. Thank you for choosing PetHub for your support needs.
 
     Best regards,
     The PetHub Team
@@ -374,6 +397,29 @@ exports.ArticleNewsletterEmail = (article, subscriberEmail) => {
     This article is attached as a PDF for your viewing convenience. You may also visit our website at http://localhost:3002/articles/${article.articleId} to view the article online.
     
     You are receiving this email as you have subscribed to the PetHub newsletter. Should you no longer wish to receive emails like these, please unsubscribe from the newsletter using this link: http://localhost:3002/unsubscribe-newsletter/${subscriberEmail}.
+
+    Best regards,
+    The PetHub Team
+  `;
+};
+
+exports.SupportClosedResolved = (name, supportTicket) => {
+  return `
+    Dear ${name},
+
+    We trust this message finds you well.
+
+    We are pleased to inform you that your support ticket regarding ${supportTicket.reason} has been successfully resolved and is now closed. We hope that our assistance met your expectations, and your issue has been completely addressed.
+
+    If you have any further questions or if there's anything else we can assist you with, please don't hesitate to reach out. Your satisfaction is our priority.
+
+    Here are some details from your support ticket:
+
+    Support Ticket ID: ${supportTicket.supportTicketId}
+    Status: ${supportTicket.status}
+    Created At: ${supportTicket.createdAt}
+
+    We appreciate your patience and cooperation throughout this process. Thank you for choosing PetHub for your support needs.
 
     Best regards,
     The PetHub Team
@@ -396,6 +442,21 @@ exports.SubscribeToNewsletterEmail = (email) => {
   `;
 };
 
+exports.AdminDeleteReviewToReviewer = (name, review) => {
+  return `
+    Dear ${name},
+
+    We hope this message finds you well.
+
+    We regret to inform you that your review for "${review.title}" has been removed due to a violation of our community guidelines. We take the quality and appropriateness of reviews seriously to ensure a positive experience for all users.
+
+    If you have any concerns or questions about this action, please feel free to reach out to our support team. We appreciate your understanding and cooperation in maintaining a respectful and constructive environment within our community.
+
+    Best regards,
+    The PetHub Team
+  `;
+};
+
 exports.UnsubscribeFromNewsletterEmail = (email) => {
   return `
     Dear ${email},
@@ -407,6 +468,21 @@ exports.UnsubscribeFromNewsletterEmail = (email) => {
     Thank you for your time with us, and we wish you all the best. If there's anything we can do for you in the future, don't hesitate to reach out.
 
     Warm regards,
+    The PetHub Team
+  `;
+};
+
+exports.AdminDeleteReviewToBusiness = (businessName, review) => {
+  return `
+    Dear ${businessName},
+
+    We trust this message finds you well.
+
+    We wanted to inform you that a review for your service listing "${review.serviceListing.title}" has been removed by our admin team. This action was taken due to a violation of our community guidelines.
+
+    Our goal is to maintain a fair and transparent platform for all users. If you have any questions or concerns regarding this, please don't hesitate to contact our support team. We appreciate your understanding and cooperation in upholding the quality of reviews on our platform.
+
+    Best regards,
     The PetHub Team
   `;
 };
