@@ -388,21 +388,6 @@ exports.SupportClosedUnresolved = (name, supportTicket) => {
   `;
 };
 
-exports.ArticleNewsletterEmail = (article, subscriberEmail) => {
-  return `
-    Dear Subscriber,
-
-    A new article has been published on PetHub with the title: ${article.title}. 
-    
-    This article is attached as a PDF for your viewing convenience. You may also visit our website at http://localhost:3002/articles/${article.articleId} to view the article online.
-    
-    You are receiving this email as you have subscribed to the PetHub newsletter. Should you no longer wish to receive emails like these, please unsubscribe from the newsletter using this link: http://localhost:3002/unsubscribe-newsletter/${subscriberEmail}.
-
-    Best regards,
-    The PetHub Team
-  `;
-};
-
 exports.SupportClosedResolved = (name, supportTicket) => {
   return `
     Dear ${name},
@@ -484,5 +469,124 @@ exports.AdminDeleteReviewToBusiness = (businessName, review) => {
 
     Best regards,
     The PetHub Team
+  `;
+};
+
+exports.ArticleHTMLBodyTemplateEmail = (
+  title,
+  cleanedContent,
+  authorName,
+  formattedDateCreated,
+  tagsHtml,
+  categoryHtml,
+  coverImageUrl,
+  articleType,
+  articleId,
+  subscriberEmail
+) => {
+  // Conditional sidebar rendering
+  const sidebar = subscriberEmail
+    ? `
+    <div class="sidebar">
+      This article is also attached as a PDF for your viewing convenience. You may also visit our website at <a href="http://localhost:3002/articles/${articleId}" target="_blank">http://localhost:3002/articles/${articleId}</a> to view the article online.
+      <br><br>
+      You are receiving this email as you have subscribed to the PetHub newsletter. Should you no longer wish to receive emails like these, please <a href="http://localhost:3002/unsubscribe-newsletter?email=${subscriberEmail}" target="_blank">unsubscribe</a> from the newsletter.
+    </div>
+  `
+    : "";
+
+  return `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        background-color: #e0e0e0; /* Darker background outside the article */
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 600px;
+        background-color: #ffffff; /* White article body */
+        margin: 40px auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar {
+        background-color: #e9ecef;
+        padding: 10px 20px;
+        border-bottom: 2px solid #dee2e6;
+        border-top: 2px solid #dee2e6;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 0.9em;
+      }
+      .article-header {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .article-title {
+        color: #444;
+        margin-bottom: 10px;
+      }
+      .article-meta {
+        margin-bottom: 15px;
+        font-size: 0.9em;
+        color: #666;
+      }
+      .article-cover {
+        width: 100%;
+        height: auto;
+        margin-bottom: 15px;
+      }
+      .article-content {
+        margin-bottom: 20px;
+      }
+      .tags {
+        margin-top: 10px;
+        text-align: center;
+      }
+      .tag {
+        margin-right: 5px;
+        background-color: #eef;
+        padding: 3px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .category {
+        color: #06c;
+        margin-bottom: 10px;
+        display: block;
+      }
+      a {
+        color: #06c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      ${sidebar}
+      <div class="article-header">
+        <h1 class="article-title">${title}</h1>
+        <div class="article-meta">
+          <div>Type: ${articleType}</div>
+          <div>Author: ${authorName}</div>
+          <div>Date: ${formattedDateCreated}</div>
+          ${categoryHtml ? `<div class="category">${categoryHtml}</div>` : ""}
+        </div>
+        ${coverImageUrl ? `<img src="${coverImageUrl}" class="article-cover" alt="Cover Image">` : ""}
+      </div>
+      <div class="article-content">${cleanedContent}</div>
+      <div class="tags">
+        ${tagsHtml ? `Tags: ${tagsHtml}` : ""}
+      </div>
+    </div>
+  </body>
+  </html>
   `;
 };

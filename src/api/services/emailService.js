@@ -53,43 +53,43 @@ class EmailService {
     }
   }
 
-  async sendEmailWithBufferAttachment(toEmail, title, body, fileName, buffer, attachmentType) {
-    try {
-      const accessToken = await this.oAuth2Client.getAccessToken();
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          type: "OAuth2",
-          user: this.USER_EMAIL,
-          clientId: this.CLIENT_ID,
-          clientSecret: this.CLIENT_SECRET,
-          refreshToken: this.REFRESH_TOKEN,
-          accessToken: accessToken,
-        },
-      });
+  // async sendEmailWithBufferAttachment(toEmail, title, body, fileName, buffer, attachmentType) {
+  //   try {
+  //     const accessToken = await this.oAuth2Client.getAccessToken();
+  //     const transporter = nodemailer.createTransport({
+  //       service: "gmail",
+  //       auth: {
+  //         type: "OAuth2",
+  //         user: this.USER_EMAIL,
+  //         clientId: this.CLIENT_ID,
+  //         clientSecret: this.CLIENT_SECRET,
+  //         refreshToken: this.REFRESH_TOKEN,
+  //         accessToken: accessToken,
+  //       },
+  //     });
 
-      const mailOptions = {
-        from: this.USER_EMAIL,
-        to: toEmail,
-        subject: title,
-        text: body,
-      };
+  //     const mailOptions = {
+  //       from: this.USER_EMAIL,
+  //       to: toEmail,
+  //       subject: title,
+  //       text: body,
+  //     };
 
-      mailOptions.attachments = [
-        {
-          filename: fileName,
-          content: buffer,
-          contentType: attachmentType,
-        },
-      ];
+  //     mailOptions.attachments = [
+  //       {
+  //         filename: fileName,
+  //         content: buffer,
+  //         contentType: attachmentType,
+  //       },
+  //     ];
 
-      await transporter.sendMail(mailOptions);
-    } catch (error) {
-      throw error;
-    }
-  }
+  //     await transporter.sendMail(mailOptions);
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
-  async sendHTMLEmail(toEmail, title, body, fileName = null, attachmentPath = null) {
+  async sendHTMLEmailWithBufferAttachment(toEmail, title, body, fileName, buffer, attachmentType) {
     try {
       const accessToken = await this.oAuth2Client.getAccessToken();
       const transporter = nodemailer.createTransport({
@@ -111,15 +111,13 @@ class EmailService {
         html: body,
       };
 
-      // If provided, attach the file to the email
-      if (attachmentPath && fileName) {
-        mailOptions.attachments = [
-          {
-            filename: fileName,
-            path: attachmentPath,
-          },
-        ];
-      }
+      mailOptions.attachments = [
+        {
+          filename: fileName,
+          content: buffer,
+          contentType: attachmentType,
+        },
+      ];
 
       await transporter.sendMail(mailOptions);
     } catch (error) {

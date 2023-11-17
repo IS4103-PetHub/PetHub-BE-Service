@@ -263,13 +263,15 @@ class ArticleService {
 
       // Send article to newsletter subscribers after req response so its non-blocking
       const subscriberEmails = (await prisma.newsletterSubscription.findMany()).map((sub) => sub.email);
-      const pdfBuffer = await this.htmlToPdf(this.createHtmlTemplate(newArticle)); // Construct the HTML template and convert to PDF
+      const articleToHtml = this.createHtmlTemplate(newArticle, null); // Add metadata to the original HTML content, excluding subscriber specific information
+      const pdfBuffer = await this.htmlToPdf(articleToHtml); // Construct the HTML template and convert to PDF
       subscriberEmails.forEach((email) => {
+        const articleToHtml = this.createHtmlTemplate(newArticle, email); // Add metadata to the original HTML content
         emailService
-          .sendEmailWithBufferAttachment(
+          .sendHTMLEmailWithBufferAttachment(
             email,
-            `PetHub - ${newArticle.title}`,
-            emailTemplate.ArticleNewsletterEmail(newArticle, email),
+            `PetHub Newsletter - ${newArticle.title}`,
+            articleToHtml,
             `${newArticle.title}-article.pdf`, // fileName
             pdfBuffer,
             "application/pdf"
@@ -549,7 +551,8 @@ class ArticleService {
   }
 
   // This is for sending the article as HTML to PDF attachment to newsletter subscribers
-  createHtmlTemplate(article) {
+  createHtmlTemplate(article, subscriberEmail) {
+    // Remove line breaks from formatted HTML
     function removeEmptyParagraphs(htmlString) {
       const pattern = /<p><br><\/p>/g;
       return htmlString.replace(pattern, "");
@@ -584,78 +587,20 @@ class ArticleService {
       ? `<span style="color: #06c;">${formatStringToLetterCase(category)}</span>`
       : "";
 
-    return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 60px;
-                    color: #333;
-                    background-color: #f4f4f4;
-                    line-height: 1.6;
-                    padding-bottom: 40px; /* Added bottom padding */
-                }
-                .container {
-                    background-color: #fff;
-                    padding: 20px;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-                .article-header {
-                    margin-bottom: 20px;
-                }
-                .article-title {
-                    color: #444;
-                    margin-bottom: 10px;
-                }
-                .article-meta {
-                    margin-bottom: 15px;
-                    font-size: 0.9em;
-                    color: #666;
-                }
-                .article-cover {
-                    width: 100%; /* Ensure it takes the full width */
-                    height: auto;
-                    margin-bottom: 15px;
-                    display: block; /* Adjust display property */
-                }
-                .article-content {
-                    margin-bottom: 20px;
-                }
-                p {
-                    margin-bottom: 15px;
-                }
-                a {
-                    color: #06c;
-                }
-                .tags {
-                    margin-top: 10px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="article-header">
-                    <h1 class="article-title">${title}</h1>
-                    <div class="article-meta">
-                        <div>Type: ${formatStringToLetterCase(articleType)}</div>
-                        <div>Author: ${authorName}</div>
-                        <div>Date: ${formattedDateCreated}</div>
-                        ${categoryHtml ? `<div>Category: ${categoryHtml}</div>` : ""}
-                    </div>
-                    ${
-                      coverImageUrl
-                        ? `<img src="${coverImageUrl}" class="article-cover" alt="Cover Image">`
-                        : ""
-                    }
-                </div>
-                <div class="article-content">${removeEmptyParagraphs(content)}</div>
-                ${tagsHtml ? `<div class="tags">Tags: ${tagsHtml}</div>` : ""}
-            </div>
-        </body>
-        </html>`;
+    const cleanedContent = removeEmptyParagraphs(content);
+
+    return emailTemplate.ArticleHTMLBodyTemplateEmail(
+      title,
+      cleanedContent,
+      authorName,
+      formattedDateCreated,
+      tagsHtml,
+      categoryHtml,
+      coverImageUrl,
+      formatStringToLetterCase(articleType),
+      article.articleId,
+      subscriberEmail
+    );
   }
 }
 
