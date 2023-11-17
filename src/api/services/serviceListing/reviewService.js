@@ -5,6 +5,8 @@ const orderItemService = require("../finance/orderItemService");
 const serviceListingService = require("../serviceListing/serviceListingService")
 const s3ServiceInstance = require("../s3Service");
 const service = require('studio/src/service');
+const emailService = require('../emailService');
+const emailTemplate = require('../../resource/emailTemplate');
 
 class ReviewService {
 
@@ -129,6 +131,27 @@ class ReviewService {
                     overallRating: newRating
                 }
             })
+
+            if (callee.accountType == "INTERNAL_USER") {
+                const POname = reviewToDelete.orderItem.invoice.PetOwner.lastName;
+                const PBname = reviewToDelete.serviceListing.petBusiness.companyName;
+                const POemail = reviewToDelete.orderItem.invoice.PetOwner.user.email;
+                const PBemail = reviewToDelete.serviceListing.petBusiness.user.email;
+                // send email to PO
+                await emailService.sendEmail(
+                    POemail,
+                    "PetHub: Your Review has been removed",
+                    emailTemplate.AdminDeleteReviewToReviewer(POname, reviewToDelete)
+                )
+
+                // send email to PB
+                await emailService.sendEmail(
+                    PBemail,
+                    "PetHub: Review Removed for Your Service Listing",
+                    emailTemplate.AdminDeleteReviewToBusiness(PBname, reviewToDelete)
+                )
+            }
+            
             await this.deleteFilesOfAReview(reviewId)
             await prisma.review.delete({
                 where: { reviewId }
@@ -148,17 +171,44 @@ class ReviewService {
                 include: {
                     serviceListing: {
                         include: {
-                            reviews: true
+                            reviews: true,
+                            petBusiness: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            userId: true,
+                                            email: true,
+                                            accountType: true,
+                                            accountStatus: true,
+                                        },
+                                    },
+                                },
+                            }
                         }
                     },
                     orderItem: {
                         include: {
-                            invoice: true
+                            invoice: {
+                                include: {
+                                    PetOwner: {
+                                        include: {
+                                            user: {
+                                                select: {
+                                                    userId: true,
+                                                    email: true,
+                                                    accountType: true,
+                                                    accountStatus: true,
+                                                },
+                                            },
+                                        },
+                                    }
+                                }
+                            }
                         }
                     },
                     reportedBy: {
                         include: {
-                            reportedBy: true
+                            reportedBy: true,
                         }
                     },
                     likedBy: true

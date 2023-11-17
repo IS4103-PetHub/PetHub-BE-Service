@@ -4,7 +4,9 @@ const SupportTicketError = require("../../errors/supportTicketError")
 const petOwnerService = require("../user/petOwnerService")
 const petBusinessService = require("../user/petBusinessService");
 const { baseUserServiceInstance } = require("../user/baseUserService");
-const { SupportTicketStatus } = require('@prisma/client')
+const { SupportTicketStatus } = require('@prisma/client');
+const emailService = require("../emailService");
+const emailTemplate = require('../../resource/emailTemplate');
 
 class SupportService {
     async createPOSupportTicket(petOwnerId, data) {
@@ -376,8 +378,6 @@ class SupportService {
         }
     }
 
-
-
     async addComment(supportTicketId, data) {
         try {
             const supportTicket = await this.getSupportTicketById(supportTicketId)
@@ -428,6 +428,8 @@ class SupportService {
     async updateSupportTicketStatus(supportTicketId, status) {
         try {
             const supportTicket = await this.getSupportTicketById(supportTicketId);
+            const email = supportTicket.petBusiness ? supportTicket.petBusiness.user.email : supportTicket.petOwner.user.email;
+            const name = supportTicket.petBusiness ? supportTicket.petBusiness.companyName : supportTicket.petOwner.lastName;
 
             if (status == "PENDING" && supportTicket.status != "CLOSED_UNRESOLVED") {
                 throw new CustomError("Only able to reopen tickets that are closed and unresolved", 400)
@@ -439,6 +441,25 @@ class SupportService {
                     status: status
                 }
             })
+
+            // send email to PO/PB when admin closes the ticket as unresolved -> email informs that the ticket is idel and closed due to inactivty -> if they want to continue can reopen the ticket
+            if (status == SupportTicketStatus.CLOSED_UNRESOLVED) {
+                await emailService.sendEmail(
+                    email,
+                    "PetHub: Support Ticket closed as unresolved",
+                    emailTemplate.SupportClosedUnresolved(name, supportTicket)
+                )
+            }
+
+            // send email to PO/PB when the ticket is resolved
+            if (status == SupportTicketStatus.CLOSED_RESOLVED) {
+                await emailService.sendEmail(
+                    email,
+                    "PetHub: Support Ticket Resolved and Closed",
+                    emailTemplate.SupportClosedResolved(name, supportTicket)
+                )
+            }
+
             return updateSupportTicket;
 
         } catch (error) {
