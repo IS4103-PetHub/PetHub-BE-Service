@@ -39,12 +39,12 @@ async function main() {
   const funPackUpdatedWithBooking = await seedBookings(prisma, orderItems);
   console.log("Seeding fulfilled orders (claim voucher)...");
   const funPackUpdatedWithFulfillment = await seedFulfillment(prisma, funPackUpdatedWithBooking);
+  console.log("Seeding expired orders...");
+  const funPackUpdatedWithExpired = await seedExpired(prisma, funPackUpdatedWithFulfillment);
   console.log("Seeding refunded orders...");
-  const funPackUpdatedWithRefunds = await seedRefunds(prisma, funPackUpdatedWithFulfillment);
+  const funPackUpdatedWithRefunds = await seedRefunds(prisma, funPackUpdatedWithExpired);
   console.log("Seeding reviewed orders...");
   const funPackUpdatedWithReviews = await seedReviews(prisma, funPackUpdatedWithRefunds);
-  console.log("Seeding expired orders...");
-  const funPackUpdatedWithExpired = await seedExpired(prisma, funPackUpdatedWithReviews);
   console.log("Seeding payout invoices...");
   await seedPayout(prisma);
   console.log("Seeding pet lost and found...");

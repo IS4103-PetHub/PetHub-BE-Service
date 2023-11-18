@@ -69,7 +69,7 @@ const sittingUrls = [
 ];
 
 const groomingAllURLs = [
-  "https://img.freepik.com/free-photo/cute-pet-collage-isolated_23-2150007407.jpg?w=740&t=st=1700031072~exp=1700031672~hmac=86248383e10cf1e0e52ca855aeef9e7d84a39045e1f9ed7c703ea4773b147e80",
+  "https://pewaukeeveterinaryservice.com/wp-content/uploads/2019/09/iStock-1065436826-1024x683.jpg",
   "https://img.freepik.com/free-photo/haircuting-process-small-dog-sits-table-dog-with-professional_1157-48819.jpg?w=826&t=st=1700097736~exp=1700098336~hmac=bb2392a930a8bf27cc54c6ab7a225b1e4a81e551f43332007ccffc04ad91d0c4",
   "https://img.freepik.com/premium-photo/funny-wet-jack-russell-puppy-after-bath-wrapped-towel-freshly-washed-cute-dog-with-soap-suds-his-head-yellow-background-high-quality-photo_96727-2015.jpg?w=826",
   "https://img.freepik.com/premium-photo/vet-examining-dog-cat_119439-711.jpg?w=826",
@@ -90,9 +90,9 @@ const boardingAllURLs = [
   "https://nekoya.co/wp-content/uploads/2019/09/Select-Trustworthy-Hotel.png",
   "https://nekoya.co/wp-content/uploads/2016/11/cat-playing-tips-to-choosing-cat-boarding-hotel-singapore-1.jpg",
   "https://nekoya.co/wp-content/uploads/2019/09/Cat-Exclusive-Environment.png",
-  "https://assets-global.website-files.com/606e96048e07f8de3d446a0b/62fb52eb93696234a44e9271_WMCkTfXY9u6LK-_DuCNl7yJQRXYk_018LT4y2egJK4sHQb8SEBfhWEAJ-9DNuNhcDQ4nx60-AodAjPCldZipNjWePQe6ET_KTBR9q22I18vTqzrVp-RLOQOo1fy-dyMZvvSwOYaZ11JNl2JhP2QHcI8.png",
   "https://assets-global.website-files.com/606e96048e07f8de3d446a0b/62fca4d781de9f6164b09227_h_AiqYKT-vjlFm0pRly2zuO2fLwcpdh_pyHr9dzj-_3w0izXQfHi0MAvXR0EedFoC37vJ_URqkW3jdk_yngBug5A0W1JF9K9nyAxwcSxDC5Pg2284Nt0Y6VTvDzfBH5gRgQhrSDNyGE5Bl5wu_jdHaQ.png",
-  "https://cdn.shopify.com/s/files/1/0558/3316/5987/files/Untitled_design.jpg?v=1656304494"
+  "https://cdn.shopify.com/s/files/1/0558/3316/5987/files/Untitled_design.jpg?v=1656304494",
+  "https://kauaihumane.org/wp-content/uploads/2019/09/AdobeStock_303386394-scaled-e1587348530589-960x694.jpeg"
 ]
 
 const trainingAllURLs = [
@@ -124,15 +124,15 @@ const vetAllURLs = [
   "https://d2zp5xs5cp8zlg.cloudfront.net/image-54043-340.jpg",
 ]
 const dogURLs = [
-  "https://img.freepik.com/free-photo/close-up-view-beautiful-dog-with-bow-tie_23-2148786566.jpg?w=740&t=st=1700031089~exp=1700031689~hmac=5a0f2468b2128c016dd6ebaeb358a72cbe1fb9dc85624fdf31d95dbfe3c977bd",
   "https://img.freepik.com/free-photo/veterinarian-taking-care-pet-dog_23-2149198639.jpg?w=826&t=st=1700031119~exp=1700031719~hmac=4db3511a9ce087eb549f8ba7ff45af54ac4a7cef828b5c21d59d0215e85c4adf",
   "https://img.freepik.com/free-photo/adorable-chihuahua-dog-with-female-owner_23-2149880096.jpg?w=826&t=st=1700031146~exp=1700031746~hmac=04da2aa633bac13a5ce644a32d6946dab11e2098259b7cbd3447a50be4c88496",
   "https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://img.freepik.com/free-photo/cute-dog-biting-flip-flop_23-2149544896.jpg?w=826&t=st=1700097552~exp=1700098152~hmac=0e8d6cff6514c6abb02a5d76216f130a62bdce2f4152e532a73092cf1b7ad560",
   "https://img.freepik.com/free-photo/washing-pet-dog-home_23-2149627229.jpg?w=826&t=st=1700097560~exp=1700098160~hmac=03b809a83d63c30bc95bbf658af9d377c5e21721aeb8b412fbc8f59f25424f5f",
-  "https://images.unsplash.com/photo-1600169337065-c5b0102ca06d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  "https://images.unsplash.com/photo-1535930749574-1399327ce78f?q=80&w=1936&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-
+  "https://images.squarespace-cdn.com/content/v1/54e7a1a6e4b08db9da801ded/fdecc7f0-42bf-4696-bd4c-73a868e5d1d2/81.jpg?format=1000w",
+  "https://petcube.com/blog/content/images/2018/08/hot-dog-corgi.jpg",
+  "https://cielowigle.com/wp-content/uploads/2021/08/Dog-surfing.jpg",
+  "https://i.pinimg.com/564x/31/58/aa/3158aa2df03a53b818a99629e8b85166.jpg",
 ]
 
 const catURLs = [
@@ -140,14 +140,14 @@ const catURLs = [
   "https://images.unsplash.com/photo-1555008872-f03b347ffb53?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "https://nekoya.co/wp-content/uploads/2016/11/cat-playing-tips-to-choosing-cat-boarding-hotel-singapore-1.jpg",
   "https://nekoya.co/wp-content/uploads/2019/09/Cat-Exclusive-Environment.png",
-  "https://i0.wp.com/catcaresolutions.com/wp-content/uploads/2020/12/cute-cat-with-yellow-headband-on.png?fit=1000%2C1500&ssl=1",
-  "https://images.pexels.com/photos/4587959/pexels-photo-4587959.jpeg?auto=compress&cs=tinysrgb&w=600",
-  "https://images.pexels.com/photos/4588069/pexels-photo-4588069.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   "https://images.pexels.com/photos/1909802/pexels-photo-1909802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   "https://i.insider.com/5cd2f2a293a152283e34b3a4?width=800&format=jpeg&auto=webp",
   "https://i.insider.com/5cd2f12393a15227e7539465?width=800&format=jpeg&auto=webp",
   "https://i.insider.com/5cd2f36b93a1522a7532f2f3?width=800&format=jpeg&auto=webp",
   "https://dbw4iivs1kce3.cloudfront.net/680x390/2017/10/7-weird-things-your-cat-does-and-why-cover.jpg",
+  "https://www.victorpest.com/media/wysiwyg/Articles/Victorpest/VP_What-to-Do-if-Your-Cat-Brings-You-a-Gift_M2-hero.jpg",
+  "https://www.victorpest.com/media/wysiwyg/Articles/Victorpest/VP_What-to-Do-if-Your-Cat-Brings-You-a-Gift_yellow-cat.jpg",
+  "https://www.universityofcalifornia.edu/sites/default/files/styles/article_default_banner/public/cat-at-keyboard.jpg?h=32736f25&itok=qawzHL3H",
 ]
 
 const reptileURLs = [
@@ -776,7 +776,7 @@ async function seedBusinessData(prisma) {
       category: data.category,
       duration: data.duration,
       requiresBooking: data.requiresBooking,
-      dateCreated: getRandomPastDate(CURRENT_DATE, 14), // get a random date between the current date and a date 2 weeks ago
+      dateCreated: getRandomPastDate(CURRENT_DATE, 120), // get a random date between the current date and a date 2 weeks ago
       lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 0-4 weeks from the current date
       defaultExpiryDays: data.defaultExpiryDays,
       attachmentURLs: url,
@@ -853,7 +853,7 @@ async function remoteImageUrlToFile(url, filename) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch the image: ${response.status} - ${response.statusText}`);
+      throw new Error(`Failed to fetch the image: ${response.status} - ${response.statusText}, URL: ${url}`);
     }
     const buffer = await response.buffer();
     return { buffer: buffer, originalname: filename };
