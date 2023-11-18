@@ -86,3 +86,24 @@ exports.validateArticleCommentPayload = (payload) => {
     }
     return { isValid: true };
 }
+
+exports.validateNewsletterSubscriptionPayload = (payload) => {
+    const schema = Joi.object({
+        email: Joi.string()
+            .trim()
+            .email({ tlds: { allow: false } })
+            .required()
+            .messages({
+                'string.empty': 'Email cannot be empty.',
+                'any.required': 'Email is required.',
+                'string.email': 'Email must be a valid email address.',
+            }),
+    });
+
+    const { error } = schema.validate(payload, { convert: false });
+    if (error) {
+        console.log(error);
+        return { isValid: false, message: error.details[0].message };
+    }
+    return { isValid: true };
+}

@@ -5,6 +5,7 @@ const constants = require("../../constants/common");
 const s3ServiceInstance = require("../services/s3Service");
 const errorMessages = constants.errorMessages;
 const { getUserFromToken } = require("../../utils/nextAuth");
+const { replaceBase64WithS3URL } = require("../../utils/article");
 
 exports.getAllArticle = async (req, res, next) => {
   try {
@@ -58,12 +59,15 @@ exports.deleteArticle = async (req, res, next) => {
 
 exports.createArticle = async (req, res, next) => {
   try {
-    const payload = req.body;
+    let payload = req.body;
     const validationResult = articleValidation.validateCreateAndUpdateArticlePayload(payload);
     if (!validationResult.isValid) {
       res.status(400).send({ message: validationResult.message });
       return;
     }
+
+    // Replace all base64 encoded images with S3 url links
+    payload.content = await replaceBase64WithS3URL(payload.content);
 
     if (req.files) {
       payload.attachmentKeys = await s3ServiceInstance.uploadImgFiles(req.files, "article");
@@ -91,6 +95,9 @@ exports.updateArticle = async (req, res, next) => {
       res.status(400).send({ message: validationResult.message });
       return;
     }
+
+    // Replace all base64 encoded images with S3 url links
+    payload.content = await replaceBase64WithS3URL(payload.content);
 
     if (req.files) {
       await articleService.deleteFilesOfAnArticle(Number(articleId));
@@ -244,6 +251,38 @@ exports.getLatestAnnouncementArticle = async (req, res, next) => {
   try {
     const article = await articleService.getLatestAnnouncementArticle();
     res.status(200).json(article);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.subscribeToNewsletter = async (req, res, next) => {
+  try {
+    const payload = req.body;
+    const validationResult = articleValidation.validateNewsletterSubscriptionPayload(payload);
+    if (!validationResult.isValid) {
+      res.status(400).send({ message: validationResult.message });
+      return;
+    }
+
+    const subscription = await articleService.subscribeToNewsletter(payload.email);
+    res.status(201).json(subscription);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.unsubscribeFromNewsletter = async (req, res, next) => {
+  try {
+    const payload = req.body;
+    const validationResult = articleValidation.validateNewsletterSubscriptionPayload(payload);
+    if (!validationResult.isValid) {
+      res.status(400).send({ message: validationResult.message });
+      return;
+    }
+
+    const subscription = await articleService.unsubscribeFromNewsletter(payload.email);
+    res.status(200).json(subscription);
   } catch (error) {
     next(error);
   }

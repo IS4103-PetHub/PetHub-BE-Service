@@ -3,8 +3,10 @@ const ArticleError = require("../../errors/articleError");
 const CustomError = require("../../errors/customError");
 const InternalUserService = require("../../services/user/internalUserService");
 const s3ServiceInstance = require("../s3Service");
-const PetOwnerService = require("../../services/user/petOwnerService");
 const petOwnerService = require("../../services/user/petOwnerService");
+const emailService = require("../emailService");
+const emailTemplate = require("../../resource/emailTemplate");
+const pdf = require("html-pdf");
 
 class ArticleService {
   constructor() {}
@@ -243,6 +245,40 @@ class ArticleService {
           },
           category: articlePayload.category,
         },
+        include: {
+          createdBy: {
+            select: {
+              firstName: true,
+              lastName: true,
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+            },
+          },
+          tags: true,
+        },
+      });
+
+      // Send article to newsletter subscribers after req response so its non-blocking
+      const subscriberEmails = (await prisma.newsletterSubscription.findMany()).map((sub) => sub.email);
+      const articleToHtml = this.createHtmlTemplate(newArticle, null); // Add metadata to the original HTML content, excluding subscriber specific information
+      const pdfBuffer = await this.htmlToPdf(articleToHtml); // Construct the HTML template and convert to PDF
+      subscriberEmails.forEach((email) => {
+        const articleToHtml = this.createHtmlTemplate(newArticle, email); // Add metadata to the original HTML content
+        emailService
+          .sendHTMLEmailWithBufferAttachment(
+            email,
+            `PetHub Newsletter - ${newArticle.title}`,
+            articleToHtml,
+            `${newArticle.title}-article.pdf`, // fileName
+            pdfBuffer,
+            "application/pdf"
+          )
+          .catch((error) => {
+            console.error("Error sending email to:", email, "Error:", error);
+          });
       });
 
       return newArticle;
@@ -353,6 +389,23 @@ class ArticleService {
       // Check that the article comment exists
       const articleComment = await prisma.articleComment.findUnique({
         where: { articleCommentId },
+        include: {
+          petOwner: {
+            select: {
+              lastName: true,
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+            },
+          },
+          article: {
+            select: {
+              title: true,
+            },
+          },
+        },
       });
       if (!articleComment) throw new CustomError("Article comment not found", 404);
 
@@ -364,6 +417,15 @@ class ArticleService {
       await prisma.articleComment.delete({
         where: { articleCommentId },
       });
+
+      // If deletion was performed by an admin, send email to pet owner
+      if (callee.accountType === "INTERNAL_USER") {
+        await emailService.sendEmail(
+          articleComment.petOwner.user.email,
+          `Article Comment Deleted`,
+          emailTemplate.DeleteArticleCommentEmail(articleComment)
+        );
+      }
     } catch (error) {
       if (error instanceof CustomError) throw error;
       throw new ArticleError(error);
@@ -395,6 +457,68 @@ class ArticleService {
     }
   }
 
+  async subscribeToNewsletter(email) {
+    try {
+      const existingSubscription = await prisma.newsletterSubscription.findUnique({
+        where: {
+          email: email,
+        },
+      });
+
+      if (existingSubscription) {
+        throw new CustomError("This email is already subscribed to the PetHub Newsletter", 400);
+      }
+
+      const subscription = await prisma.newsletterSubscription.create({
+        data: {
+          email: email,
+        },
+      });
+
+      await emailService.sendEmail(
+        email,
+        `Pethub - Subscribed to Newsletter`,
+        emailTemplate.SubscribeToNewsletterEmail(email)
+      );
+
+      return subscription;
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      throw new ArticleError(error);
+    }
+  }
+
+  async unsubscribeFromNewsletter(email) {
+    try {
+      const existingSubscription = await prisma.newsletterSubscription.findUnique({
+        where: {
+          email: email,
+        },
+      });
+
+      if (!existingSubscription) {
+        throw new CustomError("This email is not subscribed to the PetHub Newsletter", 400);
+      }
+
+      await prisma.newsletterSubscription.delete({
+        where: {
+          email: email,
+        },
+      });
+
+      await emailService.sendEmail(
+        email,
+        `Pethub - Unsubscribed From Newsletter`,
+        emailTemplate.UnsubscribeFromNewsletterEmail(email)
+      );
+
+      return { message: "Successfully unsubscribed from the PetHub Newsletter" };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      throw new ArticleError(error);
+    }
+  }
+
   async deleteFilesOfAnArticle(articleId) {
     try {
       const article = await prisma.article.findUnique({
@@ -411,6 +535,72 @@ class ArticleService {
       }
       throw new ArticleError(error);
     }
+  }
+
+  // Convert HTML to PDF
+  async htmlToPdf(html) {
+    return new Promise((resolve, reject) => {
+      pdf.create(html).toBuffer((err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffer);
+        }
+      });
+    });
+  }
+
+  // This is for sending the article as HTML to PDF attachment to newsletter subscribers
+  createHtmlTemplate(article, subscriberEmail) {
+    // Remove line breaks from formatted HTML
+    function removeEmptyParagraphs(htmlString) {
+      const pattern = /<p><br><\/p>/g;
+      return htmlString.replace(pattern, "");
+    }
+
+    function formatStringToLetterCase(enumString) {
+      return enumString
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    const { title, content, articleType, tags, category, attachmentUrls, createdBy, dateCreated } = article;
+    const coverImageUrl = attachmentUrls.length > 0 ? attachmentUrls[0] : null;
+    const authorName = `${createdBy.firstName} ${createdBy.lastName}`;
+    const formattedDateCreated = new Date(dateCreated).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const tagsHtml = tags
+      ? tags
+          .map(
+            (tag) =>
+              `<span style="margin-right: 5px; background-color: #eef; padding: 3px 6px; border-radius: 4px;">${tag.name}</span>`
+          )
+          .join("")
+      : "";
+
+    const categoryHtml = category
+      ? `<span style="color: #06c;">${formatStringToLetterCase(category)}</span>`
+      : "";
+
+    const cleanedContent = removeEmptyParagraphs(content);
+
+    return emailTemplate.ArticleHTMLBodyTemplateEmail(
+      title,
+      cleanedContent,
+      authorName,
+      formattedDateCreated,
+      tagsHtml,
+      categoryHtml,
+      coverImageUrl,
+      formatStringToLetterCase(articleType),
+      article.articleId,
+      subscriberEmail
+    );
   }
 }
 

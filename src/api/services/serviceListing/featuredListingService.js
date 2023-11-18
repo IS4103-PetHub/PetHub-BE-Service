@@ -94,6 +94,7 @@ exports.createFeaturedListingSet = async (category, startDate, endDate, listingI
               include: {
                 tags: true,
                 addresses: true,
+                reviews: true,
                 petBusiness: {
                   select: {
                     companyName: true,
@@ -139,6 +140,7 @@ exports.getFeaturedListingSetsByDateRange = async (startDate, endDate) => {
               include: {
                 tags: true,
                 addresses: true,
+                reviews: true,
                 petBusiness: {
                   select: {
                     companyName: true,
