@@ -12,7 +12,7 @@ const serviceListingService = require("../../../src/api/services/serviceListing/
 const { remoteImageUrlToFile, getRandomImageURLs, mapCategoryToURLs, serviceListings } = require("../serviceListing/serviceListing");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
-const NUM_INVOICES = 60;
+const NUM_INVOICES = 66;
 const NUM_CART_ITEMS = 3;
 const CURRENT_DATE = new Date();
 const NUM_VOUCHERS_TO_CLAIM = 400; //fulfilled orders
