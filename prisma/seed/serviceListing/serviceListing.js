@@ -144,6 +144,10 @@ const catURLs = [
   "https://images.pexels.com/photos/4587959/pexels-photo-4587959.jpeg?auto=compress&cs=tinysrgb&w=600",
   "https://images.pexels.com/photos/4588069/pexels-photo-4588069.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   "https://images.pexels.com/photos/1909802/pexels-photo-1909802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://i.insider.com/5cd2f2a293a152283e34b3a4?width=800&format=jpeg&auto=webp",
+  "https://i.insider.com/5cd2f12393a15227e7539465?width=800&format=jpeg&auto=webp",
+  "https://i.insider.com/5cd2f36b93a1522a7532f2f3?width=800&format=jpeg&auto=webp",
+  "https://dbw4iivs1kce3.cloudfront.net/680x390/2017/10/7-weird-things-your-cat-does-and-why-cover.jpg",
 ]
 
 const reptileURLs = [
@@ -153,6 +157,8 @@ const reptileURLs = [
   "https://d2alru2r30ax77.cloudfront.net/become-a-vet/_pageGallery/Veterinarian-Turtle-exam-gallery-web.jpg",
   "https://marinesavers.com/wordpress/wp-content/uploads/2022/08/Katrina-turtle-veterinary-care-at-Marine-Savers-Maldives-1080.jpg",
   "https://marinesavers.com/wordpress/wp-content/uploads/2022/07/Frisbee-male-Olive-Ridley-rescue-turtle-Maldives-2-1080.jpg",
+  "https://img.freepik.com/premium-photo/funny-turtle-underwater-showing-thumb-up_798986-902.jpg?w=2000",
+  "https://www.worldanvil.com/uploads/images/bccba8a7a97a55a9e43d7e4850840bb8.png",
 ]
 
 const rabbitURLs = [
@@ -161,6 +167,7 @@ const rabbitURLs = [
   "https://dims.apnews.com/dims4/default/ed6d2d7/2147483647/strip/true/crop/3000x2000+0+0/resize/1440x960!/format/webp/quality/90/?url=https%3A%2F%2Fstorage.googleapis.com%2Fafs-prod%2Fmedia%2Fe5ed326091ae46a18a1f15cac3e61e36%2F3000.jpeg",
   "https://www.scmagazine.com/_next/image?url=https%3A%2F%2Ffiles.scmagazine.com%2Fwp-content%2Fuploads%2F2022%2F01%2FGettyImages-137876949.jpg&w=750&q=75",
   "https://npr.brightspotcdn.com/dims4/default/5096441/2147483647/strip/true/crop/1600x1165+0+0/resize/1760x1282!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F77%2F24%2F29756c5244d39d1d32ab5f15ac87%2F51540497220-6a66f4310d-h.jpg",
+  "https://assets.newatlas.com/dims4/default/ad1194b/2147483647/strip/true/crop/1997x1331+2+0/resize/1200x800!/quality/90/?url=http%3A%2F%2Fnewatlas-brightspot.s3.amazonaws.com%2F5f%2F5c%2F348d6a3a4e9fb7d90f1a26e0c305%2Fdepositphotos-34452711-l-2015.jpg",
 ]
 
 const birdURLs = [
@@ -169,6 +176,8 @@ const birdURLs = [
   "https://www.washingtonpost.com/blogs/going-out-guide/files/2018/01/IMG_7915-1024x768.jpg",
   "https://www.washingtonpost.com/blogs/going-out-guide/files/2018/01/IMG_E1230-1024x768.jpg",
   "https://hips.hearstapps.com/hmg-prod/images/best-pet-birds-lead-1572839035.jpg?crop=1.00xw:0.761xh;0,0.0386xh&resize=1200:*",
+  "https://www.scimex.org/__data/assets/image/0003/551118/tete-de-pigeon-1398017497xQG.jpg",
+  "https://assets.newatlas.com/dims4/default/0f10f0d/2147483647/strip/true/crop/1954x1303+0+32/resize/1200x800!/quality/90/?url=http%3A%2F%2Fnewatlas-brightspot.s3.amazonaws.com%2F3d%2F84%2Fc16571724fa89291d84ee3ca6bf9%2Fscreenshot-2023-10-27-at-8.09.19%20am.png",
 ]
 
 const serviceListings = [
@@ -186,7 +195,8 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 1,
     requiresBooking: true,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 2,
@@ -202,7 +212,8 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 4,
     requiresBooking: true,
-    url: getRandomImageURLs(trainingAllURLs)
+    url: getRandomImageURLs(dogURLs),
+    urlFiles: dogURLs
   },
   {
     id: 3,
@@ -217,7 +228,8 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 1,
     requiresBooking: true,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 4,
@@ -232,7 +244,8 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }, { addressId: 2 }],
     calendarGroupId: 3,
     requiresBooking: true,
-    url: getRandomImageURLs(vetAllURLs)
+    url: getRandomImageURLs(vetAllURLs),
+    urlFiles: vetAllURLs
   },
   {
     id: 5,
@@ -247,7 +260,8 @@ const serviceListings = [
     addressIds: [{ addressId: 6 }],
     requiresBooking: false,
     defaultExpiryDays: 30,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(boardingAllURLs),
+    urlFiles: boardingAllURLs
   },
   {
     id: 6,
@@ -262,7 +276,8 @@ const serviceListings = [
     duration: 60,
     requiresBooking: false,
     defaultExpiryDays: 14,
-    url: getRandomImageURLs(catURLs)
+    url: getRandomImageURLs(catURLs),
+    urlFiles: catURLs
   },
   {
     id: 7,
@@ -284,7 +299,8 @@ const serviceListings = [
       "https://pethub-data-lake-default.s3.ap-southeast-1.amazonaws.com/uploads/service-listing/img/4f34978d-afbf-433a-8300-f04a4af8c2ef-adoption2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA3X6HC7JLMRAUOW66%2F20231010%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20231010T135811Z&X-Amz-Expires=604800&X-Amz-Signature=7a7d872a9c5be2b6deaef9c6e196634c026697edf72f6e1a94715a7d7e1e69d6&X-Amz-SignedHeaders=host&x-id=GetObject",
     ],
     defaultExpiryDays: 14,
-    url: getRandomImageURLs(dogURLs)
+    url: getRandomImageURLs(dogURLs),
+    urlFiles: dogURLs
   },
   {
     id: 8,
@@ -299,7 +315,8 @@ const serviceListings = [
     calendarGroupId: 2,
     requiresBooking: true,
     defaultExpiryDays: 14,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 9,
@@ -314,7 +331,8 @@ const serviceListings = [
     duration: 60,
     calendarGroupId: 3,
     requiresBooking: true,
-    url: getRandomImageURLs(vetAllURLs)
+    url: getRandomImageURLs(vetAllURLs),
+    urlFiles: vetAllURLs
   },
   {
     id: 10,
@@ -330,7 +348,8 @@ const serviceListings = [
     calendarGroupId: 5,
     requiresBooking: true,
     defaultExpiryDays: 14,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(dogURLs),
+    urlFiles: dogURLs
   },
   {
     id: 11,
@@ -341,7 +360,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 10.0,
     requiresBooking: false,
-    url: getRandomImageURLs(reptileURLs)
+    url: getRandomImageURLs(reptileURLs),
+    urlFiles: reptileURLs
   },
   {
     id: 12,
@@ -352,7 +372,8 @@ const serviceListings = [
     defaultExpiryDays: 45,
     basePrice: 13.5,
     requiresBooking: false,
-    url: getRandomImageURLs(birdURLs)
+    url: getRandomImageURLs(birdURLs),
+    urlFiles: birdURLs
   },
   {
     id: 13,
@@ -363,7 +384,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 7.0,
     requiresBooking: false,
-    url: getRandomImageURLs(rabbitURLs)
+    url: getRandomImageURLs(rabbitURLs),
+    urlFiles: rabbitURLs
   },
   {
     id: 14,
@@ -374,7 +396,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 0.0, 
     requiresBooking: false, 
-    url: getRandomImageURLs(catURLs)
+    url: getRandomImageURLs(catURLs),
+    urlFiles: catURLs
   },
   {
     id: 15,
@@ -385,7 +408,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 17.0,
     requiresBooking: false,
-    url: getRandomImageURLs(reptileURLs)
+    url: getRandomImageURLs(reptileURLs),
+    urlFiles: reptileURLs
   },
   {
     id: 16,
@@ -396,7 +420,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 20.0,
     requiresBooking: false,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(boardingAllURLs),
+    urlFiles: boardingAllURLs
   },
   {
     id: 17,
@@ -407,7 +432,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 15.0,
     requiresBooking: false,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(boardingAllURLs),
+    urlFiles: boardingAllURLs
   },
   {
     id: 18,
@@ -418,7 +444,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 5.0,
     requiresBooking: false,
-    url: getRandomImageURLs(reptileURLs)
+    url: getRandomImageURLs(reptileURLs),
+    urlFiles: reptileURLs
   },
   {
     id: 19,
@@ -429,7 +456,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 25.0,
     requiresBooking: false,
-    url: getRandomImageURLs(reptileURLs)
+    url: getRandomImageURLs(reptileURLs),
+    urlFiles: reptileURLs
   },
   {
     id: 20,
@@ -440,7 +468,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 33.0,
     requiresBooking: false,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 21,
@@ -451,7 +480,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 12.0,
     requiresBooking: false,
-    url: getRandomImageURLs(catURLs)
+    url: getRandomImageURLs(catURLs),
+    urlFiles: catURLs
   },
   {
     id: 22,
@@ -462,7 +492,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 10.0,
     requiresBooking: false,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(boardingAllURLs),
+    urlFiles: boardingAllURLs
   },
   {
     id: 23,
@@ -473,7 +504,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 8.5,
     requiresBooking: true,
-    url: getRandomImageURLs(vetAllURLs)
+    url: getRandomImageURLs(vetAllURLs),
+    urlFiles: vetAllURLs
   },
   {
     id: 24,
@@ -485,7 +517,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 9.0,
     requiresBooking: false,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(boardingAllURLs),
+    urlFiles: boardingAllURLs
   },
   {
     id: 25,
@@ -496,7 +529,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 10.0,
     requiresBooking: true,
-    url: getRandomImageURLs(rabbitURLs)
+    url: getRandomImageURLs(rabbitURLs),
+    urlFiles: rabbitURLs
   },
   {
     id: 26,
@@ -507,7 +541,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 17.0,
     requiresBooking: false,
-    url: getRandomImageURLs(reptileURLs)
+    url: getRandomImageURLs(reptileURLs),
+    urlFiles: reptileURLs
   },
   {
     id: 27,
@@ -519,7 +554,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 25.0,
     requiresBooking: false,
-    url: getRandomImageURLs(dogURLs)
+    url: getRandomImageURLs(dogURLs),
+    urlFiles: dogURLs
   },
   {
     id: 28,
@@ -530,7 +566,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 20.0,
     requiresBooking: true,
-    url: getRandomImageURLs(vetAllURLs)
+    url: getRandomImageURLs(vetAllURLs),
+    urlFiles: vetAllURLs
   },
   {
     id: 29,
@@ -542,7 +579,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 15.0,
     requiresBooking: false,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 30,
@@ -554,7 +592,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 10.0,
     requiresBooking: true,
-    url: getRandomImageURLs(birdURLs)
+    url: getRandomImageURLs(birdURLs),
+    urlFiles: birdURLs
   },
   {
     id: 31,
@@ -565,7 +604,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 16.75,
     requiresBooking: false,
-    url: getRandomImageURLs(reptileURLs)
+    url: getRandomImageURLs(reptileURLs),
+    urlFiles: reptileURLs
   },
   {
     id: 32,
@@ -576,7 +616,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 15.0,
     requiresBooking: false,
-    url: getRandomImageURLs(boardingAllURLs)
+    url: getRandomImageURLs(boardingAllURLs),
+    urlFiles: boardingAllURLs
   },
   {
     id: 33,
@@ -587,7 +628,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 7.75,
     requiresBooking: true,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 34,
@@ -599,7 +641,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 18.9,
     requiresBooking: false,
-    url: getRandomImageURLs(birdURLs)
+    url: getRandomImageURLs(birdURLs),
+    urlFiles: catURLs
   },
   {
     id: 35,
@@ -610,7 +653,8 @@ const serviceListings = [
     defaultExpiryDays: 30,
     basePrice: 23.5,
     requiresBooking: true,
-    url: getRandomImageURLs(trainingAllURLs)
+    url: getRandomImageURLs(trainingAllURLs),
+    urlFiles: trainingAllURLs
   },
 
   // This service listings (id 36-37) have requiresBooking: true but no CG
@@ -627,7 +671,8 @@ const serviceListings = [
     duration: 60,
     requiresBooking: true,
     defaultExpiryDays: 14,
-    url: getRandomImageURLs(groomingAllURLs)
+    url: getRandomImageURLs(groomingAllURLs),
+    urlFiles: groomingAllURLs
   },
   {
     id: 37,
@@ -641,7 +686,8 @@ const serviceListings = [
     addressIds: [],
     duration: 90,
     requiresBooking: true,
-    url: getRandomImageURLs(trainingAllURLs)
+    url: getRandomImageURLs(trainingAllURLs),
+    urlFiles: dogURLs
   },
   // This service listing (id 38) will have a lastPossibleDate to be < currentDate
   // On the customer side, pet owners should not be able to see these listings as the SL is already invalid.
@@ -655,7 +701,8 @@ const serviceListings = [
     basePrice: 5.0,
     tagIds: [{ tagId: 3 }],
     addressIds: [],
-    url: getRandomImageURLs(rabbitURLs)
+    url: getRandomImageURLs(rabbitURLs),
+    urlFiles: birdURLs
   },
   {
     id: 39,
@@ -669,7 +716,8 @@ const serviceListings = [
     addressIds: [{ addressId: 1 }],
     defaultExpiryDays: 30,
     requiresBooking: false,
-    url: getRandomImageURLs(dogURLs)
+    url: getRandomImageURLs(dogURLs),
+    urlFiles: dogURLs
   },
 ];
 
@@ -730,7 +778,6 @@ async function seedBusinessData(prisma) {
       requiresBooking: data.requiresBooking,
       dateCreated: getRandomPastDate(CURRENT_DATE, 14), // get a random date between the current date and a date 2 weeks ago
       lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 0-4 weeks from the current date
-      listingTime: getRandomPastDate(CURRENT_DATE, 14), // lisitng was bumped between (dateCreated and current_dates)
       defaultExpiryDays: data.defaultExpiryDays,
       attachmentURLs: url,
       attachmentKeys: key,
@@ -749,6 +796,8 @@ async function seedBusinessData(prisma) {
         connect: petOwnerIds.map((ownerId) => ({ userId: ownerId })),
       },
     };
+
+    createObject.listingTime = createObject.dateCreated;
 
     const pastDate = new Date();
     pastDate.setDate(pastDate.getDate() - 1);
@@ -778,6 +827,11 @@ async function seedBusinessData(prisma) {
     if (data.id % 5 == 0) {
       createObject.dateCreated = CURRENT_DATE;
       createObject.listingTime = CURRENT_DATE;
+    }
+
+    // These are the seeded bumped listings
+    if (data.id % 7 == 0 || data.id % 8 == 0 ) {
+      createObject.listingTime = getRandomPastDate(CURRENT_DATE, 7);
     }
 
     // Check if data.calendarGroupId exists before adding it to createObject
@@ -824,10 +878,12 @@ function generateRandomPetOwnerIds(count, min, max) {
 function getRandomImageURLs(arr) {
   // Shuffle the array to get a random order of images
   const shuffled = arr.sort(() => Math.random() - 0.5);
-  const randomImageURLS = shuffled.slice(0, 2);
+  // Return 1-3 images
+  const numberOfImages = Math.floor(Math.random() * 3) + 1;
+  const randomImageURLS = shuffled.slice(0, numberOfImages);
 
   return randomImageURLS;
 }
 
 
-module.exports = { serviceListings, tags, seedBusinessData, remoteImageUrlToFile };
+module.exports = { serviceListings, tags, seedBusinessData, remoteImageUrlToFile, getRandomImageURLs };
