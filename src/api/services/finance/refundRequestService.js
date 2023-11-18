@@ -308,6 +308,17 @@ class RefundRequestService {
                         },
                     },
                 });
+
+                // Set order item status to refunded
+                await prismaClient.orderItem.update({
+                    where: {
+                        orderItemId: refundRequest.orderItemId
+                    },
+                    data: {
+                        status: OrderItemStatus.REFUNDED
+                    }
+                });
+
                 return updatedRefundRequest
             });
 
