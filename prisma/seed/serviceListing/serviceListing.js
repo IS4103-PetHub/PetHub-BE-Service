@@ -776,7 +776,7 @@ async function seedBusinessData(prisma) {
       category: data.category,
       duration: data.duration,
       requiresBooking: data.requiresBooking,
-      dateCreated: getRandomPastDate(CURRENT_DATE, 14), // get a random date between the current date and a date 2 weeks ago
+      dateCreated: getRandomPastDate(CURRENT_DATE, 120), // get a random date between the current date and a date 2 weeks ago
       lastPossibleDate: getRandomFutureDate(CURRENT_DATE), // get a random future date, between 0-4 weeks from the current date
       defaultExpiryDays: data.defaultExpiryDays,
       attachmentURLs: url,
