@@ -491,6 +491,26 @@ exports.PBReplysReview = (customerName, title, reply) => {
   `;
 };
 
+exports.reopenRefundRequestEmail = (name, refundRequest) => {
+  return `
+    Dear ${name},
+
+    We want to inform you that the refund request for order item ${refundRequest.orderItemId} has been reverted to Pending status.
+
+    Refund Request Details:
+    - Refund Request ID: ${refundRequest.refundRequestId}
+    - Status: Pending
+    - Reason: ${refundRequest.reason}
+    - Comment: ${refundRequest.comment || 'No comment provided'}
+    
+    Please review the refund request and take any necessary actions.
+
+    Thank you for your attention to this matter.
+
+    Sincerely,
+    [Your Company Name]
+  `;
+}
 
 
 exports.ArticleHTMLBodyTemplateEmail = (
