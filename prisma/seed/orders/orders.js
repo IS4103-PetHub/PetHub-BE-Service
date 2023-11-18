@@ -7,14 +7,16 @@ const CalendarGroupService = require("../../../src/api/services/appointments/cal
 const { getRandomPastDate } = require("../../../src/utils/date");
 const refundRequestService = require("../../../src/api/services/finance/refundRequestService");
 const reviewService = require("../../../src/api/services/serviceListing/reviewService");
+const s3ServiceInstance = require("../../../src/api/services/s3Service");
 const serviceListingService = require("../../../src/api/services/serviceListing/serviceListingService");
+const { remoteImageUrlToFile, getRandomImageURLs, mapCategoryToURLs, serviceListings } = require("../serviceListing/serviceListing");
 
 // CHANGE THESE VALUES TO CHANGE HOW MUCH SEEDED DATA IS GENERATED. INVOICE PDFs WILL BE GENERATED TOO
 const NUM_INVOICES = 60;
 const NUM_CART_ITEMS = 3;
 const CURRENT_DATE = new Date();
 const NUM_VOUCHERS_TO_CLAIM = 400; //fulfilled orders
-const NUM_REVIEWS = 380;
+const NUM_REVIEWS = 200;
 const NUM_PENDING_REFUNDS = 5;
 const NUM_EXPIRED = 15;
 
@@ -294,26 +296,47 @@ async function simulateCheckout(data, lastMonth = false) {
 const getRandomElement = (array) => array[Math.floor(Math.random() * array.length)];
 
 const getRandomRating = () => {
-  const ratings = [1, 2, 3, 4, 4, 5, 5, 5]; // Higher chances for 4 and 5s LOL
+  const ratings = [1, 2, 3, 4, 4, 4, 5, 5, 5, 5]; // Higher chances for 4 and 5s LOL
   return getRandomElement(ratings);
 };
 
 // Sample data for titles, comments, and image URLs
-const reviewTitles = [
-  "Not Satisfied",
-  "Could be better",
-  "Disappointed",
-  "Alright",
-  "This item has exceeded by expectations",
-];
+// review rating : [title, comment, pb reply]
+const reviewVariations = new Map([
+  [1, [
+    ["Not Satisfied", "Expected more from this product", "We're sorry to hear about your experience. Please reach out to our support team so we can assist you further."],
+    ["Could be better", "Not worth the price", "We apologize for any inconvenience caused. Your feedback helps us improve."],
+    ["Not as advertised", "The product didn't match the description provided. Disappointing experience overall.", "We're disappointed to hear this. Your satisfaction is important to us; please contact us for assistance."]
+  ]],
+  [2, [
+    ["Disappointed", "Expected more from this product", "We're disappointed to hear this. Your satisfaction is important to us; please contact us for assistance."],
+    ["Alright", "Meh, it's alright I guess", "We're sorry the product didn't meet your expectations. Please contact us so we can make it right."],
+    ["Needs improvement", "There are a few areas that could use some enhancement, especially in terms of quality and time spent on it.", "We appreciate your feedback! We're constantly working on improving our products and services."]
+  ]],
+  [3, [
+    ["Surpassed my expectations", "Absolutely thrilled with my purchase! It's rare to find something that exceeds expectations.", "It's wonderful to hear that our product surpassed your expectations! Thank you for sharing your experience."],
+    ["Fantastic purchase", "I was skeptical at first, but this product blew me away with its performance.", "We're delighted to know that our product made your purchase fantastic! Thank you for choosing us."],
+    ["This item has exceeded by expectations", "I recently purchased this, and I have to say, it has been a game-changer for my little Beagle, Benny! From the moment I unwrapped it, Benny was drawn to it that just molds around his body. It's been a couple of weeks now, and Benny has never looked so peaceful. I've noticed he's more energetic during our walks, and I'm convinced it's because he's getting quality rest. The bed has held up beautifully despite Benny's occasional digging ritual before he settles down. It's been through the wash a few times and has maintained its shape and softness, which honestly has surprised me, considering how many beds we've gone through before.", "We're thrilled to hear that our product has met your expectations! Thank you for your kind words."]
+  ]],
+  [4, [
+    ["Great quality!", "The stitching and material used are top-notch. Very impressed with the overall quality.", "Thank you for appreciating the quality of our product! We're dedicated to providing top-notch items."],
+    ["Impressed with durability", "This product has proven its durability even after repeated use.", "We're glad to hear that our product's durability has impressed you! Your satisfaction motivates us."],
+    ["Stylish and functional", "Not only is this product functional, but it also adds a stylish touch to my pet's space.", "We're happy to hear that our product adds both functionality and style! Thank you for your feedback."]
+  ]],
+  [5, [
+    ["Exceeded expectations!", "My pet loves it! It's a hit from day one.", "We're thrilled to hear that our product is a hit with your pet! Thank you for sharing."],
+    ["Exceptional comfort", "Unmatched comfort for my furry friend. A must-buy!", "We're delighted to provide unmatched comfort for your furry friend! Thank you for choosing us."],
+    ["Perfect purchase", "Exactly what I was looking for. Couldn't be happier.", "We're glad our product met your expectations! Thank you for your kind words."]
+  ]],
+]);
 
-const reviewComments = [
-  "Expected more from this product",
-  "Not worth the price",
-  "Expected more from this product",
-  "Meh its alright I guess",
-  "I recently purchased the 'SnugglePaws Deluxe Pet Bed' from the 'Cozy Critters Emporium', and I have to say, it has been a game-changer for my little Beagle, Benny! From the moment I unwrapped the bed, Benny was drawn to the plush, velvety fabric, and the generous padding that just molds around his body. It's been a couple of weeks now, and Benny has never looked so peaceful during his naps. I've noticed he's more energetic during our walks, and I'm convinced it's because he's getting quality rest. The bed has held up beautifully despite Benny's occasional digging ritual before he settles down. It's been through the wash a few times and has maintained its shape and softness, which honestly has surprised me, considering how many beds we've gone through before.",
-];
+const getRandomTupleForRating = (rating) => {
+  const tuples = reviewVariations.get(rating);
+  if (tuples) {
+    return tuples[Math.floor(Math.random() * tuples.length)];
+  }
+  return null; 
+};
 
 const reviewImages = [
   {
@@ -345,11 +368,33 @@ async function simulateCreateReview(prisma, payload, orderItem) {
     if (!orderItem.dateFulfilled) console.log("WARNING: Order item does not have a dateFulfilled");
 
     // Simulate the date of review creation as 3 days after the order fulfillment
-    const simulatedDateCreated = new Date(orderItem.dateFulfilled);
+    let simulatedDateCreated = new Date(orderItem.dateFulfilled);
     simulatedDateCreated.setDate(simulatedDateCreated.getDate() + 3);
+
+    // If simulatedDateCreated is in the future, set it to the current date
+    if (simulatedDateCreated.getTime() > CURRENT_DATE.getTime()) {
+      simulatedDateCreated = CURRENT_DATE;
+    }
 
     const serviceListingId = orderItem.serviceListingId;
     const serviceListing = await serviceListingService.getServiceListingById(serviceListingId);
+    
+    let key = [];
+    let url = [];
+
+    if (Math.random() < 0.5) { // 50% chance of a review having image
+      const listingData = serviceListings.find( (item) => item.id === serviceListingId );
+      const imageForReview = getRandomImageURLs(listingData.urlFiles);
+
+      const images = [];
+      for (const imageURL of imageForReview) {
+        const file = await remoteImageUrlToFile(imageURL, uuidv4);
+        images.push(file);
+      }
+
+      key = await s3ServiceInstance.uploadImgFiles(images, "review");
+      url = await s3ServiceInstance.getObjectSignedUrl(key);
+    }
 
     let newRating;
     if (serviceListing.reviews.length != 0 && serviceListing.overallRating != 0) {
@@ -364,11 +409,16 @@ async function simulateCreateReview(prisma, payload, orderItem) {
         title: payload.title,
         comment: payload.comment,
         rating: payload.rating,
-        attachmentKeys: payload.attachmentKeys,
-        attachmentURLs: payload.attachmentURLs,
+        attachmentURLs: url,
+        attachmentKeys: key,
         orderItemId: orderItem.orderItemId,
         serviceListingId: orderItem.serviceListingId,
         dateCreated: simulatedDateCreated,
+        likedBy: { // Connect random number of users (between 0 and 8) with userID between 9 and 17
+          connect: Array.from({ length: Math.floor(Math.random() * 9) }, () => ({
+            userId: Math.floor(Math.random() * (17 - 9 + 1)) + 9,
+          })),
+        },
       },
     });
 
@@ -698,16 +748,12 @@ async function seedReviews(prisma, funPack) {
 
   for (const item of itemsForReview) {
     const rating = getRandomRating();
-    const title = reviewTitles[rating - 1];
-    const comment = reviewComments[rating - 1];
-    const images = getRandomReviewImages();
+    const [title, comment, pbReply] = getRandomTupleForRating(rating);
 
     const payload = {
       title: title,
       comment: comment,
       rating,
-      attachmentKeys: images.map((img) => img.name),
-      attachmentURLs: images.map((img) => img.url),
     };
 
     try {
@@ -721,7 +767,7 @@ async function seedReviews(prisma, funPack) {
         const updatedReview = await prisma.review.update({
           where: { reviewId: newReview.reviewId },
           data: {
-            reply: "Thank you for your feedback! But we are not accepting feedback at the moment.",
+            reply: pbReply,
             replyDate: new Date(),
           },
         });
