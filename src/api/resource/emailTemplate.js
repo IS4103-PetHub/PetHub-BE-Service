@@ -472,6 +472,27 @@ exports.AdminDeleteReviewToBusiness = (businessName, review) => {
   `;
 };
 
+exports.PBReplysReview = (customerName, title, reply) => {
+  return `
+    Dear ${customerName},
+
+    We hope this message finds you well.
+
+    We wanted to inform you that the business has responded to your review on the service listing "${title}". Here is the business's reply:
+
+    ${reply}
+
+    We appreciate your engagement and the time you took to share your thoughts. If you have any further questions or would like to continue the conversation, feel free to reach out.
+
+    Thank you for being a valued member of our community.
+
+    Best regards,
+    The PetHub Team
+  `;
+};
+
+
+
 exports.ArticleHTMLBodyTemplateEmail = (
   title,
   cleanedContent,
