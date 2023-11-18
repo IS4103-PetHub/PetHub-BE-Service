@@ -668,7 +668,7 @@ async function seedFulfillment(prisma, funPack) {
 async function seedRefunds(prisma, funPack) {
   let orderItemVarietyFunPack = funPack;
 
-  const itemsForRefund = orderItemVarietyFunPack.pendingFulfillment.slice(0, NUM_PENDING_REFUNDS);
+  const itemsForRefund = orderItemVarietyFunPack.pendingFulfillment;
   const reasons =
     "I recently purchased the Deluxe Pet Bed for my senior Labrador, " +
     "and it did not meet our expectations. The fabric tore within a week, " +
@@ -677,9 +677,13 @@ async function seedRefunds(prisma, funPack) {
 
   let refundRequestIds = [];
   const currentDate = new Date();
+  let refundedCount = 0;
 
   try {
     for (const item of itemsForRefund) {
+      if (refundedCount >= NUM_PENDING_REFUNDS) break; // Only refund NUN_PENDING_REFUNDS items
+      if (item.itemPrice === 0) continue; // Skip items that are free
+
       // Set dateFulfilled such that it falls within the allowed holding period
       const dateFulfilledWithinHoldingPeriod = new Date();
       dateFulfilledWithinHoldingPeriod.setDate(currentDate.getDate() - 8);
@@ -698,6 +702,7 @@ async function seedRefunds(prisma, funPack) {
       // update local state
       item.RefundRequest = refundRequest;
       refundRequestIds.push(refundRequest.refundRequestId);
+      refundedCount++;
     }
 
     // Approve the refund for the first item and update status locally
@@ -832,6 +837,9 @@ async function seedReviews(prisma, funPack) {
     console.error("Failed to aggregate top reviewed service listings:", error);
   }
 
+  // print log of overview of all orderItems
+  countBrackets(orderItemVarietyFunPack);
+
   return validateAndDistributeOrderItems(orderItemVarietyFunPack);
 }
 
@@ -845,21 +853,20 @@ async function seedExpired(prisma, funPack) {
       // Update the DB
       await prisma.orderItem.update({
         where: { orderItemId: item.orderItemId },
-        data: { 
+        data: {
           expiryDate: currentDate,
-          status: OrderItemStatus.EXPIRED, 
+          status: OrderItemStatus.EXPIRED,
         },
       });
-      orderItemVarietyFunPack.expired.push(item);
+      // orderItemVarietyFunPack.expired.push(item);
+      // update local state
+      item.status = OrderItemStatus.EXPIRED;
     }
   } catch (error) {
     console.error(`Error seeding expired order items`, error);
   }
 
-  // print log of overview of all orderItems
-  countBrackets(orderItemVarietyFunPack);
   return validateAndDistributeOrderItems(orderItemVarietyFunPack);
-
 }
 
 module.exports = {
