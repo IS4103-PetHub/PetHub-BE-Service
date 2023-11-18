@@ -235,6 +235,17 @@ class ReviewService {
                     replyDate: new Date()
                 }
             })
+
+            
+            const POemail = reviewToReply.orderItem.invoice.PetOwner.user.email;
+            const POname = reviewToReply.orderItem.invoice.PetOwner.lastName;
+            // send email to PO
+            await emailService.sendEmail(
+                POemail,
+                `PetHub: Response to Your Review on ${reviewToReply.serviceListing.title}`,
+                emailTemplate.PBReplysReview(POname, reviewToReply.serviceListing.title, payload.reply)
+            )
+
             return updatedReview
         } catch (error) {
             if (error instanceof CustomError) throw error;
