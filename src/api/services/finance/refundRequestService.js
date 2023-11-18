@@ -18,8 +18,30 @@ class RefundRequestService {
             const refundRequest = await prisma.refundRequest.findUnique({
                 where: { refundRequestId: refundRequestId },
                 include: {
-                    petBusiness: true,
-                    petOwner: true,
+                    petBusiness: {
+                        include: {
+                            user: {
+                                select: {
+                                    userId: true,
+                                    email: true,
+                                    accountType: true,
+                                    accountStatus: true,
+                                },
+                            },
+                        },
+                    },
+                    petOwner: {
+                        include: {
+                            user: {
+                                select: {
+                                    userId: true,
+                                    email: true,
+                                    accountType: true,
+                                    accountStatus: true,
+                                },
+                            },
+                        },
+                    },
                     orderItem: true
                 }
             })
@@ -319,6 +341,22 @@ class RefundRequestService {
                     processedAt: null,
                 },
             });
+
+            const POname = refundRequest.petOwner.lastName;
+            const PBname = refundRequest.petBusiness.companyName;
+            const POemail = refundRequest.petOwner.user.email;
+            const PBemail = refundRequest.petBusiness.user.email;
+
+            await emailService.sendEmail(
+                POemail,
+                "PetHub: Refund Request Reverted",
+                emailTemplate.reopenRefundRequestEmail(POname, refundRequest)
+            )
+            await emailService.sendEmail(
+                PBemail,
+                "PetHub: Refund Request Reverted",
+                emailTemplate.reopenRefundRequestEmail(PBname, refundRequest)
+            )
     
             return updatedRefundRequest
         } catch(error) {
