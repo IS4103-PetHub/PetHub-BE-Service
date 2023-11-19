@@ -54,6 +54,7 @@ class PetBusinessApplicationService {
             businessType: data.businessType,
             businessEmail: data.businessEmail,
             businessDescription: data.businessDescription,
+            stripeAccountId: data.stripeAccountId,
             websiteURL: data.websiteURL,
             attachments: data.attachments || [],
             adminRemarks: [],
@@ -282,6 +283,7 @@ class PetBusinessApplicationService {
                 websiteURL: updatedApplication.websiteURL,
                 businessDescription: updatedApplication.businessDescription,
                 businessEmail: updatedApplication.businessEmail,
+                stripeAccountId: updatedApplication.stripeAccountId,
               },
             },
           },
@@ -292,7 +294,7 @@ class PetBusinessApplicationService {
 
       // Notify PB by email
       const name = associatedPetBusinessApp.petBusiness.companyName;
-      const link = "http://localhost:3002";
+      const link = "http://localhost:3002/business/application";
       const body = emailTemplate.petBusinessApplicationApprovalEmail(name, link);
 
       // Don't await the sending of email (will block client), instead promise to catch the error later
@@ -343,7 +345,7 @@ class PetBusinessApplicationService {
 
       // Notify PB by email
       const name = associatedPetBusinessApp.petBusiness.companyName;
-      const link = "http://localhost:3002";
+      const link = "http://localhost:3002/business/application";
       const body = emailTemplate.petBusinessApplicationRejectionEmail(name, link, remark);
 
       // Don't await the sending of email (will block client), instead promise to catch the error later

@@ -6,15 +6,44 @@ const EmailService = require('../emailService')
 const PetOwnerService = require('../user/petOwnerService')
 const { differenceInDays, addDays, format, parseISO } = require('date-fns');
 const emailTemplate = require('../../resource/emailTemplate');
-const { getAllCalendarGroups } = require('../../controllers/calendarGroupController');
 const PetBusinessService = require('../user/petBusinessService');
 const emailService = require('../emailService');
+const orderItemService = require('../finance/orderItemService');
+const serviceListingService = require('../serviceListing/serviceListingService');
 
 class CalendarGroupService {
 
-    async getAvailability(calendarGroupId, startTime, endTime, bookingDuration) {
-        // 1. Fetch all the timeslots
+    async getAvailability(orderItemId, serviceListingId, startTime, endTime, bookingDuration) {
 
+        let expiryDate;
+        let calendarGroupId;
+
+        if (orderItemId) {
+            // 1. Check if the orderItem is valid
+            const orderItem = await orderItemService.getOrderItemById(orderItemId);
+
+            // 2. Check if the orderItem is for a service listing with a calendar group
+            if (!orderItem.serviceListing.calendarGroupId) throw new CustomError(`OrderItem with id (${orderItemId}) does not have a service listing with a calendar group tied to it`, 400);
+        
+            // 3. Extract details we need
+            expiryDate = orderItem.expiryDate;
+            calendarGroupId = orderItem.serviceListing.calendarGroupId;
+
+        } else {
+            // If serviceListingId is provided instead of orderItemId (PO wants to view timeslots without having made an order)
+
+            // 1. Check if the service listing is valid
+            const serviceListing = await serviceListingService.getServiceListingById(serviceListingId);
+
+            // 2. Check if the service listing is tied to a calendar group
+            if (!serviceListing.calendarGroupId) throw new CustomError(`ServiceListing with id (${serviceListingId}) does not have a calendar group tied to it`, 400);
+
+            // 3. Extract details we need
+            expiryDate = serviceListing.lastPossibleDate; // This may be falsy, but we will handle it in getAvailabilityForTimeSlot
+            calendarGroupId = serviceListing.calendarGroupId;
+        }
+
+        // 4. Fetch all the timeslots
         const queryStartDate = new Date(startTime);
         queryStartDate.setHours(0, 0, 0, 0);
 
@@ -32,19 +61,20 @@ class CalendarGroupService {
 
         let availableSlots = [];
 
-        // 2. For each timeslot, get the available sub-slots
+        // 5. For each timeslot, get the available sub-slots
         for (let slot of timeSlots) {
-            const slotsForThisTimeSlot = this.getAvailabilityForTimeSlot(slot, bookingDuration, startTime, endTime);
+            const slotsForThisTimeSlot = this.getAvailabilityForTimeSlot(expiryDate, slot, bookingDuration, startTime, endTime);
             availableSlots = [...availableSlots, ...slotsForThisTimeSlot];
         }
 
         return availableSlots;
     }
 
-    getAvailabilityForTimeSlot(timeSlot, bookingDuration, searchStartTime, searchEndTime) {
+    getAvailabilityForTimeSlot(expiryDate, timeSlot, bookingDuration, searchStartTime, searchEndTime) {
         let availableSlots = [];
         let slotStart = new Date(Math.max(timeSlot.startTime, searchStartTime));
-        const slotEnd = new Date(Math.min(timeSlot.endTime, searchEndTime));
+        // Factor in expiry date into min possible slot end time, if expiryDate is falsy, disregard from Math.min
+        const slotEnd = new Date(Math.min(timeSlot.endTime, searchEndTime, (expiryDate || Infinity))); 
 
         // Iterate within the timeslot
         while (slotStart <= slotEnd - bookingDuration * 60000) {
@@ -102,19 +132,21 @@ class CalendarGroupService {
         try {
             let includeField = {
                 timeslots: includeTimeSlot ? {
-                    include: { Booking: includeBooking ? {
-                        include: { serviceListing: true }
-                    } : false }
+                    include: {
+                        Booking: includeBooking ? {
+                            include: { serviceListing: true }
+                        } : false
+                    }
                 } : false,
                 scheduleSettings: true
             };
-    
+
             if (formatForFrontend) {
                 // FE requires timePeriods to be included in scheduleSettings instead
                 includeField = {
                     scheduleSettings: {
-                        include: { 
-                            timePeriods: true 
+                        include: {
+                            timePeriods: true
                         },
                     },
                 };
@@ -128,28 +160,28 @@ class CalendarGroupService {
             if (!calendarGroup) throw new CustomError(`CalendarGroup with id (${calendarGroupId}) not found`, 404);
 
             if (formatForFrontend) {
-              // FE requires scheduleSettings to be nested inside a layer of 'recurrence'
-              const transformedCalendarGroup = {
-                calendarGroupId: calendarGroup.calendarGroupId,
-                name: calendarGroup.name,
-                description: calendarGroup.description,
-                scheduleSettings: calendarGroup.scheduleSettings.map((setting) => ({
-                  scheduleSettingsId: setting.scheduleSettingId,
-                  days: setting.days,
-                  recurrence: {
-                    pattern: setting.pattern,
-                    startDate: setting.startDate,
-                    endDate: setting.endDate,
-                    timePeriods: setting.timePeriods.map((period) => ({
-                      timePeriodId: period.timePeriodId,
-                      startTime: period.startTime,
-                      endTime: period.endTime,
-                      vacancies: period.vacancies,
+                // FE requires scheduleSettings to be nested inside a layer of 'recurrence'
+                const transformedCalendarGroup = {
+                    calendarGroupId: calendarGroup.calendarGroupId,
+                    name: calendarGroup.name,
+                    description: calendarGroup.description,
+                    scheduleSettings: calendarGroup.scheduleSettings.map((setting) => ({
+                        scheduleSettingsId: setting.scheduleSettingId,
+                        days: setting.days,
+                        recurrence: {
+                            pattern: setting.pattern,
+                            startDate: setting.startDate,
+                            endDate: setting.endDate,
+                            timePeriods: setting.timePeriods.map((period) => ({
+                                timePeriodId: period.timePeriodId,
+                                startTime: period.startTime,
+                                endTime: period.endTime,
+                                vacancies: period.vacancies,
+                            })),
+                        },
                     })),
-                  },
-                })),
-              };
-              return transformedCalendarGroup;
+                };
+                return transformedCalendarGroup;
             }
 
             return calendarGroup;
@@ -268,7 +300,7 @@ class CalendarGroupService {
                     },
                 });
 
-                const unsuccessfulMigration = await this.migrateBookings(Bookings, calendarGroupId)
+                const unsuccessfulMigration = await this.migrateBookings(Bookings)
                 for (const booking of unsuccessfulMigration) {
                     const petOwner = await PetOwnerService.getUserById(Number(booking.petOwnerId))
                     const emailTitle = "[Action Required] Reschedule Booking or Request for Refund"
@@ -291,12 +323,12 @@ class CalendarGroupService {
         }
     }
 
-    async migrateBookings(bookings, calendarGroupId) {
+    async migrateBookings(bookings) {
         const unsuccessfulMigration = [];
         for (const existingBooking of bookings) {
-            const { startTime, endTime, bookingId } = existingBooking;
+            const { startTime, endTime, bookingId, orderItemId } = existingBooking;
             const bookingDuration = Math.abs((new Date(startTime) - new Date(endTime)) / 60000);
-            const availableSlots = await this.getAvailability(Number(calendarGroupId), new Date(startTime), new Date(endTime), bookingDuration);
+            const availableSlots = await this.getAvailability(Number(orderItemId), null, new Date(startTime), new Date(endTime), bookingDuration);
 
             if (availableSlots.length === 0) {
                 unsuccessfulMigration.push(existingBooking);

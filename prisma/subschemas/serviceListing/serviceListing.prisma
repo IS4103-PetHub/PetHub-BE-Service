@@ -1,31 +1,60 @@
-import {Category} from "../enums/businessLogicEnums"
-import {PetBusiness, Address} from "../user/user"
+import {Category, FeaturedListingCategoryEnum} from "../enums/businessLogicEnums"
+import {PetBusiness, Address, PetOwner} from "../user/user"
 import {CalendarGroup, Booking} from "../appointments/appointments"
-import { PetOwner } from "..\user\user"
+import {OrderItem, Invoice} from "../finance/transactions"
+import { OrderItem } from "../finance/transactions"
+import { PetOwner } from "../user/user"
+import { ReviewReportReason } from "../enums/reviewEnums"
+import { ServiceListing } from "../../schema"
+import { Article } from "..\..\schema"
+import { SupportTicket } from "..\support\support"
 
 model ServiceListing {
-  serviceListingId Int       @id @default(autoincrement())
-  title            String
-  description      String
-  basePrice        Float     @default(0)
-  attachmentKeys   String[]
-  attachmentURLs   String[]
-  dateCreated      DateTime  @default(now())
-  lastUpdated      DateTime?
-  duration         Int?
+  serviceListingId  Int       @id @default(autoincrement())
+  title             String
+  description       String
+  basePrice         Float     @default(0)
+  attachmentKeys    String[]
+  attachmentURLs    String[]
+  dateCreated       DateTime  @default(now())
+  listingTime       DateTime  @default(now())
+  lastUpdated       DateTime?
+  duration          Int?
+  defaultExpiryDays Int // Number of days from purchase for the default expiry
+  lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
+  requiresBooking   Boolean   @default(false)
 
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
-  tags          Tag[]
-  addresses     Address[]
-  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
-  petBusinessId Int
+  tags            Tag[]
+  addresses       Address[]
+  petBusiness     PetBusiness    @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusinessId   Int
   favouritedUsers PetOwner[]
-
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: SetNull, onUpdate: Cascade)
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
+  OrderItem       OrderItem[]
+
+  // review and ratings
+  reviews          Review[]
+  overallRating    Float             @default(0)
+  FeaturedListings FeaturedListing[]
+  Bump             Bump[]
+
+
+  // support 
+  supportTickets SupportTicket[]
+}
+
+model Bump {
+  bumpId           Int            @id @default(autoincrement())
+  dateCreated      DateTime       @default(now())
+  amountCharged    Float          @default(5)
+  paymentId        String         @unique // to be obtained from Stripe transaction
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -38,4 +67,52 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article Article[]
+}
+
+model FeaturedListingSet {
+  id                  Int                         @id @default(autoincrement())
+  category            FeaturedListingCategoryEnum
+  validityPeriodStart DateTime?
+  validityPeriodEnd   DateTime?
+  featuredListings    FeaturedListing[]
+}
+
+model FeaturedListing {
+  id          Int    @id @default(autoincrement())
+  description String
+
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  serviceListingId Int
+
+  featuredListingSet   FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
+  featuredListingSetId Int
+}
+
+model Review {
+  reviewId         Int            @id @default(autoincrement())
+  title            String
+  comment          String
+  reply            String?
+  replyDate        DateTime?
+  rating           Int
+  dateCreated      DateTime       @default(now())
+  lastUpdated      DateTime?
+  attachmentKeys   String[]
+  attachmentURLs   String[]
+  orderItemId      Int            @unique
+  orderItem        OrderItem      @relation(fields: [orderItemId], references: [orderItemId])
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  reportedBy       ReportReview[]
+  likedBy          PetOwner[]
+}
+
+model ReportReview {
+  reportReviewId Int                @id @default(autoincrement())
+  petOwnerId     Int
+  reportedBy     PetOwner           @relation(fields: [petOwnerId], references: [userId])
+  reportReason   ReviewReportReason
+  reviewId       Int
+  review         Review             @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
 }

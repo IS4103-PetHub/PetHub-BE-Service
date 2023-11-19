@@ -1,6 +1,6 @@
 const InternalUserService = require('../../../src/api/services/user/internalUserService');
-const { AccountStatus, AccountType } = require('@prisma/client');
-
+const { AccountStatus, AccountType, AdminRole } = require('@prisma/client');
+const bcrypt = require("bcryptjs"); // bcrypt for password hashing
 
 const permissions = [
     // USERS
@@ -30,6 +30,26 @@ const permissions = [
     // Service Listings
     { code: "WRITE_SERVICE_LISTINGS", name: "Write Service Listings", description: "Permission to write Service Listings" },
     { code: "READ_SERVICE_LISTINGS", name: "Read Service Listings", description: "Permission to read Service Listings" },
+
+    // Commission Rule
+    { code: "WRITE_COMMISSION_RULES", name: "Write Commission Rules", description: "Permission to write Commission Rules" },
+    { code: "READ_COMMISSION_RULES", name: "Read Commission Rules", description: "Permission to read Commission Rules" },
+
+    // Order Items
+    { code: "WRITE_ORDER_ITEMS", name: "Write Order Items", description: "Permission to write Order Items" },
+    { code: "READ_ORDER_ITEMS", name: "Read Order Items", description: "Permission to read Order Items" },
+
+    // Review
+    { code: "WRITE_REPORTED_REVIEWS", name: "Write Reported Reviews", description: "Permission to write Reported Reviews" },
+    { code: "READ_REPORTED_REVIEWS", name: "Read Reported Reviews", description: "Permission to read Reported Reviews" },
+    
+    // Article
+    { code: "WRITE_ARTICLES", name: "Write Articles", description: "Permission to write Articles" },
+    { code: "READ_ARTICLES", name: "Read Articles", description: "Permission to read Articles" },
+
+    // Support
+    { code: "WRITE_SUPPORTS", name: "Write Supports", description: "Permission to write Supports" },
+    { code: "READ_SUPPORTS", name: "Read Supports", description: "Permission to read Supports" },
 ];
 
 // Root Administrator User Data
@@ -72,7 +92,23 @@ async function seedRBAC(prisma) {
     }
 
     // Create Root Administrator user and associated InternalUser
-    const rootAdmin = await InternalUserService.createUser(rootAdminData);
+    const rootAdmin = await prisma.user.upsert({
+        where: {userId: 19},
+        update: {},
+        create: {
+            email: rootAdminData.email,
+            password: await bcrypt.hash(rootAdminData.password, 10),
+            accountType: AccountType.INTERNAL_USER,
+            accountStatus: AccountStatus.ACTIVE,
+            internalUser: {
+                create: {
+                    firstName: rootAdminData.firstName,
+                    lastName: rootAdminData.lastName,
+                    adminRole: AdminRole.ADMINISTRATOR,
+                }
+            }
+        }
+    });
     console.log("Root Administrator created:", rootAdmin);
 
     // Activate Root Administrator

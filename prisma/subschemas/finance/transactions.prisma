@@ -1,0 +1,128 @@
+import {PetOwner, PetBusiness} from "../user/user"
+import {ServiceListing} from "../serviceListing/serviceListing"
+import {Booking} from "../appointments/appointments"
+import { Review } from "../serviceListing/serviceListing"
+import { SupportTicket } from "..\support\support"
+import { SupportTicket } from "..\..\schema"
+
+// Note: Invoice must remain immutable as much as possible for accounting purposes
+model Invoice {
+  invoiceId  Int      @id @default(autoincrement())
+  totalPrice Float // The total price considering cart item prices only
+  miscCharge Float // The total price * miscChargeRate
+  createdAt  DateTime @default(now())
+  paymentId  String   @unique // to be obtained from Stripe transaction
+
+  pointsRedeemed  Int // final misc charge after deducting points
+  finalMiscCharge Float // final misc charge after deducting points
+  finalTotalPrice Float // totalPrice + finalMiscCharge
+
+  // For invoice PDF (consolidated)
+  attachmentKey String
+  attachmentURL String
+
+  orderItems     OrderItem[]
+  PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
+  petOwnerUserId Int
+
+  supportTicket SupportTicket[]
+}
+
+// Note: Invoice must remain immutable as much as possible for accounting purposes
+model PayoutInvoice {
+  invoiceId        Int   @id @default(autoincrement())
+  totalAmount      Float // The total amount based on accumulated order item prices
+  commissionCharge Float // The total amount deducted for commission
+  paidOutAmount    Float // The total paid out amount at the time of transaction
+
+  createdAt DateTime @default(now())
+  paymentId String   @unique // to be obtained from Stripe transaction
+
+  // For invoice PDF (consolidated)
+  attachmentKey String?
+  attachmentURL String?
+
+  orderItems  OrderItem[]
+  userId      Int
+  petBusiness PetBusiness @relation(fields: [userId], references: [userId])
+
+  // support 
+  supportTickets SupportTicket[]
+}
+
+enum OrderItemStatus {
+  PENDING_BOOKING // This OrderItem needs a booking, but user has not booked yet
+  PENDING_FULFILLMENT // Ordered (booked, or not) but not yet fulfilled
+  FULFILLED // Service has been delivered
+  PAID_OUT // Revenue for this service has been paid out to PBs
+  REFUNDED // Service is refunded
+  EXPIRED // Service has expired without being fulfilled or refunded
+}
+
+// Note: OrderItem must remain immutable as much as possible for accounting purposes
+model OrderItem {
+  orderItemId    Int             @id @default(autoincrement())
+  itemName       String // Name of the order item at the time of transaction
+  itemPrice      Float // Item Price of the individual item at the time of transaction
+  commissionRate Float // The commission rate at the time of transaction
+  expiryDate     DateTime
+  voucherCode    String // generated UUID to identify order
+  status         OrderItemStatus @default(PENDING_FULFILLMENT)
+  dateFulfilled  DateTime? // If orderItem is fulfilled, dateFulfilled will be updated
+
+  // For invoice PDF (single row)
+  attachmentKey String
+  attachmentURL String
+
+  // Must be associated to invoice
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
+
+  // associated to service listing for additional info
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+
+  // (Optional) Bookings associated with the order item
+  booking Booking?
+
+  RefundRequest          RefundRequest?
+  PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
+  payoutInvoiceInvoiceId Int?
+
+  review Review?
+
+  // support 
+  supportTickets SupportTicket[]
+
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED // not required
+}
+
+model RefundRequest {
+  refundRequestId Int          @id @default(autoincrement())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
+  status          RefundStatus @default(PENDING)
+  reason          String // Required eason or notes for requesting the refund
+  comment         String? // Optional notes for approving / rejecting refund
+  processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
+  stripeRefundId  String?      @unique // to be obtained from Stripe transaction after refund is successful
+
+  // Associations
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId])
+
+  orderItemId Int       @unique
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+
+  petBusinessId Int
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId])
+
+  // support
+  supportTickets SupportTicket[]
+}

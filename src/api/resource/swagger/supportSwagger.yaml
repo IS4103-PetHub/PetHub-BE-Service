@@ -1,0 +1,247 @@
+swagger: "2.0"
+
+paths:
+  /api/support-tickets/health-check:
+    get:
+      summary: Test endpoint to check if the Support Tickets API is working
+      responses:
+        200:
+          description: API is working
+      tags:
+        - Health
+
+  /api/support-tickets/:
+    get:
+      summary: Get all support tickets
+      description: Get all support tickets.
+      responses:
+        200:
+          description: fetched support ticket
+      tags:
+        - Support Ticket
+
+  /api/support-tickets/{supportTicketId}:
+    get:
+      summary: Get support ticket by id
+      description: get support ticket by id.
+      parameters:
+        - in: path
+          name: supportTicketId
+          description: The ID of the  support ticket.
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        200:
+          description: fetched support ticket
+      tags:
+        - Support Ticket
+
+  /api/support-tickets/{userId}/user:
+    get:
+      summary: Get support tickets by userId
+      description: Get support tickets by userId.
+      parameters:
+        - in: path
+          name: userId
+          description: The ID of the user.
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        200:
+          description: fetched support ticket
+      tags:
+        - Support Ticket
+
+  /api/support-tickets/{supportTicketId}/comments:
+    post:
+      summary: add comment to support ticket
+      description: add comment to support ticket.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: path
+          name: supportTicketId
+          description: The ID of the  support ticket.
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema: # Request payload
+              type: object
+              properties: # Request parts
+                comment:
+                  type: string
+                  example: "some comment"
+                  required: true
+                userId:
+                  type: integer
+                  example: "1"
+                  required: true
+                files:
+                  type: string
+                  format: binary
+                  required: false
+      responses:
+        200:
+          description: fetched support ticket
+      tags:
+        - Support Ticket
+
+  /api/support-tickets/pet-owner/{petOwnerId}:
+    post:
+      summary: Create a new support ticket
+      description: Create a new support ticket with the specified details.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: path
+          name: petOwnerId
+          description: The ID of the pet owner who is requesting for support ticket.
+          required: true
+          schema:
+            type: integer
+          example: 9
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema: # Request payload
+              type: object
+              properties: # Request parts
+                reason:
+                  type: string
+                  example: "Some reason for creating support ticket"
+                  required: true
+                supportCategory:
+                  type: string
+                  enum:
+                    [
+                      GENERAL_ENQUIRY,
+                      SERVICE_LISTINGS,
+                      ORDERS,
+                      APPOINTMENTS,
+                      PAYMENTS,
+                      ACCOUNTS,
+                      OTHERS,
+                    ]
+                  example: "GENERAL_ENQUIRY"
+                  required: true
+                priority:
+                  type: string
+                  enum: [HIGH, MEDIUM, LOW]
+                  example: "MEDIUM"
+                  required: true
+                files:
+                  type: string
+                  format: binary
+                  required: false
+                serviceListingId:
+                  type: integer
+                  example: 1
+                  required: false
+                orderItemId:
+                  type: integer
+                  example: 1
+                  required: false
+                bookingId:
+                  type: integer
+                  example: 1
+                  required: 1
+                payoutInvoiceId:
+                  type: integer
+                  example: 1
+                  required: false
+                refundRequestId:
+                  type: integer
+                  example: 1
+                  required: false
+                invoiceId:
+                  type: integer
+                  example: 1
+                  required: false
+
+      responses:
+        200:
+          description: newly created support ticket
+      tags:
+        - Support Ticket
+
+  /api/support-tickets/pet-business/{petBusinessId}:
+    post:
+      summary: Create a new support ticket
+      description: Create a new support ticket with the specified details.
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: path
+          name: petBusinessId
+          description: The ID of the pet business who is requesting for support ticket.
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          multipart/form-data: # Media type
+            schema: # Request payload
+              type: object
+              properties: # Request parts
+                reason:
+                  type: string
+                  example: "Some reason for creating support ticket"
+                  required: true
+                supportCategory:
+                  type: string
+                  enum:
+                    [
+                      GENERAL_ENQUIRY,
+                      SERVICE_LISTINGS,
+                      ORDERS,
+                      APPOINTMENTS,
+                      PAYMENTS,
+                      ACCOUNTS,
+                      OTHERS,
+                    ]
+                  example: "GENERAL_ENQUIRY"
+                  required: true
+                priority:
+                  type: string
+                  enum: [HIGH, MEDIUM, LOW]
+                  example: "MEDIUM"
+                  required: true
+                files:
+                  type: string
+                  format: binary
+                  required: false
+                serviceListingId:
+                  type: integer
+                  example: 1
+                  required: false
+                orderItemId:
+                  type: integer
+                  example: 1
+                  required: false
+                bookingId:
+                  type: integer
+                  example: 789
+                  required: 1
+                payoutInvoiceId:
+                  type: integer
+                  example: 1
+                  required: false
+                refundRequestId:
+                  type: integer
+                  example: 1
+                  required: false
+
+      responses:
+        200:
+          description: newly created support ticket
+      tags:
+        - Support Ticket

@@ -129,9 +129,19 @@ exports.getAvailability = async (req, res, next) => {
 
         // TODO: identify user to see if user has permissions to check calendar group
 
-        const calendarID = req.params.calendarID; // must be valid number
+        const orderItemId = req.query.orderItemId;
+        const serviceListingId = req.query.serviceListingId; 
 
-        if (!(await baseValidations.isValidInteger(calendarID))) {
+        // Ensure either orderItemId or serviceListingId is provided
+        if (!orderItemId && !serviceListingId) {
+            return res.status(400).json({ message: "Either orderItemId or serviceListingId must be provided." });
+        }
+
+        if (orderItemId && !(await baseValidations.isValidInteger(orderItemId))) {
+            return res.status(400).json({ message: errorMessages.INVALID_ID });
+        }
+
+        if (serviceListingId && !(await baseValidations.isValidInteger(serviceListingId))) {
             return res.status(400).json({ message: errorMessages.INVALID_ID });
         }
 
@@ -146,7 +156,13 @@ exports.getAvailability = async (req, res, next) => {
         }
 
         const { startTime, endTime, duration } = payload; // Extract values from payload
-        const availableSlots = await calendarGroupService.getAvailability(Number(calendarID), new Date(startTime), new Date(endTime), Number(duration));
+        const availableSlots = await calendarGroupService.getAvailability(
+          orderItemId ? Number(orderItemId) : null,
+          serviceListingId ? Number(serviceListingId) : null,
+          new Date(startTime),
+          new Date(endTime),
+          Number(duration)
+        );
 
         return res.status(200).json(availableSlots);
     } catch (error) {

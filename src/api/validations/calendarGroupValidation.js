@@ -123,20 +123,14 @@ exports.isValidCreateCalendarGroupPayload = (payload) => {
     const schema = Joi.object({
         name: Joi.string()
             .trim()
-            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'name pattern')
-            .pattern(/[a-zA-Z]+/, 'alphabet presence')
             .messages({
                 'string.empty': 'Name must not be empty.',
-                'string.pattern.name': 'Name must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
             })
             .required(),
         description: Joi.string()
             .trim()
-            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'description pattern')
-            .pattern(/[a-zA-Z]+/, 'alphabet presence')
             .messages({
                 'string.empty': 'Description must not be empty.',
-                'string.pattern.name': 'Description must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
             })
             .optional(),
         scheduleSettings: Joi.array()
@@ -159,20 +153,14 @@ exports.isValidUpdateCalendarGroupPayload = (payload) => {
     const schema = Joi.object({
         name: Joi.string()
             .trim()
-            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'name pattern')
-            .pattern(/[a-zA-Z]+/, 'alphabet presence')
             .messages({
                 'string.empty': 'Name must not be empty.',
-                'string.pattern.name': 'Name must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
             })
             .optional(),
         description: Joi.string()
             .trim()
-            .pattern(/^[a-zA-Z0-9\s.,]+$/, 'description pattern')
-            .pattern(/[a-zA-Z]+/, 'alphabet presence')
             .messages({
                 'string.empty': 'Description must not be empty.',
-                'string.pattern.name': 'Description must have a valid format (only alphabets, numbers, spaces, periods, and commas are allowed) and must contain at least one alphabet character.'
             })
             .optional(),
         scheduleSettings: Joi.array()

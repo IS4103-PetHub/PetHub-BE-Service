@@ -1,0 +1,93 @@
+import { User, PetOwner, PetBusiness } from "../user/user"
+import { ServiceListing } from "..\serviceListing\serviceListing"
+import { Booking, Invoice, OrderItem, PayoutInvoice, RefundRequest } from "..\..\schema"
+
+enum SupportTicketStatus {
+    PENDING
+    IN_PROGRESS
+    CLOSED_RESOLVED
+    CLOSED_UNRESOLVED
+}
+
+enum SupportCategoryEnum {
+    GENERAL_ENQUIRY
+    SERVICE_LISTINGS
+    ORDERS
+    APPOINTMENTS
+    PAYMENTS
+    ACCOUNTS
+    REFUNDS
+    OTHERS
+}
+
+// 
+enum Priority {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+model SupportTicket {
+    supportTicketId Int                 @id @default(autoincrement())
+    createdAt       DateTime            @default(now())
+    updatedAt       DateTime            @default(now()) @updatedAt
+    status          SupportTicketStatus @default(PENDING)
+    reason          String // Required eason or notes for opening the support ticket
+    closedAt        DateTime? // Timestamp when the support ticket is closed
+
+    attachmentKeys String[]
+    attachmentURLs String[]
+    comments       Comment[]
+
+    supportCategory SupportCategoryEnum
+    priority        Priority
+
+    // user associations to be validated by service
+    petOwnerId Int?
+    petOwner   PetOwner? @relation(fields: [petOwnerId], references: [userId])
+
+    petBusinessId Int?
+    petBusiness   PetBusiness? @relation(fields: [petBusinessId], references: [userId])
+
+    // Service Listing
+    serviceListingId Int?
+    serviceListing ServiceListing? @relation(fields: [serviceListingId], references: [serviceListingId])
+
+    // orders
+    orderItemId Int?
+    orderItem OrderItem? @relation(fields: [orderItemId], references: [orderItemId])
+
+    // Appointments
+    bookingId Int?
+    booking Booking? @relation(fields: [bookingId], references: [bookingId])
+
+    // Payments
+    // for PO refer to orderItem's invoice 
+    // for PB's payout related
+    payoutInvoiceId Int?
+    payoutInvoice PayoutInvoice? @relation(fields: [payoutInvoiceId], references: [invoiceId])
+
+    // Others
+    // refund requests?
+    refundRequestId Int?
+    refundRequest RefundRequest?  @relation(fields: [refundRequestId], references: [refundRequestId])
+
+    // Invoice
+    invoiceId Int?
+    invoice Invoice? @relation(fields: [invoiceId], references: [invoiceId])
+
+}
+
+model Comment {
+    commentId      Int      @id @default(autoincrement())
+    createdAt      DateTime @default(now())
+    comment        String
+    attachmentKeys String[]
+    attachmentURLs String[]
+
+    supportTicketId Int
+    supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [supportTicketId], onDelete: Cascade, onUpdate: Cascade)
+
+    userId Int
+    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}

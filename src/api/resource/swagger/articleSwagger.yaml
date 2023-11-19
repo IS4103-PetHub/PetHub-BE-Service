@@ -1,0 +1,32 @@
+swagger: "2.0"
+
+paths:
+  /api/articles/:
+    get:
+      summary: Get all articles
+      description: Get all articles
+      responses:
+        200:
+          description: fetched articles
+      tags:
+        - Articles
+
+  /api/articles/{articleId}:
+    get:
+      summary: Get article by id
+      description: Get article by id.
+      parameters:
+        - in: path
+          name: articleId
+          description: The ID of the article.
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        200:
+          description: fetched article
+      tags:
+        - Articles
+  
+  

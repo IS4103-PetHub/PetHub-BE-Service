@@ -1,4 +1,4 @@
-//🧩Don't Edit this file.✨Generated in Mon Oct 02 2023 23:36:38 GMT+0800 (GMT+08:00)✨
+//🧩Don't Edit this file.✨Generated in Fri Nov 17 2023 16:30:38 GMT+0800 (Singapore Standard Time)✨
 
 model CalendarGroup {
   calendarGroupId  Int                @id @default(autoincrement())
@@ -49,12 +49,10 @@ model TimeSlot {
 }
 
 model Booking {
-  bookingId     Int       @id @default(autoincrement())
-  invoiceId     Int?
-  transactionId Int?
-  petOwnerId    Int
-  dateCreated   DateTime  @default(now())
-  lastUpdated   DateTime?
+  bookingId   Int       @id @default(autoincrement())
+  petOwnerId  Int
+  dateCreated DateTime  @default(now())
+  lastUpdated DateTime?
 
   startTime DateTime
   endTime   DateTime
@@ -65,8 +63,56 @@ model Booking {
   timeSlotId Int?
   timeSlot   TimeSlot? @relation(fields: [timeSlotId], references: [timeSlotId], onUpdate: Cascade, onDelete: SetNull)
 
-  petId Int?
-  pet   Pet? @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
+  petId       Int?
+  pet         Pet?      @relation(fields: [petId], references: [petId], onUpdate: Cascade, onDelete: Cascade)
+  OrderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+  orderItemId Int       @unique
+
+  // support 
+  supportTickets SupportTicket[]
+}
+
+model Article {
+  articleId   Int         @id @default(autoincrement())
+  articleType ArticleType
+  title       String
+  content     String
+  isPinned    Boolean     @default(false)
+
+  dateCreated DateTime  @default(now())
+  dateUpdated DateTime?
+
+  attachmentKeys String[]
+  attachmentUrls String[]
+
+  tags            Tag[]
+  category        Category?
+  articleComments ArticleComment[]
+
+  createdByUserId Int
+  updatedByUserId Int?
+  createdBy       InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
+  updatedBy       InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
+}
+
+model ArticleComment {
+  articleCommentId Int    @id @default(autoincrement())
+  comment          String
+
+  dateCreated DateTime  @default(now())
+  dateUpdated DateTime?
+
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [articleId], onDelete: Cascade, onUpdate: Cascade)
+
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model NewsletterSubscription {
+  newsletterSubscriptionId Int      @id @default(autoincrement())
+  email                    String   @unique
+  dateSubscribed           DateTime @default(now())
 }
 
 generator client {
@@ -83,6 +129,7 @@ enum AccountStatus {
   ACTIVE
   INACTIVE
   PENDING
+  PENDING_VERIFICATION
 }
 
 enum AccountType {
@@ -138,6 +185,13 @@ enum RecurrencePattern {
   WEEKLY
 }
 
+enum ArticleType {
+  ANNOUNCEMENTS
+  TIPS_AND_TRICKS
+  EVENTS
+  OTHERS
+}
+
 enum Category {
   PET_GROOMING
   DINING
@@ -146,29 +200,223 @@ enum Category {
   PET_BOARDING
 }
 
+enum FeaturedListingCategoryEnum {
+  HOTTEST_LISTINGS
+  ALMOST_GONE
+  RISING_LISTINGS
+  ALL_TIME_FAVS
+}
+
+enum PetLostRequestType {
+  LOST_PET
+  FOUND_PET
+}
+
+enum ReviewReportReason {
+  RUDE_ABUSIVE
+  PORNOGRAPHIC
+  SPAM
+  EXPOSING_PERSONAL_INFORMATION
+  UNAUTHORIZED_ADVERTISEMENT
+  INACCURATE_MISLEADING
+  OTHERS
+}
+
+model CommissionRule {
+  commissionRuleId Int           @id @default(autoincrement())
+  name             String        @unique
+  commissionRate   Float // Represented in percentage. For example, 5.5 for 5.5%
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
+  petBusinesses    PetBusiness[]
+}
+
+// Note: Invoice must remain immutable as much as possible for accounting purposes
+model Invoice {
+  invoiceId  Int      @id @default(autoincrement())
+  totalPrice Float // The total price considering cart item prices only
+  miscCharge Float // The total price * miscChargeRate
+  createdAt  DateTime @default(now())
+  paymentId  String   @unique // to be obtained from Stripe transaction
+
+  pointsRedeemed  Int // final misc charge after deducting points
+  finalMiscCharge Float // final misc charge after deducting points
+  finalTotalPrice Float // totalPrice + finalMiscCharge
+
+  // For invoice PDF (consolidated)
+  attachmentKey String
+  attachmentURL String
+
+  orderItems     OrderItem[]
+  PetOwner       PetOwner    @relation(fields: [petOwnerUserId], references: [userId])
+  petOwnerUserId Int
+
+  supportTicket SupportTicket[]
+}
+
+// Note: Invoice must remain immutable as much as possible for accounting purposes
+model PayoutInvoice {
+  invoiceId        Int   @id @default(autoincrement())
+  totalAmount      Float // The total amount based on accumulated order item prices
+  commissionCharge Float // The total amount deducted for commission
+  paidOutAmount    Float // The total paid out amount at the time of transaction
+
+  createdAt DateTime @default(now())
+  paymentId String   @unique // to be obtained from Stripe transaction
+
+  // For invoice PDF (consolidated)
+  attachmentKey String?
+  attachmentURL String?
+
+  orderItems  OrderItem[]
+  userId      Int
+  petBusiness PetBusiness @relation(fields: [userId], references: [userId])
+
+  // support 
+  supportTickets SupportTicket[]
+}
+
+enum OrderItemStatus {
+  PENDING_BOOKING // This OrderItem needs a booking, but user has not booked yet
+  PENDING_FULFILLMENT // Ordered (booked, or not) but not yet fulfilled
+  FULFILLED // Service has been delivered
+  PAID_OUT // Revenue for this service has been paid out to PBs
+  REFUNDED // Service is refunded
+  EXPIRED // Service has expired without being fulfilled or refunded
+}
+
+// Note: OrderItem must remain immutable as much as possible for accounting purposes
+model OrderItem {
+  orderItemId    Int             @id @default(autoincrement())
+  itemName       String // Name of the order item at the time of transaction
+  itemPrice      Float // Item Price of the individual item at the time of transaction
+  commissionRate Float // The commission rate at the time of transaction
+  expiryDate     DateTime
+  voucherCode    String // generated UUID to identify order
+  status         OrderItemStatus @default(PENDING_FULFILLMENT)
+  dateFulfilled  DateTime? // If orderItem is fulfilled, dateFulfilled will be updated
+
+  // For invoice PDF (single row)
+  attachmentKey String
+  attachmentURL String
+
+  // Must be associated to invoice
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
+
+  // associated to service listing for additional info
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+
+  // (Optional) Bookings associated with the order item
+  booking Booking?
+
+  RefundRequest          RefundRequest?
+  PayoutInvoice          PayoutInvoice? @relation(fields: [payoutInvoiceInvoiceId], references: [invoiceId])
+  payoutInvoiceInvoiceId Int?
+
+  review Review?
+
+  // support 
+  supportTickets SupportTicket[]
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED // not required
+}
+
+model RefundRequest {
+  refundRequestId Int          @id @default(autoincrement())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
+  status          RefundStatus @default(PENDING)
+  reason          String // Required eason or notes for requesting the refund
+  comment         String? // Optional notes for approving / rejecting refund
+  processedAt     DateTime? // Timestamp when the request was processed (approved/rejected)
+  stripeRefundId  String?      @unique // to be obtained from Stripe transaction after refund is successful
+
+  // Associations
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId])
+
+  orderItemId Int       @unique
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [orderItemId])
+
+  petBusinessId Int
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId])
+
+  // support
+  supportTickets SupportTicket[]
+}
+
+model PetLostAndFound {
+  petLostAndFoundId Int                @id @default(autoincrement())
+  title             String
+  description       String
+  requestType       PetLostRequestType
+  lastSeenDate      DateTime
+  lastSeenLocation  String
+  contactNumber     String
+  attachmentKeys    String[]
+  attachmentURLs    String[]
+  isResolved        Boolean            @default(false)
+  dateCreated       DateTime           @default(now())
+  dateUpdated       DateTime           @default(now())
+
+  petId    Int?
+  pet      Pet?     @relation(fields: [petId], references: [petId], onDelete: Cascade, onUpdate: Cascade)
+  userId   Int
+  petOwner PetOwner @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
+
 model ServiceListing {
-  serviceListingId Int       @id @default(autoincrement())
-  title            String
-  description      String
-  basePrice        Float     @default(0)
-  attachmentKeys   String[]
-  attachmentURLs   String[]
-  dateCreated      DateTime  @default(now())
-  lastUpdated      DateTime?
-  duration         Int?
+  serviceListingId  Int       @id @default(autoincrement())
+  title             String
+  description       String
+  basePrice         Float     @default(0)
+  attachmentKeys    String[]
+  attachmentURLs    String[]
+  dateCreated       DateTime  @default(now())
+  listingTime       DateTime  @default(now())
+  lastUpdated       DateTime?
+  duration          Int?
+  defaultExpiryDays Int // Number of days from purchase for the default expiry
+  lastPossibleDate  DateTime? // The last possible date this service listing is valid for, regardless of purchase date
+  requiresBooking   Boolean   @default(false)
 
   category Category
 
   // tags that a service listing has (implicit many-to-many relationship)
   tags            Tag[]
   addresses       Address[]
-  petBusiness     PetBusiness @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petBusiness     PetBusiness    @relation(fields: [petBusinessId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   petBusinessId   Int
   favouritedUsers PetOwner[]
-
   calendarGroupId Int?
-  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: SetNull, onUpdate: Cascade)
+  CalendarGroup   CalendarGroup? @relation(fields: [calendarGroupId], references: [calendarGroupId], onDelete: Cascade, onUpdate: Cascade)
   Booking         Booking[]
+  OrderItem       OrderItem[]
+
+  // review and ratings
+  reviews          Review[]
+  overallRating    Float             @default(0)
+  FeaturedListings FeaturedListing[]
+  Bump             Bump[]
+
+  // support 
+  supportTickets SupportTicket[]
+}
+
+model Bump {
+  bumpId           Int            @id @default(autoincrement())
+  dateCreated      DateTime       @default(now())
+  amountCharged    Float          @default(5)
+  paymentId        String         @unique // to be obtained from Stripe transaction
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // m-n relation type between Tag and ServiceListing: implicit
@@ -181,6 +429,143 @@ model Tag {
 
   // service listings with this tag (implicit many-to-many relationship)
   serviceListings ServiceListing[]
+  article         Article[]
+}
+
+model FeaturedListingSet {
+  id                  Int                         @id @default(autoincrement())
+  category            FeaturedListingCategoryEnum
+  validityPeriodStart DateTime?
+  validityPeriodEnd   DateTime?
+  featuredListings    FeaturedListing[]
+}
+
+model FeaturedListing {
+  id          Int    @id @default(autoincrement())
+  description String
+
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  serviceListingId Int
+
+  featuredListingSet   FeaturedListingSet @relation(fields: [featuredListingSetId], references: [id])
+  featuredListingSetId Int
+}
+
+model Review {
+  reviewId         Int            @id @default(autoincrement())
+  title            String
+  comment          String
+  reply            String?
+  replyDate        DateTime?
+  rating           Int
+  dateCreated      DateTime       @default(now())
+  lastUpdated      DateTime?
+  attachmentKeys   String[]
+  attachmentURLs   String[]
+  orderItemId      Int            @unique
+  orderItem        OrderItem      @relation(fields: [orderItemId], references: [orderItemId])
+  serviceListingId Int
+  serviceListing   ServiceListing @relation(fields: [serviceListingId], references: [serviceListingId])
+  reportedBy       ReportReview[]
+  likedBy          PetOwner[]
+}
+
+model ReportReview {
+  reportReviewId Int                @id @default(autoincrement())
+  petOwnerId     Int
+  reportedBy     PetOwner           @relation(fields: [petOwnerId], references: [userId])
+  reportReason   ReviewReportReason
+  reviewId       Int
+  review         Review             @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
+}
+
+enum SupportTicketStatus {
+  PENDING
+  IN_PROGRESS
+  CLOSED_RESOLVED
+  CLOSED_UNRESOLVED
+}
+
+enum SupportCategoryEnum {
+  GENERAL_ENQUIRY
+  SERVICE_LISTINGS
+  ORDERS
+  APPOINTMENTS
+  PAYMENTS
+  ACCOUNTS
+  REFUNDS
+  OTHERS
+}
+
+// 
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model SupportTicket {
+  supportTicketId Int                 @id @default(autoincrement())
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @default(now()) @updatedAt
+  status          SupportTicketStatus @default(PENDING)
+  reason          String // Required eason or notes for opening the support ticket
+  closedAt        DateTime? // Timestamp when the support ticket is closed
+
+  attachmentKeys String[]
+  attachmentURLs String[]
+  comments       Comment[]
+
+  supportCategory SupportCategoryEnum
+  priority        Priority
+
+  // user associations to be validated by service
+  petOwnerId Int?
+  petOwner   PetOwner? @relation(fields: [petOwnerId], references: [userId])
+
+  petBusinessId Int?
+  petBusiness   PetBusiness? @relation(fields: [petBusinessId], references: [userId])
+
+  // Service Listing
+  serviceListingId Int?
+  serviceListing   ServiceListing? @relation(fields: [serviceListingId], references: [serviceListingId])
+
+  // orders
+  orderItemId Int?
+  orderItem   OrderItem? @relation(fields: [orderItemId], references: [orderItemId])
+
+  // Appointments
+  bookingId Int?
+  booking   Booking? @relation(fields: [bookingId], references: [bookingId])
+
+  // Payments
+  // for PO refer to orderItem's invoice 
+  // for PB's payout related
+  payoutInvoiceId Int?
+  payoutInvoice   PayoutInvoice? @relation(fields: [payoutInvoiceId], references: [invoiceId])
+
+  // Others
+  // refund requests?
+  refundRequestId Int?
+  refundRequest   RefundRequest? @relation(fields: [refundRequestId], references: [refundRequestId])
+
+  // Invoice
+  invoiceId Int?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [invoiceId])
+}
+
+model Comment {
+  commentId      Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  comment        String
+  attachmentKeys String[]
+  attachmentURLs String[]
+
+  supportTicketId Int
+  supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [supportTicketId], onDelete: Cascade, onUpdate: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // models for Role Based Access Control (RBAC)
@@ -240,6 +625,13 @@ model User {
   petOwner            PetOwner?
   petBusiness         PetBusiness?
   UserGroupMembership UserGroupMembership[]
+  Comment             Comment[]
+}
+
+model EmailVerification {
+  token      String   @unique
+  expiryDate DateTime
+  email      String   @unique
 }
 
 model InternalUser {
@@ -247,6 +639,8 @@ model InternalUser {
   lastName                        String
   adminRole                       AdminRole
   approvedPetBusinessApplications PetBusinessApplication[]
+  createdArticle                  Article[]                @relation("CreatedBy")
+  updatedArticle                  Article[]                @relation("UpdatedBy")
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
@@ -257,12 +651,20 @@ model PetOwner {
   lastName      String
   contactNumber String
   dateOfBirth   DateTime
+  points        Int      @default(0)
 
   user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId Int  @id @unique
 
   pets              Pet[]
   favouriteListings ServiceListing[]
+  petLostAndFound   PetLostAndFound[]
+  invoices          Invoice[]
+  RefundRequest     RefundRequest[]
+  reportReview      ReportReview[]
+  likedReview       Review[]
+  SupportTicket     SupportTicket[]
+  articleComments   ArticleComment[]
 }
 
 model PetBusiness {
@@ -274,6 +676,7 @@ model PetBusiness {
   businessEmail          String?
   businessDescription    String?
   websiteURL             String?
+  stripeAccountId        String?
   businessAddresses      Address[]
   // ------------------------------------------------ Section End ------------------------------------------------ //
   serviceListings        ServiceListing[]
@@ -283,6 +686,12 @@ model PetBusiness {
   user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId        Int             @id @unique
   CalendarGroup CalendarGroup[]
+  RefundRequest RefundRequest[]
+
+  commissionRuleId Int?
+  commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
+  PayoutInvoice    PayoutInvoice[]
+  SupportTicket    SupportTicket[]
 }
 
 model ResetPassword {
@@ -322,7 +731,8 @@ model Pet {
   petOwnerId Int
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
-  bookings Booking[]
+  bookings        Booking[]
+  petLostAndFound PetLostAndFound[]
 }
 
 model PetBusinessApplication {
@@ -330,6 +740,7 @@ model PetBusinessApplication {
   businessType             BusinessType
   businessEmail            String
   businessDescription      String
+  stripeAccountId          String                    @default("")
   businessAddresses        Address[]
   websiteURL               String?
   attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
@@ -339,7 +750,7 @@ model PetBusinessApplication {
   lastUpdated              DateTime?
 
   petBusinessId Int         @unique
-  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade)
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade, onDelete: Cascade)
 
   approverId Int?
   approver   InternalUser? @relation(fields: [approverId], references: [userId])

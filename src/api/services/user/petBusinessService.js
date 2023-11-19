@@ -5,6 +5,10 @@ const UserError = require("../../errors/userError");
 const CustomError = require("../../errors/customError");
 const validations = require("../../validations");
 const AddressService = require("./addressService");
+const UserHelper = require('../../helpers/usersHelper')
+const emailTemplate = require('../../resource/emailTemplate');
+const emailService = require("../emailService");
+const constants = require("../../../constants/transactions");
 
 // Shared selection fields
 const petBusinessSelectFields = {
@@ -14,11 +18,13 @@ const petBusinessSelectFields = {
   businessEmail: true,
   businessDescription: true,
   businessAddresses: true,
+  stripeAccountId: true,
   petBusinessApplication: {
     select: {
       petBusinessApplicationId: true,
     },
   },
+  commissionRule: true,
   contactNumber: true,
   websiteURL: true,
   userId: true,
@@ -52,7 +58,7 @@ class PetBusinessService extends BaseUserService {
           email: data.email,
           password: hashedPassword,
           accountType: AccountType.PET_BUSINESS,
-          accountStatus: AccountStatus.INACTIVE,
+          accountStatus: AccountStatus.PENDING_VERIFICATION,
           petBusiness: {
             create: {
               companyName: data.companyName,
@@ -62,11 +68,17 @@ class PetBusinessService extends BaseUserService {
               businessDescription: data.businessDescription,
               contactNumber: data.contactNumber,
               websiteURL: data.websiteURL,
+              commissionRuleId: constants.DEFAULT_CR_ID,
             },
           },
-        },
+        }
       });
 
+      const token = UserHelper.generateUniqueToken();
+      const link = `http://localhost:3002/verify-email/?token=${token}`
+      const body = emailTemplate.AccountEmailVerificationEmail(data.companyName, link)
+      await this.createVerifyEmailRecord(token, user.email)
+      await emailService.sendEmail(user.email, "Verify Your Email Address for PetHub Registration", body)
       return this.removePassword(user);
     } catch (error) {
       console.error("Error during user creation:", error);

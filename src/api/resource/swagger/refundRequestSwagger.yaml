@@ -1,0 +1,179 @@
+swagger: "2.0"
+definitions:
+  CreateRefundRequest:
+    type: object
+    properties:
+      orderItemId:
+        type: integer
+        description: The ID of the orderItem.
+      reason:
+        type: string
+        description: reason for creating refund request.
+    example:
+      orderItemId: 1
+      reason: "some reason"
+
+  UpdateRefundRequest:
+    type: object
+    properties:
+      comment:
+        type: string
+        description: reason for rejecting/approving refund request.
+    example:
+      comment: "some reason"
+
+paths:
+  /api/refund-requests:
+    post:
+      summary: create refund request for order item
+      requestBody:
+        description: refund request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/CreateRefundRequest"
+
+      responses:
+        200:
+          description: newly created refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/{refundRequestId}:
+    get:
+      summary: get refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: refund request
+      tags:
+        - RefundRequest
+
+    delete:
+      summary: cancel refund request for order item
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: deleted refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/reject/{refundRequestId}:
+    patch:
+      summary: reject refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      requestBody:
+        description: reject refund request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/UpdateRefundRequest"
+      responses:
+        200:
+          description: rejected refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/approve/{refundRequestId}:
+    patch:
+      summary: approve refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      requestBody:
+        description: approve refund request details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/UpdateRefundRequest"
+      responses:
+        200:
+          description: approved refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/reopen/{refundRequestId}:
+    patch:
+      summary: reopen refund request by id
+      parameters:
+        - name: refundRequestId
+          in: path
+          description: ID of the Refund Request.
+          required: true
+          type: integer
+          default: 1 # Example default value
+      responses:
+        200:
+          description: reopened refund request
+      tags:
+        - RefundRequest
+
+  /api/refund-requests/pet-businesses/{petBusinessId}:
+    get:
+      summary: Get refund requests by pet business ID.
+      description: Get refund requests by pet business ID. Use statusFilter to filter for specific status. all refund requests are returned if not provided
+      parameters:
+        - name: petBusinessId
+          in: path
+          description: ID of the pet business.
+          required: true
+          type: integer
+          default: 1 # Example default value
+        - name: statusFilter
+          in: query
+          description: comma deliminated filters e.g., ?statusFilter=PENDING,APPROVED,REJECTED
+          required: false
+          type: string
+          default: PENDING,APPROVED,REJECTED
+        - name: startDate
+          in: query
+          description: start date to query from
+          required: false
+          type: string
+          default: "2023-10-01T00:00:00.000Z"
+        - name: endDate
+          in: query
+          description: end date to query from
+          required: false
+          type: string
+          default: "2023-10-31T23:59:59.999Z"
+        - name: serviceListingFilters
+          in: query
+          description: comma deliminated filters of the Serivce Listings IDs
+          required: false
+          type: string
+          default: "1,2"
+      responses:
+        200:
+          description: List of refund requests
+          content:
+            application/json:
+              schema:
+                type: array
+      tags:
+        - RefundRequest

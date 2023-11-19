@@ -5,7 +5,7 @@ const Joi = require('joi');
 exports.isValidCreateBookingPayload = (payload) => {
     const schema = Joi.object({
         calendarGroupId: baseValidation.integerValidation('calendarGroupId').required(),
-        serviceListingId: baseValidation.integerValidation('serviceListingId').required(),
+        orderItemId: baseValidation.integerValidation('orderItemId').required(),
         startTime: baseValidation.dateTimeValidation('startTime').required(),
         endTime: baseValidation.dateTimeValidation('endTime').required()
             .custom((value, helpers) => {

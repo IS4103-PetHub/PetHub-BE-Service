@@ -1,0 +1,47 @@
+import { ArticleType } from "../enums/articleEnums"
+import { InternalUser, PetOwner } from "../user/user"
+import { Tag } from "..\serviceListing\serviceListing"
+import { Category, Category, FeaturedListingCategoryEnum } from "..\enums\businessLogicEnums"
+
+model Article {
+    articleId       Int         @id @default(autoincrement())
+    articleType     ArticleType
+    title           String
+    content         String
+    isPinned        Boolean     @default(false)
+
+    dateCreated     DateTime  @default(now())
+    dateUpdated     DateTime?
+
+    attachmentKeys  String[]
+    attachmentUrls  String[]
+
+    tags            Tag[]
+    category        Category?
+    articleComments ArticleComment[]
+
+    createdByUserId Int
+    updatedByUserId Int?
+    createdBy InternalUser  @relation("CreatedBy", fields: [createdByUserId], references: [userId])
+    updatedBy InternalUser? @relation("UpdatedBy", fields: [updatedByUserId], references: [userId])
+}
+
+model ArticleComment {
+    articleCommentId    Int         @id @default(autoincrement())
+    comment             String
+
+    dateCreated         DateTime  @default(now())
+    dateUpdated         DateTime?
+
+    articleId           Int
+    article             Article @relation(fields: [articleId], references: [articleId], onDelete: Cascade, onUpdate: Cascade)
+
+    petOwnerId          Int
+    petOwner            PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model NewsletterSubscription {
+    newsletterSubscriptionId    Int         @id @default(autoincrement())
+    email                       String      @unique
+    dateSubscribed              DateTime    @default(now())
+}

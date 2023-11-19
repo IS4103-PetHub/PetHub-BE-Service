@@ -1,53 +1,72 @@
-import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus} from "../enums/accountEnums"
+import {AccountType, AdminRole, AccountStatus, BusinessType, BusinessApplicationStatus, Gender, PetType} from "../enums/accountEnums"
 import {UserGroupMembership} from "./rbac"
 import {ServiceListing} from "../serviceListing/serviceListing"
-import { PetBusiness } from "..\..\schema"
-import { Gender, PetType } from "..\enums\accountEnums"
-import { PetOwner } from "..\..\schema"
-import {CalendarGroup} from "../appointments/appointments"
-import { ServiceListing } from "..\..\schema"
-import { Booking } from "..\appointments\appointments"
+import {ArticleComment} from "../article/article"
+import {CalendarGroup, Booking} from "../appointments/appointments"
+import { OrderItem, Invoice, RefundRequest, PayoutInvoice} from "../finance/transactions"
+import { CommissionRule } from "../finance/commissions"
+import { PetLostAndFound } from "../petLostAndFound/petLostAndFound"
+import { Article, Article } from "../article/article"
+import { ReportReview, Review } from "../serviceListing/serviceListing"
+import { Comment, SupportTicket } from "../support/support"
 
 // Entities
 model User {
-    userId        Int           @id @default(autoincrement())
-    email         String        @unique
-    password      String
-    accountType   AccountType
-    accountStatus AccountStatus @default(ACTIVE)
-    dateCreated   DateTime      @default(now())
-    lastUpdated   DateTime?
+  userId        Int           @id @default(autoincrement())
+  email         String        @unique
+  password      String
+  accountType   AccountType
+  accountStatus AccountStatus @default(ACTIVE)
+  dateCreated   DateTime      @default(now())
+  lastUpdated   DateTime?
 
-    // Enforcement of email being associated only with one type of account
-    // must be implemented in your application logic as Prisma does not
-    // support multi-table unique constraints
-    internalUser        InternalUser?
-    petOwner            PetOwner?
-    petBusiness         PetBusiness?
-    UserGroupMembership UserGroupMembership[]
+  // Enforcement of email being associated only with one type of account
+  // must be implemented in your application logic as Prisma does not
+  // support multi-table unique constraints
+  internalUser        InternalUser?
+  petOwner            PetOwner?
+  petBusiness         PetBusiness?
+  UserGroupMembership UserGroupMembership[]
+  Comment             Comment[]
+}
+
+model EmailVerification {
+  token      String   @unique
+  expiryDate DateTime
+  email      String   @unique
 }
 
 model InternalUser {
-    firstName                       String
-    lastName                        String
-    adminRole                       AdminRole
-    approvedPetBusinessApplications PetBusinessApplication[]
+  firstName                       String
+  lastName                        String
+  adminRole                       AdminRole
+  approvedPetBusinessApplications PetBusinessApplication[]
+  createdArticle                  Article[]                @relation("CreatedBy")
+  updatedArticle                  Article[]                @relation("UpdatedBy")
 
-    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    userId Int  @id @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 }
 
 model PetOwner {
-    firstName     String
-    lastName      String
-    contactNumber String
-    dateOfBirth   DateTime
+  firstName     String
+  lastName      String
+  contactNumber String
+  dateOfBirth   DateTime
+  points        Int      @default(0)
 
-    user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
-    userId Int  @id @unique
+  user   User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId Int  @id @unique
 
-    pets Pet[]
-    favouriteListings ServiceListing[]
+  pets              Pet[]
+  favouriteListings ServiceListing[]
+  petLostAndFound   PetLostAndFound[]
+  invoices          Invoice[]
+  RefundRequest     RefundRequest[]
+  reportReview      ReportReview[]
+  likedReview       Review[]
+  SupportTicket     SupportTicket[]
+  articleComments   ArticleComment[]
 }
 
 model PetBusiness {
@@ -59,6 +78,7 @@ model PetBusiness {
   businessEmail          String?
   businessDescription    String?
   websiteURL             String?
+  stripeAccountId        String?
   businessAddresses      Address[]
   // ------------------------------------------------ Section End ------------------------------------------------ //
   serviceListings        ServiceListing[]
@@ -68,12 +88,18 @@ model PetBusiness {
   user          User            @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId        Int             @id @unique
   CalendarGroup CalendarGroup[]
+  RefundRequest RefundRequest[]
+
+  commissionRuleId Int?
+  commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [commissionRuleId], onUpdate: Cascade, onDelete: SetNull)
+  PayoutInvoice    PayoutInvoice[]
+  SupportTicket    SupportTicket[]
 }
 
 model ResetPassword {
-    token      String   @unique
-    expiryDate DateTime
-    email      String
+  token      String   @unique
+  expiryDate DateTime
+  email      String
 }
 
 model Address {
@@ -92,40 +118,42 @@ model Address {
 }
 
 model Pet {
-  petId          Int       @id @default(autoincrement())
-  petName        String
-  petType        PetType  
-  gender         Gender   
-  dateOfBirth    DateTime?
-  petWeight      Float?
+  petId           Int       @id @default(autoincrement())
+  petName         String
+  petType         PetType
+  gender          Gender
+  dateOfBirth     DateTime?
+  petWeight       Float?
   microchipNumber String?
-  attachmentKeys String[]
-  attachmentURLs String[]
-  dateCreated    DateTime  @default(now())
-  lastUpdated    DateTime?
+  attachmentKeys  String[]
+  attachmentURLs  String[]
+  dateCreated     DateTime  @default(now())
+  lastUpdated     DateTime?
 
-  petOwnerId     Int
-  petOwner       PetOwner  @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  petOwnerId Int
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
-  bookings Booking[]
+  bookings        Booking[]
+  petLostAndFound PetLostAndFound[]
 }
 
 model PetBusinessApplication {
-    petBusinessApplicationId Int                       @id @default(autoincrement())
-    businessType             BusinessType
-    businessEmail            String
-    businessDescription      String
-    businessAddresses        Address[]
-    websiteURL               String?
-    attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
-    applicationStatus        BusinessApplicationStatus @default(PENDING)
-    adminRemarks             String[]
-    dateCreated              DateTime                  @default(now())
-    lastUpdated              DateTime?
+  petBusinessApplicationId Int                       @id @default(autoincrement())
+  businessType             BusinessType
+  businessEmail            String
+  businessDescription      String
+  stripeAccountId          String                    @default("") 
+  businessAddresses        Address[]
+  websiteURL               String?
+  attachments              String[] // Assuming that these would be URLs pointing to the S3 bucket                 
+  applicationStatus        BusinessApplicationStatus @default(PENDING)
+  adminRemarks             String[]
+  dateCreated              DateTime                  @default(now())
+  lastUpdated              DateTime?
 
-    petBusinessId Int         @unique
-    petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade)
+  petBusinessId Int         @unique
+  petBusiness   PetBusiness @relation(fields: [petBusinessId], references: [userId], onUpdate: Cascade, onDelete: Cascade)
 
-    approverId Int?
-    approver   InternalUser? @relation(fields: [approverId], references: [userId])
+  approverId Int?
+  approver   InternalUser? @relation(fields: [approverId], references: [userId])
 }

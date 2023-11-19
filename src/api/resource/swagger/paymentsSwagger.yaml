@@ -1,0 +1,72 @@
+swagger: "2.0"
+definitions:
+  PaymentRequest:
+    type: object
+    properties:
+      paymentMethodId:
+        type: string
+        description: The ID of the payment method.
+      totalPrice:
+        type: integer
+        description: total amount payable = totalPrice (from cart items) + miscCharge - pointsRedeemed (in cents, capped at miscCharge).
+      pointsRedeemed:
+        type: integer
+        description: points to offset misc charge.
+      userId:
+        type: integer
+        description: The ID of the user.
+      cartItems:
+        type: array
+        items:
+          type: object
+          properties:
+            serviceListingId:
+              type: integer
+              description: The ID of the service listing.
+            quantity:
+              type: integer
+              description: The quantity of the item.
+    example:
+      paymentMethodId: "pm_card_visa"
+      totalPrice: 198.49
+      pointsRedeemed: 0
+      userId: 9
+      cartItems:
+        - serviceListingId: 10
+          quantity: 2
+        - serviceListingId: 4
+          quantity: 1
+        - serviceListingId: 5
+          quantity: 1
+        - serviceListingId: 6
+          quantity: 1
+
+  # wil change when OrderItems and Invoice is generated
+  PaymentResponse:
+    type: object
+    properties:
+      paymentIntentId:
+        type: string
+        description: The unique identifier of the payment intent.
+
+paths:
+  /api/payments/checkout:
+    post:
+      summary: Checkout --> Make payment and create order items
+      requestBody:
+        description: Payment details.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/PaymentRequest"
+
+      responses:
+        200:
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/PaymentResponse"
+      tags:
+        - Payments

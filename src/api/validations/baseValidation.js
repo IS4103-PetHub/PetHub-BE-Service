@@ -29,6 +29,10 @@ exports.isValidFloat = async (num) => {
   return !isNaN(parsed) && parsed >= 0;
 };
 
+exports.isValidBooleanString = (value) => {
+  return value === "true" || value === "false";
+};
+
 // Check if an array contains all positive IDs
 // Takes in an array of string ids
 exports.isValidNumericIDs = async (ids) => {
