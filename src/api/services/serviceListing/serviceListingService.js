@@ -346,25 +346,31 @@ exports.getServiceListingByTag = async (id) => {
   }
 };
 
-exports.getServiceListingByPBId = async (id) => {
+exports.getServiceListingByPBId = async (id, isPB) => {
   try {
     const currentDate = new Date();
+    let whereClause = {
+      petBusinessId: id,
+    };
+
+    if (!isPB) {
+      whereClause.lastPossibleDate = {
+        gte: currentDate,
+      };
+    }
+
     const serviceListings = await prisma.serviceListing.findMany({
-      where: { 
-        petBusinessId: id,
-        lastPossibleDate: {
-          gte: currentDate, // Filter listings with lastPossibleDate >= current date
-        },
-      },
+      where: whereClause,
       include: {
         tags: true,
         addresses: true,
         reviews: true,
       },
       orderBy: {
-        listingTime: 'desc', // Sort by listingTime in descending order (latest first)
+        listingTime: 'desc',
       },
     });
+
     return serviceListings;
   } catch (error) {
     console.error("Error fetching service listings by pet business ID:", error);

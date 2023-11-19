@@ -45,7 +45,8 @@ exports.getNumberOfOrders = async () => {
 exports.getRemainingAppointmentToday = async (petBusinessId) => {
     try {
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
 
         const totalRemainingAppointment = await prisma.booking.count({
             where: {
@@ -54,16 +55,17 @@ exports.getRemainingAppointmentToday = async (petBusinessId) => {
                 },
                 startTime: {
                     gte: today,
+                    lt: tomorrow,
                 },
                 OrderItem: {
-                    dateFulfilled: null, 
+                    dateFulfilled: null,
                 },
             },
         });
-        
+
         return totalRemainingAppointment;
-        
-    } catch(error) {
+
+    } catch (error) {
         console.error("Error generating remaining appointment count:", error);
         throw new Error("Error generating remaining appointment count");
     }
@@ -102,18 +104,18 @@ exports.getInvalidServiceListings = async (petBusinessId) => {
                             {
                                 OR: [
                                     { duration: null },
-                                    { calendarGroupId: null }
-                                ]
-                            }
-                        ]
+                                    { calendarGroupId: null },
+                                ],
+                            },
+                        ],
                     },
                     {
                         lastPossibleDate: {
-                            lt: new Date()
-                        }
-                    }
-                ]
-            }
+                            lt: new Date(),
+                        },
+                    },
+                ],
+            },
         });
 
         return invalidServiceListingCount
@@ -133,7 +135,7 @@ exports.getOpenRefundRequests = async (petBusinessId) => {
             }
         })
         return openRefundRequests
-    } catch(error) {
+    } catch (error) {
         console.error("Error generating open Refund Requests count:", error);
         throw new Error("Error generating open Refund Requests count");
     }
@@ -151,7 +153,7 @@ exports.getOpenSupportRequests = async (petBusinessId) => {
         });
 
         return openSupportRequests
-    } catch(error) {
+    } catch (error) {
         console.error("Error generating open Support Requests count:", error);
         throw new Error("Error generating open Support Requests count");
     }

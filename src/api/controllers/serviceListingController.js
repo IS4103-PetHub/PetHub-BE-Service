@@ -271,12 +271,15 @@ exports.getServiceListingByPBId = async (req, res, next) => {
         .status(400)
         .json({ message: "Pet Business ID cannot be empty" });
     }
+    const isPB = req.query.isPB;
+    
     if (!(await BaseValidations.isValidInteger(petBusinessId))) {
       return res.status(400).json({ message: errorMessages.INVALID_ID });
     }
 
     const serviceListings = await ServiceListingService.getServiceListingByPBId(
-      Number(petBusinessId)
+      Number(petBusinessId),
+      isPB
     );
     res.status(200).json(serviceListings);
   } catch (error) {
